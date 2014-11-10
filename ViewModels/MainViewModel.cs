@@ -28,8 +28,8 @@ namespace TheoryC.ViewModels
         Point _MousePosition = default(Point);
         public Point MousePosition { get { return _MousePosition; } set { base.SetProperty(ref _MousePosition, value); } }
 
-        bool _IsRunning = default(bool);
-        public bool IsRunning { get { return _IsRunning; } set { base.SetProperty(ref _IsRunning, value); } }
+        bool _IsExperimentRunning = default(bool);
+        public bool IsExperimentRunning { get { return _IsExperimentRunning; } set { base.SetProperty(ref _IsExperimentRunning, value); } }
 
         double _angle = default(double);
         public double Angle { get { return _angle; } set { base.SetProperty(ref _angle, value); } }
@@ -60,7 +60,6 @@ namespace TheoryC.ViewModels
         Point trackCenter = new Point(Settings.Default.TrackCenterX, Settings.Default.TrackCenterY);
         double trackRadius = Settings.Default.TrackRadius;
         double TargetSizeRadius;
-        public List<double> absErrorDuringTrial = new List<double>();
 
         public MainViewModel()
         {
@@ -72,8 +71,8 @@ namespace TheoryC.ViewModels
                 {
                     this.Trials.Add(new Models.Trial
                     {
-                        Number = i + 1, // no 0-based trials exposed to user
-                        Results = new Models.Result { TimeOnTargetMs = 3.5, AbsoluteError = 3.5 }
+                        Number = i, //; //use a converter + 1, // no 0-based trials exposed to user
+                        Results = new Models.Result { TimeOnTargetMs = 3.5, AbsoluteError = 3.5, AbsoluteErrorForEachTickList = new List<double>() }
                     });
                 }
 
@@ -89,8 +88,8 @@ namespace TheoryC.ViewModels
             {
                 this.Trials.Add(new Models.Trial
                 {
-                    Number = i + 1, // no 0-based trials exposed to user
-                    Results = new Models.Result { TimeOnTargetMs = 0, AbsoluteError = 0 }
+                    Number = i, // use a converter + 1, // no 0-based trials exposed to user
+                    Results = new Models.Result { TimeOnTargetMs = 0, AbsoluteError = 0 , AbsoluteErrorForEachTickList = new List<double>()}
                 });
             }
 
@@ -100,6 +99,10 @@ namespace TheoryC.ViewModels
 
             // needed if in the future user changes something about scene, they'll get to see it in realtime
             CurrentTrial.PropertyChanged += CurrentTrial_PropertyChanged;
+            this.TrialCompleted += StartNextTrial_TrialCompleted;
+
+            // Show debug window
+            ShowDebugWindow();
         }
 
         void CurrentTrial_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -164,23 +167,11 @@ namespace TheoryC.ViewModels
                     {
                         if (!DebugWindowOpen)
                         {
-                            DebugWindowOpen = true;
-
-                            var debugWin = new Views.DebugWindow();
-                            debugWin.DataContext = this; // to share same model data
-                            var main = Application.Current.MainWindow;
-                            debugWin.Left = main.Left;
-                            debugWin.Top = main.Top + main.Height;
-                            debugWin.Owner = main; // whatever happens to main window happens here
-                            debugWin.ShowInTaskbar = false;
-                            debugWin.Show();
+                            ShowDebugWindow();
                         }
                         else
                         {
-                            DebugWindowOpen = false;
-
-                            var debugWin = Application.Current.Windows.OfType<Views.DebugWindow>().First();
-                            debugWin.Close();
+                            HideDebugWindow();
                         }
                     },
                     () =>
@@ -191,6 +182,27 @@ namespace TheoryC.ViewModels
                 this.PropertyChanged += (s, e) => _ShowDebugCommand.RaiseCanExecuteChanged();
                 return _ShowDebugCommand;
             }
+        }
+
+        private void HideDebugWindow()
+        {
+            DebugWindowOpen = false;
+            var debugWin = Application.Current.Windows.OfType<Views.DebugWindow>().First();
+            debugWin.Close();
+        }
+
+        private void ShowDebugWindow()
+        {
+            DebugWindowOpen = true;
+            var debugWin = new Views.DebugWindow();
+            debugWin.DataContext = this; // to share same model data
+            var main = Application.Current.MainWindow;
+            debugWin.Left = main.Left;
+            debugWin.Top = main.Top + main.Height;
+            debugWin.Owner = main; // whatever happens to main window happens here
+            debugWin.ShowInTaskbar = false;
+            debugWin.Show();
+            main.Focus(); // put focus back on main window
         }
 
         DelegateCommand _StartCommand = null;
@@ -216,32 +228,84 @@ namespace TheoryC.ViewModels
         DateTime stopTime;
         public void StartExecuted()
         {
-            if (!IsRunning)
+            if (!IsExperimentRunning)
             {
+                StartNextTrial();
 
-                StartTrial();
             }
             else
             {
-                StopTrial();
+                StopCurrentTrial();
             }
         }
 
-        private void StopTrial()
+        // throws an exception
+        //private async void StartExperiment()
+        //{
+        //    foreach (var trial in Trials)
+        //    {
+        //        await Task.Run(() => StartTrial());
+        //        Debug.Print("moving on " + DateTime.Now.ToString());                                         
+        //    }
+        //}
+
+        private void StartNextTrial_TrialCompleted(object sender, EventArgs e)
         {
-            StopTimer();
+            // check to see if there are any trials left to run
+            if (CurrentTrial.Number + 1 >= Trials.Count)
+            {
+                StopExperiment();
+            }
+            else
+            {
+                int nextTrialNumber = CurrentTrial.Number + 1;
+                CurrentTrial = Trials[nextTrialNumber];
+                StartNextTrial();
+            }
+
         }
 
-        private void StartTrial()
+        private void StopExperiment()
         {
+            // just let it execute for now...
+        }
+
+        private void StartNextTrial()
+        {
+            // is there anything to reset??
             stopTime = DateTime.Now.AddSeconds(CurrentTrial.DurationSeconds);
-            //tickCounter = 0;
+
             // set the radius so we don't have to do /2 every tick
             TargetSizeRadius = this.CurrentTrial.ShapeSizeDiameter / 2.0;
+
+            // rock and roll
             timer.Start();
-            this.IsRunning = true;
+            this.IsExperimentRunning = true;
+
+            //tickCounter = 0; // for debugging
         }
 
+        private void StopCurrentTrial()
+        {
+            //            Debug.Print("Stopping at " + DateTimeOffset.Now.ToString());
+            timer.Stop();
+            this.IsExperimentRunning = false;
+
+            // fire the event to call the next trial
+            OnTrialCompleted(new EventArgs());
+        }
+
+
+
+        public event EventHandler TrialCompleted;
+        
+        protected virtual void OnTrialCompleted(EventArgs e)
+        {
+            if (TrialCompleted != null)
+            {
+                TrialCompleted(this, e);
+            }
+        }
 
         public int tickCounter = 0;
         double xt, yt;
@@ -255,11 +319,24 @@ namespace TheoryC.ViewModels
 
             CheckIsOnTarget();
 
-            GetAbsoluteErrorForTick();
+            UpdateAbsoluteErrorForTrial();
 
-            CheckTrialElapsedTime();
+            if (HasTrialTimeExpired())
+            {
+                StopCurrentTrial();
+            }
         }
 
+        // Hmm, how might I unit test this??
+        double distanceFromCenterOnTick;
+        private void UpdateAbsoluteErrorForTrial()
+        {
+            // for entire trials               
+            distanceFromCenterOnTick = Statistics.DistanceBetween2Points(this.MousePosition, this.TargetPositionCenter);
+            CurrentTrial.Results.AbsoluteErrorForEachTickList.Add(distanceFromCenterOnTick);
+            CurrentTrial.Results.AbsoluteError = Statistics.StandardDeviation(CurrentTrial.Results.AbsoluteErrorForEachTickList);
+        }
+        
         private void MoveTargetOnTick()
         {
             Common.Tools.PointsOnACircle(trackRadius, Angle, trackCenter, out xt, out yt);
@@ -267,13 +344,10 @@ namespace TheoryC.ViewModels
             TargetPositionTop = yt - TargetSizeRadius;
         }
 
-        private void CheckTrialElapsedTime()
+        private bool HasTrialTimeExpired()
         {
             int result = DateTime.Compare(DateTime.Now, stopTime);
-            if (result > 0)
-            {
-                StopTimer();
-            }
+            return (result > 0); // true if time has expired
         }
 
         private void PutTargetOnTrack()
@@ -294,26 +368,6 @@ namespace TheoryC.ViewModels
             {
                 CurrentTrial.Results.TimeOnTargetMs += Settings.Default.MillisecondDelay;
             }
-        }
-
-        double distanceFromCenterOnTick;
-        private void GetAbsoluteErrorForTick()
-        {
-            // for entire trials               
-            //            double distanceFromCenterOnTick = Statistics.DistanceBetween2Points(this.MousePosition, this.TargetPositionCenter);            
-            //            this.absErrorDuringTrial.Add(distanceFromCenterOnTick);
-            //            CurrentTrial.Results.AbsoluteError = Statistics.StandardDeviation(absErrorDuringTrial);
-
-            // just showing for each tick
-            CurrentTrial.Results.AbsoluteError = Statistics.DistanceBetween2Points(this.MousePosition, this.TargetPositionCenter);
-        }
-
-        private void StopTimer()
-        {
-            //            Debug.Print("Stopping at " + DateTimeOffset.Now.ToString());
-            timer.Stop();
-            this.IsRunning = false;
-
         }
 
         // called by the MainWindow when shutting down
