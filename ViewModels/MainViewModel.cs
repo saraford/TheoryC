@@ -73,7 +73,7 @@ namespace TheoryC.ViewModels
                     this.Trials.Add(new Models.Trial
                     {
                         Number = i + 1, // no 0-based trials exposed to user
-                        Results = new Models.Result { TimeOnTargetMS = 10, AbsoluteError = 3.5 }
+                        Results = new Models.Result { TimeOnTargetMs = 3.5, AbsoluteError = 3.5 }
                     });
                 }
 
@@ -90,14 +90,16 @@ namespace TheoryC.ViewModels
                 this.Trials.Add(new Models.Trial
                 {
                     Number = i + 1, // no 0-based trials exposed to user
-                    Results = new Models.Result { TimeOnTargetMS = 10, AbsoluteError = 3.5 }
+                    Results = new Models.Result { TimeOnTargetMs = 0, AbsoluteError = 0 }
                 });
             }
 
             this.CurrentTrial = this.Trials.First();
             timer.Tick += Timer_Tick;
-            CurrentTrial.PropertyChanged += CurrentTrial_PropertyChanged;
             PutTargetOnTrack();
+
+            // needed if in the future user changes something about scene, they'll get to see it in realtime
+            CurrentTrial.PropertyChanged += CurrentTrial_PropertyChanged;
         }
 
         void CurrentTrial_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -217,17 +219,27 @@ namespace TheoryC.ViewModels
             if (!IsRunning)
             {
 
-                stopTime = DateTime.Now.AddSeconds(CurrentTrial.DurationSeconds);
-                //tickCounter = 0;
-                // set the radius so we don't have to do /2 every tick
-                TargetSizeRadius = this.CurrentTrial.ShapeSizeDiameter / 2.0;
-                timer.Start();
-                this.IsRunning = true;
+                StartTrial();
             }
             else
             {
-                StopTimer();
+                StopTrial();
             }
+        }
+
+        private void StopTrial()
+        {
+            StopTimer();
+        }
+
+        private void StartTrial()
+        {
+            stopTime = DateTime.Now.AddSeconds(CurrentTrial.DurationSeconds);
+            //tickCounter = 0;
+            // set the radius so we don't have to do /2 every tick
+            TargetSizeRadius = this.CurrentTrial.ShapeSizeDiameter / 2.0;
+            timer.Start();
+            this.IsRunning = true;
         }
 
 
@@ -241,11 +253,11 @@ namespace TheoryC.ViewModels
 
             MoveTargetOnTick();
 
-            CheckElapsedTime();
-
             CheckIsOnTarget();
 
             GetAbsoluteErrorForTick();
+
+            CheckTrialElapsedTime();
         }
 
         private void MoveTargetOnTick()
@@ -255,7 +267,7 @@ namespace TheoryC.ViewModels
             TargetPositionTop = yt - TargetSizeRadius;
         }
 
-        private void CheckElapsedTime()
+        private void CheckTrialElapsedTime()
         {
             int result = DateTime.Compare(DateTime.Now, stopTime);
             if (result > 0)
@@ -271,12 +283,17 @@ namespace TheoryC.ViewModels
             TargetPositionLeft = pt.X;
             TargetPositionTop = pt.Y;
         }
-
+        
         private void CheckIsOnTarget()
         {
             // calculate whether inside the circle
             // IsOnTarget is a DP that goes through a converter to set the color of the shape  
             IsOnTarget = Tools.IsInsideCircle(this.MousePosition, this.TargetPositionCenter, (this.CurrentTrial.ShapeSizeDiameter / 2.0));
+
+            if (IsOnTarget)
+            {
+                CurrentTrial.Results.TimeOnTargetMs += Settings.Default.MillisecondDelay;
+            }
         }
 
         double distanceFromCenterOnTick;

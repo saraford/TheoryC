@@ -24,7 +24,7 @@
             
             <StackPanel>
                 <TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="Time On Target MS" VerticalAlignment="Top"/>
-                <TextBox Margin="10,0,0,0"  Text="{Binding CurrentTrial.Results.TimeOnTargetMS}" />
+                <TextBox Margin="10,0,0,0"  Text="{Binding CurrentTrial.Results.TimeOnTargetMs}" />
             </StackPanel>
 
             <StackPanel>

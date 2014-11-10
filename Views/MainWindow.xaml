@@ -8,6 +8,9 @@
     <Window.DataContext>
         <ViewModels:MainViewModel/>
     </Window.DataContext>
+    <Window.InputBindings>
+        <KeyBinding Command="{Binding StartCommand, Mode=OneWay}"  Key="Space"/>
+    </Window.InputBindings>
     <Window.Resources>
         <Converters:BlueWhenTrue x:Key="BlueWhenTrue" />
         <Converters:InvertBooleanConverter x:Key="InvertBoolean"/>

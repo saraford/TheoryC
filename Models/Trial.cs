@@ -19,9 +19,6 @@ namespace TheoryC.Models
         int _number = default(int);
         public int Number { get { return _number; } set { base.SetProperty(ref _number, value); } }
 
-        int _TimeOnTargetMs = default(int);
-        public int TimeOnTargetMs { get { return _TimeOnTargetMs; } set { base.SetProperty(ref _TimeOnTargetMs, value); } }
-
         Models.Result _Results = default(Models.Result);
         public Models.Result Results { get { return _Results; } set { _Results = value; } }
 
