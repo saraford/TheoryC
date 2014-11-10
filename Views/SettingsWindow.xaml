@@ -1,0 +1,40 @@
+﻿<Window
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:ViewModels="clr-namespace:TheoryC.ViewModels" x:Class="TheoryC.Views.SettingsWindow"
+        Title="SettingsWindow" Height="300" Width="277.113">
+    <Window.DataContext>
+        <ViewModels:MainViewModel/>
+    </Window.DataContext>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="50" />
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
+
+        <ListBox Grid.Column="0"
+                         DisplayMemberPath="Number"
+                         ItemsSource="{Binding Trials}"
+                         SelectedItem="{Binding CurrentTrial, Mode=TwoWay}"/>
+        <StackPanel Grid.Column="1" DataContext="{Binding CurrentTrial}">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock FontSize="20" Text="Current Trial #" />
+                <TextBlock FontSize="20"  Text="{Binding Number, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+            </StackPanel>
+
+            <StackPanel Margin="0,5,0,0" Orientation="Horizontal">
+                <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Target Diameter:" VerticalAlignment="Top"/>
+                <TextBox Margin="10,0,0,0" HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" VerticalAlignment="Top" Width="86" Text="{Binding ShapeSizeDiameter, UpdateSourceTrigger=PropertyChanged}" />
+            </StackPanel>
+            <StackPanel Margin="0,5,0,0" Orientation="Horizontal">
+                <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Duration:" VerticalAlignment="Top"/>
+                <TextBox Margin="10,0,0,0" HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" Text="{Binding DurationSeconds}" VerticalAlignment="Top" Width="86"/>
+            </StackPanel>
+            <TextBlock Margin="0,10,0,0" Text="Results" FontWeight="SemiBold"/>
+            <TextBlock Margin="0,10,0,0" Text="Time On Target MS"/>
+            <TextBox Margin="0,5,0,0" Text="{Binding Results.TimeOnTargetMS}"  />
+            <TextBlock Margin="0,5,0,0" Text="Absolute Error"/>
+            <TextBox Margin="0,5,0,0" Text="{Binding Results.AbsoluteError}"  />
+        </StackPanel>
+    </Grid>
+</Window>

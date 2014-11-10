@@ -1,0 +1,35 @@
+﻿<Window
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:Controls="clr-namespace:TheoryC.Controls"
+        xmlns:Converters="clr-namespace:TheoryC.Converters"
+        xmlns:ViewModels="clr-namespace:TheoryC.ViewModels" x:Class="TheoryC.Views.MainWindow"
+        Title="MainWindow" Width="960" Height="530" Background="#FF656565">
+    <Window.DataContext>
+        <ViewModels:MainViewModel/>
+    </Window.DataContext>
+    <Window.Resources>
+        <Converters:BlueWhenTrue x:Key="BlueWhenTrue" />
+        <Converters:InvertBooleanConverter x:Key="InvertBoolean"/>
+        <Converters:StartButtonTextConverter x:Key="StartButtonText"/>
+    </Window.Resources>
+    <Canvas x:Name="SceneCanvas" Width="960" Height="510" >
+        <Ellipse Width="100"
+			Height="100"
+			Stroke="AliceBlue"
+			StrokeThickness="10"
+            Canvas.Left="400"
+            Canvas.Top="200"/>
+
+        <Controls:Target x:Name="Target" 
+				Width="{Binding CurrentTrial.ShapeSizeDiameter}"
+				Height="{Binding CurrentTrial.ShapeSizeDiameter}"
+        Canvas.Left="{Binding TargetPositionLeft, Mode=OneWay}"
+                Canvas.Top="{Binding TargetPositionTop, Mode=OneWay}"
+        FillColor="{Binding IsOnTarget, Converter={StaticResource BlueWhenTrue}, Mode=OneWay}" 
+            />
+
+        <Button IsDefault="True" Content="{Binding IsRunning, Converter={StaticResource StartButtonText}, Mode=OneWay}" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="74" Command="{Binding StartCommand, Mode=OneWay}"/>
+        <Button Content="Settings" IsEnabled="{Binding IsRunning, Converter={StaticResource InvertBoolean}}" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Margin="10,38,0,0" Command="{Binding ShowSettingsCommand, Mode=OneWay}"/>
+    </Canvas>
+</Window>
