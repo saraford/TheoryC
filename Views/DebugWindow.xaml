@@ -1,0 +1,39 @@
+﻿<Window x:Class="TheoryC.Views.DebugWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:ViewModels="clr-namespace:TheoryC.ViewModels"        
+        WindowStyle="None" AllowsTransparency="true" Background="Transparent"
+        Height="50" Width="960">
+    <Window.DataContext>
+        <ViewModels:MainViewModel/>
+    </Window.DataContext>
+    <Border Width="Auto" Height="Auto"     
+          BorderBrush="#395984"
+          BorderThickness="1"
+          CornerRadius="0,0,10,10" >
+        <Border.Background>
+            <SolidColorBrush Color="#FFD0D8E0" />
+        </Border.Background>
+
+        <Grid>
+        <StackPanel Orientation="Horizontal"> 
+            <StackPanel>            
+            <TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="Trial Number" VerticalAlignment="Top"/>
+                <TextBox Margin="10,0,0,0"  Text="{Binding CurrentTrial.Number}" />
+            </StackPanel>
+            
+            <StackPanel>
+                <TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="Time On Target MS" VerticalAlignment="Top"/>
+                <TextBox Margin="10,0,0,0"  Text="{Binding CurrentTrial.Results.TimeOnTargetMS}" />
+            </StackPanel>
+
+            <StackPanel>
+                <TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="Absolute Error" VerticalAlignment="Top"/>
+                <TextBox Margin="10,0,0,0"  Text="{Binding CurrentTrial.Results.AbsoluteError}" />
+            </StackPanel>
+
+        </StackPanel>
+            
+    </Grid>
+</Border>
+</Window>

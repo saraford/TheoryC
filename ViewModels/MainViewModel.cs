@@ -61,7 +61,7 @@ namespace TheoryC.ViewModels
         double trackRadius = Settings.Default.TrackRadius;
         double TargetSizeRadius;
         public List<double> absErrorDuringTrial = new List<double>();
-        
+
         public MainViewModel()
         {
             if (System.ComponentModel.DesignerProperties.GetIsInDesignMode(new System.Windows.DependencyObject()))
@@ -109,7 +109,6 @@ namespace TheoryC.ViewModels
             }
         }
 
-
         bool _SetupWindowOpen = default(bool);
         public bool SetupWindowOpen { get { return _SetupWindowOpen; } set { base.SetProperty(ref _SetupWindowOpen, value); } }
 
@@ -146,6 +145,51 @@ namespace TheoryC.ViewModels
             SetupWindowOpen = false;
         }
 
+        bool _DebugWindowOpen = default(bool);
+        public bool DebugWindowOpen { get { return _DebugWindowOpen; } set { base.SetProperty(ref _DebugWindowOpen, value); } }
+
+        DelegateCommand _ShowDebugCommand = null;
+        public DelegateCommand ShowDebugCommand
+        {
+            get
+            {
+                if (_ShowDebugCommand != null)
+                    return _ShowDebugCommand;
+
+                _ShowDebugCommand = new DelegateCommand
+                (
+                    () =>
+                    {
+                        if (!DebugWindowOpen)
+                        {
+                            DebugWindowOpen = true;
+
+                            var debugWin = new Views.DebugWindow();
+                            debugWin.DataContext = this; // to share same model data
+                            var main = Application.Current.MainWindow;
+                            debugWin.Left = main.Left;
+                            debugWin.Top = main.Top + main.Height;
+                            debugWin.Owner = main; // whatever happens to main window happens here
+                            debugWin.ShowInTaskbar = false;
+                            debugWin.Show();
+                        }
+                        else
+                        {
+                            DebugWindowOpen = false;
+
+                            var debugWin = Application.Current.Windows.OfType<Views.DebugWindow>().First();
+                            debugWin.Close();
+                        }
+                    },
+                    () =>
+                    {
+                        return true; // always have debug command enabled
+                    }
+                );
+                this.PropertyChanged += (s, e) => _ShowDebugCommand.RaiseCanExecuteChanged();
+                return _ShowDebugCommand;
+            }
+        }
 
         DelegateCommand _StartCommand = null;
         public DelegateCommand StartCommand
@@ -239,12 +283,12 @@ namespace TheoryC.ViewModels
         private void GetAbsoluteErrorForTick()
         {
             // for entire trials               
-//            double distanceFromCenterOnTick = Statistics.DistanceBetween2Points(this.MousePosition, this.TargetPositionCenter);            
-//            this.absErrorDuringTrial.Add(distanceFromCenterOnTick);
-//            CurrentTrial.Results.AbsoluteError = Statistics.StandardDeviation(absErrorDuringTrial);
+            //            double distanceFromCenterOnTick = Statistics.DistanceBetween2Points(this.MousePosition, this.TargetPositionCenter);            
+            //            this.absErrorDuringTrial.Add(distanceFromCenterOnTick);
+            //            CurrentTrial.Results.AbsoluteError = Statistics.StandardDeviation(absErrorDuringTrial);
 
             // just showing for each tick
-            CurrentTrial.Results.AbsoluteError = Statistics.DistanceBetween2Points(this.MousePosition, this.TargetPositionCenter);            
+            CurrentTrial.Results.AbsoluteError = Statistics.DistanceBetween2Points(this.MousePosition, this.TargetPositionCenter);
         }
 
         private void StopTimer()
@@ -255,5 +299,11 @@ namespace TheoryC.ViewModels
 
         }
 
+        // called by the MainWindow when shutting down
+        internal void Shutdown()
+        {
+            //if (debugWin != null)
+            //    debugWin.Close();
+        }
     }
 }

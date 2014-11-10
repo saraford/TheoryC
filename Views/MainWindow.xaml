@@ -31,5 +31,7 @@
 
         <Button IsDefault="True" Content="{Binding IsRunning, Converter={StaticResource StartButtonText}, Mode=OneWay}" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="74" Command="{Binding StartCommand, Mode=OneWay}"/>
         <Button Content="Settings" IsEnabled="{Binding IsRunning, Converter={StaticResource InvertBoolean}}" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Margin="10,38,0,0" Command="{Binding ShowSettingsCommand, Mode=OneWay}"/>
+        <Button Content="Debug" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Command="{Binding ShowDebugCommand, Mode=OneWay}" Canvas.Left="417" Canvas.Top="476"/>
+
     </Canvas>
 </Window>

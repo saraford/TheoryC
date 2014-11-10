@@ -1,17 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
+﻿using System.Windows;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace TheoryC.Views
 {
@@ -25,11 +13,20 @@ namespace TheoryC.Views
             InitializeComponent();
             MouseMove += MainWindow_MouseMove;
             Loaded += MainWindow_Loaded;
+            Closing += MainWindow_Closing;
         }
 
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
+
+            SetCoordinatesToTopLeftCorner();
+
             this.ViewModel.Startup();
+        }
+
+        void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            this.ViewModel.Shutdown();
         }
 
         void MainWindow_MouseMove(object sender, MouseEventArgs e)
@@ -40,6 +37,13 @@ namespace TheoryC.Views
         public ViewModels.MainViewModel ViewModel
         {
             get { return this.DataContext as ViewModels.MainViewModel; }
+        }
+
+        private void SetCoordinatesToTopLeftCorner()
+        {
+            var desktop = System.Windows.SystemParameters.WorkArea;
+            this.Left = desktop.Left;
+            this.Top = desktop.Top;
         }
     }
 }
