@@ -25,7 +25,7 @@ namespace TheoryC.Models
         public Trial()
         {
             _shapeSizeDiameter = 50;
-            _durationSeconds = 5;
+            _durationSeconds = 1;
         }
 
     }
