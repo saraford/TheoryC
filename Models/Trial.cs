@@ -28,5 +28,11 @@ namespace TheoryC.Models
             _durationSeconds = 1;
         }
 
+        internal void ClearResults()
+        {
+            Results.AbsoluteError = default(double);
+            Results.AbsoluteErrorForEachTickList = default(List<double>);
+            Results.TimeOnTargetMs = default(double);
+        }
     }
 }

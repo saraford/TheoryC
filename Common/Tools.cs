@@ -35,7 +35,7 @@ namespace TheoryC.Common
         }
 
 
-        public static Point GetPointForPlacingTargetOnStartTrack(Point trackCenter, double trackRadius, double targetRadius)
+        public static Point GetPointForPlacingTargetInStartingPosition(Point trackCenter, double trackRadius, double targetRadius)
         {
             Point pt = new Point(); 
             double rightX = trackCenter.X + trackRadius;

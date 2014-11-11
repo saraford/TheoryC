@@ -93,16 +93,16 @@ namespace TheoryC.ViewModels
                 });
             }
 
+            // needed if in the future user changes something about scene, they'll get to see it in realtime
             this.CurrentTrial = this.Trials.First();
+            CurrentTrial.PropertyChanged += CurrentTrial_PropertyChanged;
 
-            timer = new DispatcherTimer(DispatcherPriority.Render);
+            timer = new DispatcherTimer(DispatcherPriority.Normal);
             timer.Interval = TimeSpan.FromSeconds(Settings.Default.MillisecondDelay);
             timer.Tick += Timer_Tick;
 
-            PutTargetOnTrack();
+            PlaceTargetInStartingPosition();
 
-            // needed if in the future user changes something about scene, they'll get to see it in realtime
-            CurrentTrial.PropertyChanged += CurrentTrial_PropertyChanged;
             this.TrialCompleted += StartNextTrial_TrialCompleted;
 
             // Show debug window
@@ -114,7 +114,7 @@ namespace TheoryC.ViewModels
             // if the shape's size is changed, we need to place it at the right spot
             if (e.PropertyName == "ShapeSizeDiameter")
             {
-                this.PutTargetOnTrack();
+                this.PlaceTargetInStartingPosition();
             }
         }
 
@@ -266,19 +266,35 @@ namespace TheoryC.ViewModels
                 CurrentTrial = Trials[nextTrialNumber];
                 StartNextTrial();
             }
+        }
 
+        private void StartExperiment()
+        {
+            CurrentTrial = Trials.First();
+
+            // clear prior results
+            foreach (var trial in Trials)
+            {
+                trial.ClearResults();
+            }
         }
 
         private void StopExperiment()
         {
-            // just let it execute for now...
+            ResetScene();
         }
 
+        private void ResetScene()
+        {
+            this.PlaceTargetInStartingPosition();
+            IsOnTarget = false;
+        }
+
+        // create a test that verifies all Results and values are reset
         Stopwatch timeOnTarget;
         private void StartNextTrial()
         {
-            // is there anything to reset??
-            stopTime = DateTime.Now.AddSeconds(CurrentTrial.DurationSeconds);
+            stopTime = DateTime.Now.AddSeconds(CurrentTrial.DurationSeconds + Settings.Default.MillisecondDelay);
             timeOnTarget = new Stopwatch();
 
             // set the radius so we don't have to do /2 every tick
@@ -304,8 +320,6 @@ namespace TheoryC.ViewModels
             OnTrialCompleted(new EventArgs());
         }
 
-
-
         public event EventHandler TrialCompleted;
         
         protected virtual void OnTrialCompleted(EventArgs e)
@@ -320,9 +334,7 @@ namespace TheoryC.ViewModels
         double xt, yt;
         void Timer_Tick(object sender, EventArgs e)
         {
-            Debug.Print("Tick #" + tickCounter++ + " at " + DateTime.Now);
-
-            Angle += .02; // TODO: Figure out the speed here
+            Angle += .01; // TODO: Figure out the speed here
 
             MoveTargetOnTick();
 
@@ -359,9 +371,9 @@ namespace TheoryC.ViewModels
             return (result > 0); // true if time has expired
         }
 
-        private void PutTargetOnTrack()
+        private void PlaceTargetInStartingPosition()
         {
-            Point pt = Tools.GetPointForPlacingTargetOnStartTrack(trackCenter, trackRadius, CurrentTrial.ShapeSizeDiameter / 2.0);
+            Point pt = Tools.GetPointForPlacingTargetInStartingPosition(trackCenter, trackRadius, CurrentTrial.ShapeSizeDiameter / 2.0);
 
             TargetPositionLeft = pt.X;
             TargetPositionTop = pt.Y;
@@ -377,6 +389,7 @@ namespace TheoryC.ViewModels
             {
                 timeOnTarget.Start();
 //                CurrentTrial.Results.TimeOnTargetMs += Settings.Default.MillisecondDelay;
+                Debug.Print("Tick #" + tickCounter++ + " w ToT " + CurrentTrial.Results.TimeOnTargetMs);
             }
             else
             {
