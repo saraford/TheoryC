@@ -19,6 +19,9 @@ namespace TheoryC.Models
         int _number = default(int);
         public int Number { get { return _number; } set { base.SetProperty(ref _number, value); } }
 
+        int _trialName = default(int);
+        public int TrialName { get { return (Number + 1); } set { base.SetProperty(ref _trialName, value); } }
+
         Models.Result _Results = default(Models.Result);
         public Models.Result Results { get { return _Results; } set { _Results = value; } }
 

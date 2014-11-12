@@ -64,6 +64,7 @@
     <Compile Include="Controls\Target.xaml.cs">
       <DependentUpon>Target.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Converters\AddOneConverter.cs" />
     <Compile Include="Converters\BlueWhenTrue.cs" />
     <Compile Include="Converters\InvertBooleanConverter.cs" />
     <Compile Include="Converters\StartButtonTextConverter.cs" />
