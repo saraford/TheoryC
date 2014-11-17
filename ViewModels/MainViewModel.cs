@@ -54,11 +54,13 @@ namespace TheoryC.ViewModels
             }
         }
 
+        double _TrackRadius = default(double);
+        public double TrackRadius { get { return _TrackRadius; } set { base.SetProperty(ref _TrackRadius, value); } }
+
         #endregion
         
-        DispatcherTimer timer;  
-        Point trackCenter = new Point(Settings.Default.TrackCenterX, Settings.Default.TrackCenterY);
-        double trackRadius = Settings.Default.TrackRadius;
+        DispatcherTimer timer;
+        Point trackCenter = new Point(Settings.Default.TrackLeftX + Settings.Default.TrackRadius, Settings.Default.TrackTopY + Settings.Default.TrackRadius);
         double TargetSizeRadius;
 
         public MainViewModel()
@@ -77,6 +79,8 @@ namespace TheoryC.ViewModels
                 }
 
                 this.CurrentTrial = this.Trials.First();
+                TrackRadius = Settings.Default.TrackRadius;
+
             }
         }
 
@@ -89,17 +93,21 @@ namespace TheoryC.ViewModels
                 this.Trials.Add(new Models.Trial
                 {
                     Number = i, // use a converter + 1, // no 0-based trials exposed to user
-                    Results = new Models.Result { TimeOnTargetMs = 0, AbsoluteError = 0 , AbsoluteErrorForEachTickList = new List<double>()}
+                    Results = new Models.Result { TimeOnTargetMs = 0, AbsoluteError = 0, AbsoluteErrorForEachTickList = new List<double>() }
                 });
+
+                // to see real-time updates
+                this.Trials[i].PropertyChanged += CurrentTrial_PropertyChanged;
             }
 
-            // needed if in the future user changes something about scene, they'll get to see it in realtime
             this.CurrentTrial = this.Trials.First();
-            CurrentTrial.PropertyChanged += CurrentTrial_PropertyChanged;
 
             timer = new DispatcherTimer(DispatcherPriority.Normal);
-            timer.Interval = TimeSpan.FromSeconds(Settings.Default.MillisecondDelay);
+            timer.Interval = TimeSpan.FromMilliseconds(Settings.Default.MillisecondDelay);
+
             timer.Tick += Timer_Tick;
+
+            TrackRadius = Settings.Default.TrackRadius;
 
             PlaceTargetInStartingPosition();
 
@@ -209,6 +217,32 @@ namespace TheoryC.ViewModels
             main.Focus(); // put focus back on main window
         }
 
+        DelegateCommand _UpdateScene = null;
+        public DelegateCommand UpdateScene
+        {
+            get
+            {
+                if (_UpdateScene != null)
+                    return _UpdateScene;
+
+                _UpdateScene = new DelegateCommand(new Action(RefreshScene), new Func<bool>(UpdateSceneCanExecute));
+                this.PropertyChanged += (s, e) => _UpdateScene.RaiseCanExecuteChanged();
+                return _UpdateScene;
+            }
+        }
+
+        public bool UpdateSceneCanExecute()
+        {
+            // oh good lord, this fires even if the user did not invoke the action
+            // this command should only execute if the SettingsWindow is opened
+            return SetupWindowOpen;
+        }
+
+        public void RefreshScene()
+        {
+            this.PlaceTargetInStartingPosition();
+        }
+
         DelegateCommand _StartCommand = null;
         public DelegateCommand StartCommand
         {
@@ -234,8 +268,9 @@ namespace TheoryC.ViewModels
         {
             if (!IsExperimentRunning)
             {
+                // reset results / data
+                InitializeExperiment();
                 StartNextTrial();
-
             }
             else
             {
@@ -253,22 +288,7 @@ namespace TheoryC.ViewModels
         //    }
         //}
 
-        private void StartNextTrial_TrialCompleted(object sender, EventArgs e)
-        {
-            // check to see if there are any trials left to run
-            if (CurrentTrial.Number + 1 >= Trials.Count)
-            {
-                StopExperiment();
-            }
-            else
-            {
-                int nextTrialNumber = CurrentTrial.Number + 1;
-                CurrentTrial = Trials[nextTrialNumber];
-                StartNextTrial();
-            }
-        }
-
-        private void StartExperiment()
+        private void InitializeExperiment()
         {
             CurrentTrial = Trials.First();
 
@@ -287,21 +307,25 @@ namespace TheoryC.ViewModels
         private void ResetScene()
         {
             this.PlaceTargetInStartingPosition();
-            IsOnTarget = false;
+            this.Angle = 0;
+            IsOnTarget = false;            
         }
 
         // create a test that verifies all Results and values are reset
         Stopwatch timeOnTarget;
         private void StartNextTrial()
         {
-            stopTime = DateTime.Now.AddSeconds(CurrentTrial.DurationSeconds + Settings.Default.MillisecondDelay);
+            stopTime = DateTime.Now.AddSeconds(CurrentTrial.DurationSeconds);
+
+            // must add an extra tick
+          //  stopTime = stopTime.AddMilliseconds(Settings.Default.MillisecondDelay);
             timeOnTarget = new Stopwatch();
 
             // set the radius so we don't have to do /2 every tick
             TargetSizeRadius = this.CurrentTrial.ShapeSizeDiameter / 2.0;
 
             // rock and roll
-            Debug.Print("Trial #" + CurrentTrial.Number.ToString() + " starting at " + DateTimeOffset.Now.ToString());
+            Debug.Print("Trial #" + CurrentTrial.Number.ToString() + " starting at " + DateTime.Now.ToString("hh.mm.ss.ffffff"));
             timer.Start();
             this.IsExperimentRunning = true;
 
@@ -312,12 +336,29 @@ namespace TheoryC.ViewModels
         {
             timer.Stop();
             CurrentTrial.Results.TimeOnTargetMs = timeOnTarget.ElapsedMilliseconds;
-            Debug.Print("Trial #" + CurrentTrial.Number.ToString() + " stopped at " + DateTimeOffset.Now.ToString());
+            Debug.Print("Trial #" + CurrentTrial.Number.ToString() + " stopped at " + DateTime.Now.ToString("hh.mm.ss.ffffff"));
 
             this.IsExperimentRunning = false;
 
             // fire the event to call the next trial
             OnTrialCompleted(new EventArgs());
+        }
+
+        private void StartNextTrial_TrialCompleted(object sender, EventArgs e)
+        {
+            // check to see if there are any trials left to run
+            if (CurrentTrial.Number + 1 >= Trials.Count)
+            {
+                StopExperiment();
+            }
+            else
+            {
+                int nextTrialNumber = CurrentTrial.Number + 1;
+                MessageBox.Show("yo");
+                CurrentTrial = Trials[nextTrialNumber];
+                MessageBox.Show("yo");
+                StartNextTrial();
+            }
         }
 
         public event EventHandler TrialCompleted;
@@ -331,9 +372,11 @@ namespace TheoryC.ViewModels
         }
 
         public int tickCounter = 0;
-        double xt, yt;
         void Timer_Tick(object sender, EventArgs e)
         {
+
+            Debug.Print("Tick #" + tickCounter++ + " and time is right now " + DateTime.Now.ToString("hh.mm.ss.ffffff"));
+            Debug.Print("I think the radius is " + (CurrentTrial.ShapeSizeDiameter / 2.0));
             Angle += .01; // TODO: Figure out the speed here
 
             MoveTargetOnTick();
@@ -357,10 +400,11 @@ namespace TheoryC.ViewModels
             CurrentTrial.Results.AbsoluteErrorForEachTickList.Add(distanceFromCenterOnTick);
             CurrentTrial.Results.AbsoluteError = Statistics.StandardDeviation(CurrentTrial.Results.AbsoluteErrorForEachTickList);
         }
-        
+
+        double xt, yt;
         private void MoveTargetOnTick()
         {
-            Common.Tools.PointsOnACircle(trackRadius, Angle, trackCenter, out xt, out yt);
+            Common.Tools.PointsOnACircle(TrackRadius, Angle, trackCenter, out xt, out yt);
             TargetPositionLeft = xt - TargetSizeRadius;
             TargetPositionTop = yt - TargetSizeRadius;
         }
@@ -373,7 +417,7 @@ namespace TheoryC.ViewModels
 
         private void PlaceTargetInStartingPosition()
         {
-            Point pt = Tools.GetPointForPlacingTargetInStartingPosition(trackCenter, trackRadius, CurrentTrial.ShapeSizeDiameter / 2.0);
+            Point pt = Tools.GetPointForPlacingTargetInStartingPosition(trackCenter, TrackRadius, CurrentTrial.ShapeSizeDiameter / 2.0);
 
             TargetPositionLeft = pt.X;
             TargetPositionTop = pt.Y;
@@ -389,7 +433,6 @@ namespace TheoryC.ViewModels
             {
                 timeOnTarget.Start();
 //                CurrentTrial.Results.TimeOnTargetMs += Settings.Default.MillisecondDelay;
-                Debug.Print("Tick #" + tickCounter++ + " w ToT " + CurrentTrial.Results.TimeOnTargetMs);
             }
             else
             {

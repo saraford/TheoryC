@@ -33,9 +33,9 @@ namespace TheoryC.Models
 
         internal void ClearResults()
         {
-            Results.AbsoluteError = default(double);
-            Results.AbsoluteErrorForEachTickList = default(List<double>);
-            Results.TimeOnTargetMs = default(double);
+            Results.AbsoluteError = 0;
+            Results.AbsoluteErrorForEachTickList.Clear();
+            Results.TimeOnTargetMs = 0;
         }
     }
 }

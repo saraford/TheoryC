@@ -3,38 +3,44 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:Controls="clr-namespace:TheoryC.Controls"
         xmlns:Converters="clr-namespace:TheoryC.Converters"
-        xmlns:ViewModels="clr-namespace:TheoryC.ViewModels" x:Class="TheoryC.Views.MainWindow"
+        xmlns:ViewModels="clr-namespace:TheoryC.ViewModels" 
+        xmlns:Properties="clr-namespace:TheoryC.Properties"        
+        x:Class="TheoryC.Views.MainWindow"
         Title="MainWindow" Width="960" Height="530" Background="#FF656565">
     <Window.DataContext>
         <ViewModels:MainViewModel/>
     </Window.DataContext>
     <Window.InputBindings>
-        <KeyBinding Command="{Binding StartCommand, Mode=OneWay}"  Key="F9"/>
+        <KeyBinding Command="{Binding StartCommand, Mode=OneWay}"  Key="S"/>
     </Window.InputBindings>
     <Window.Resources>
+        <Converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
         <Converters:BlueWhenTrue x:Key="BlueWhenTrue" />
         <Converters:InvertBooleanConverter x:Key="InvertBoolean"/>
         <Converters:StartButtonTextConverter x:Key="StartButtonText"/>
+        <Converters:RadiusToDiameterConverter x:Key="RadiusToDiameter"/>
     </Window.Resources>
     <Canvas x:Name="SceneCanvas" Width="960" Height="510" >
-        <Ellipse Width="100"
-			Height="100"
+        <Ellipse Width="{Binding TrackRadius, Converter={StaticResource RadiusToDiameter}}"
+			Height="{Binding TrackRadius, Converter={StaticResource RadiusToDiameter}}"
 			Stroke="AliceBlue"
 			StrokeThickness="10"
-            Canvas.Left="400"
-            Canvas.Top="200"/>
+            Canvas.Left="{Binding Source={x:Static Properties:Settings.Default}, Path=TrackLeftX, Mode=OneWay}"
+            Canvas.Top="{Binding Source={x:Static Properties:Settings.Default}, Path=TrackTopY, Mode=OneWay}"/>
 
         <Controls:Target x:Name="Target" 
 				Width="{Binding CurrentTrial.ShapeSizeDiameter}"
 				Height="{Binding CurrentTrial.ShapeSizeDiameter}"
         Canvas.Left="{Binding TargetPositionLeft, Mode=OneWay}"
                 Canvas.Top="{Binding TargetPositionTop, Mode=OneWay}"
-        FillColor="{Binding IsOnTarget, Converter={StaticResource BlueWhenTrue}, Mode=OneWay}" 
-            />
+        FillColor="{Binding IsOnTarget, Converter={StaticResource BlueWhenTrue}, Mode=OneWay}"          
+                         />
 
         <Button IsDefault="True" Content="{Binding IsExperimentRunning, Converter={StaticResource StartButtonText}, Mode=OneWay}" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="74" Command="{Binding StartCommand, Mode=OneWay}"/>
         <Button Content="Settings" IsEnabled="{Binding IsRunning, Converter={StaticResource InvertBoolean}}" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Margin="10,38,0,0" Command="{Binding ShowSettingsCommand, Mode=OneWay}"/>
         <Button Content="Debug" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Command="{Binding ShowDebugCommand, Mode=OneWay}" Canvas.Left="417" Canvas.Top="476"/>
+        <!--<TextBox Height="23" Canvas.Left="10" TextWrapping="Wrap" Text="{Binding MousePosition.X}" Canvas.Top="63" Width="40"/>
+        <TextBox Height="23" Canvas.Left="55" TextWrapping="Wrap" Text="{Binding MousePosition.Y}" Canvas.Top="63" Width="40"/>-->
 
     </Canvas>
 </Window>

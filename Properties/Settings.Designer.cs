@@ -25,7 +25,7 @@ namespace TheoryC.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0.03")]
+        [global::System.Configuration.DefaultSettingValueAttribute("30")]
         public double MillisecondDelay {
             get {
                 return ((double)(this["MillisecondDelay"]));
@@ -37,31 +37,31 @@ namespace TheoryC.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("450")]
-        public int TrackCenterX {
+        [global::System.Configuration.DefaultSettingValueAttribute("500")]
+        public int TrackLeftX {
             get {
-                return ((int)(this["TrackCenterX"]));
+                return ((int)(this["TrackLeftX"]));
             }
             set {
-                this["TrackCenterX"] = value;
+                this["TrackLeftX"] = value;
             }
         }
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("250")]
-        public int TrackCenterY {
+        [global::System.Configuration.DefaultSettingValueAttribute("100")]
+        public int TrackTopY {
             get {
-                return ((int)(this["TrackCenterY"]));
+                return ((int)(this["TrackTopY"]));
             }
             set {
-                this["TrackCenterY"] = value;
+                this["TrackTopY"] = value;
             }
         }
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("50")]
+        [global::System.Configuration.DefaultSettingValueAttribute("100")]
         public double TrackRadius {
             get {
                 return ((double)(this["TrackRadius"]));
