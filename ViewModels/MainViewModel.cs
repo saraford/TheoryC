@@ -89,7 +89,7 @@ namespace TheoryC.ViewModels
         }
 
         // called by the Main Window on Loaded event
-        internal void Startup()
+        public void Startup()
         {
             // To be eventually replaced by the researcher uploading a file or something
             for (int i = 0; i < 3; i++)
@@ -117,9 +117,6 @@ namespace TheoryC.ViewModels
             PlaceTargetInStartingPosition();
 
             this.TrialCompleted += StartNextTrial_TrialCompleted;
-
-            // Show debug window
-            ShowDebugWindow();
         }
 
         void CurrentTrial_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -211,7 +208,7 @@ namespace TheoryC.ViewModels
             debugWin.Close();
         }
 
-        private void ShowDebugWindow()
+        internal void ShowDebugWindow()
         {
             DebugWindowOpen = true;
             var debugWin = new Views.DebugWindow();
@@ -309,19 +306,10 @@ namespace TheoryC.ViewModels
             }
             else
             {
-                StopCurrentTrial();
+                StopCurrentTrial(goToNextTrial:false);
+                StopExperiment();
             }
         }
-
-        // throws an exception
-        //private async void StartExperiment()
-        //{
-        //    foreach (var trial in Trials)
-        //    {
-        //        await Task.Run(() => StartTrial());
-        //        Debug.Print("moving on " + DateTime.Now.ToString());                                         
-        //    }
-        //}
 
         private void InitializeExperiment()
         {
@@ -350,7 +338,6 @@ namespace TheoryC.ViewModels
 
         // create a test that verifies all Results and values are reset
         Stopwatch timeOnTarget;
-        double dumbTargetSizeRadius;
         private void StartNextTrial()
         {
             stopTime = DateTime.Now.AddSeconds(CurrentTrial.DurationSeconds);
@@ -359,9 +346,12 @@ namespace TheoryC.ViewModels
             //  stopTime = stopTime.AddMilliseconds(Settings.Default.MillisecondDelay);
             timeOnTarget = new Stopwatch();
 
+            // this is needed to avoid flickering because of the data binding to the 
+            // CurrentTrial's ShapeSize. We need to place its position first and then resize
+            // the other way around causes flickering
             if (CurrentTrial.Number != 0)
             {
-                dumbTargetSizeRadius = this.CurrentTrial.ShapeSizeDiameter / 2.0;
+                double dumbTargetSizeRadius = this.CurrentTrial.ShapeSizeDiameter / 2.0;
                 TargetPositionLeft = xt - dumbTargetSizeRadius;
                 TargetPositionTop = yt - dumbTargetSizeRadius;
                 TargetSizeRadius = dumbTargetSizeRadius;
@@ -375,7 +365,7 @@ namespace TheoryC.ViewModels
             tickCounter = 0; // for debugging
         }
 
-        private void StopCurrentTrial()
+        private void StopCurrentTrial(bool goToNextTrial)
         {
             timer.Stop();
             CurrentTrial.Results.TimeOnTargetMs = timeOnTarget.ElapsedMilliseconds;
@@ -384,7 +374,10 @@ namespace TheoryC.ViewModels
             this.IsExperimentRunning = false;
 
             // fire the event to call the next trial
-            OnTrialCompleted(new EventArgs());
+            if (goToNextTrial)
+            {
+                OnTrialCompleted(new EventArgs());
+            }
         }
 
         private void StartNextTrial_TrialCompleted(object sender, EventArgs e)
@@ -428,7 +421,7 @@ namespace TheoryC.ViewModels
 
             if (HasTrialTimeExpired())
             {
-                StopCurrentTrial();
+                StopCurrentTrial(goToNextTrial:true);
             }
         }
 

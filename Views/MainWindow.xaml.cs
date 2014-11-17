@@ -18,10 +18,10 @@ namespace TheoryC.Views
 
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
-
             SetCoordinatesToTopLeftCorner();
 
             this.ViewModel.Startup();
+            this.ViewModel.ShowDebugWindow();
         }
 
         void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)

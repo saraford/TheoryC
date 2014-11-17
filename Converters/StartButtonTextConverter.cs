@@ -13,7 +13,6 @@ namespace TheoryC.Converters
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             bool original = (bool)value;
-            //if isRunning=true
             if (original) {
                 return "Stop";
             }
