@@ -37,6 +37,10 @@ namespace TheoryC.ViewModels
         bool _IsOnTarget = default(bool);
         public bool IsOnTarget { get { return _IsOnTarget; } set { base.SetProperty(ref _IsOnTarget, value); } }
 
+        // needed to avoid the flicker when sizes change during trial
+        double _TargetSizeRadius = default(double);
+        public double TargetSizeRadius { get { return _TargetSizeRadius; } set { base.SetProperty(ref _TargetSizeRadius, value); } }
+
         double _TargetPositionLeft = default(double);
         public double TargetPositionLeft { get { return _TargetPositionLeft; } set { base.SetProperty(ref _TargetPositionLeft, value); } }
 
@@ -58,10 +62,9 @@ namespace TheoryC.ViewModels
         public double TrackRadius { get { return _TrackRadius; } set { base.SetProperty(ref _TrackRadius, value); } }
 
         #endregion
-        
+
         DispatcherTimer timer;
         Point trackCenter = new Point(Settings.Default.TrackLeftX + Settings.Default.TrackRadius, Settings.Default.TrackTopY + Settings.Default.TrackRadius);
-        double TargetSizeRadius;
 
         public MainViewModel()
         {
@@ -80,7 +83,8 @@ namespace TheoryC.ViewModels
 
                 this.CurrentTrial = this.Trials.First();
                 TrackRadius = Settings.Default.TrackRadius;
-
+                TargetSizeRadius = this.CurrentTrial.ShapeSizeDiameter / 2.0;
+                this.PlaceTargetInStartingPosition();
             }
         }
 
@@ -108,6 +112,7 @@ namespace TheoryC.ViewModels
             timer.Tick += Timer_Tick;
 
             TrackRadius = Settings.Default.TrackRadius;
+            TargetSizeRadius = this.CurrentTrial.ShapeSizeDiameter / 2.0;
 
             PlaceTargetInStartingPosition();
 
@@ -160,6 +165,9 @@ namespace TheoryC.ViewModels
         private void SettingsWindowSetupCallback(MainViewModel viewmodel)
         {
             SetupWindowOpen = false;
+            this.CurrentTrial = this.Trials.First();
+            TargetSizeRadius = CurrentTrial.ShapeSizeDiameter / 2.0;
+            this.PlaceTargetInStartingPosition();
         }
 
         bool _DebugWindowOpen = default(bool);
@@ -243,6 +251,33 @@ namespace TheoryC.ViewModels
             this.PlaceTargetInStartingPosition();
         }
 
+        DelegateCommand _UpdateTargetSizeRadius = null;
+        public DelegateCommand UpdateTargetSizeRadius
+        {
+            get
+            {
+                if (_UpdateTargetSizeRadius != null)
+                    return _UpdateTargetSizeRadius;
+
+                _UpdateTargetSizeRadius = new DelegateCommand(new Action(UpdateTargetSize), new Func<bool>(UpdateTargetSizeCanExecute));
+                this.PropertyChanged += (s, e) => _UpdateTargetSizeRadius.RaiseCanExecuteChanged();
+                return _UpdateTargetSizeRadius;
+            }
+        }
+
+        public bool UpdateTargetSizeCanExecute()
+        {
+            // oh good lord, this fires even if the user did not invoke the action
+            // this command should only execute if the SettingsWindow is opened
+            return SetupWindowOpen;
+        }
+
+        public void UpdateTargetSize()
+        {
+            TargetSizeRadius = CurrentTrial.ShapeSizeDiameter / 2.0;
+            this.PlaceTargetInStartingPosition();
+        }
+
         DelegateCommand _StartCommand = null;
         public DelegateCommand StartCommand
         {
@@ -308,21 +343,29 @@ namespace TheoryC.ViewModels
         {
             this.PlaceTargetInStartingPosition();
             this.Angle = 0;
-            IsOnTarget = false;            
+            IsOnTarget = false;
+            xt = 0;
+            yt = 0;
         }
 
         // create a test that verifies all Results and values are reset
         Stopwatch timeOnTarget;
+        double dumbTargetSizeRadius;
         private void StartNextTrial()
         {
             stopTime = DateTime.Now.AddSeconds(CurrentTrial.DurationSeconds);
 
             // must add an extra tick
-          //  stopTime = stopTime.AddMilliseconds(Settings.Default.MillisecondDelay);
+            //  stopTime = stopTime.AddMilliseconds(Settings.Default.MillisecondDelay);
             timeOnTarget = new Stopwatch();
 
-            // set the radius so we don't have to do /2 every tick
-            TargetSizeRadius = this.CurrentTrial.ShapeSizeDiameter / 2.0;
+            if (CurrentTrial.Number != 0)
+            {
+                dumbTargetSizeRadius = this.CurrentTrial.ShapeSizeDiameter / 2.0;
+                TargetPositionLeft = xt - dumbTargetSizeRadius;
+                TargetPositionTop = yt - dumbTargetSizeRadius;
+                TargetSizeRadius = dumbTargetSizeRadius;
+            }
 
             // rock and roll
             Debug.Print("Trial #" + CurrentTrial.Number.ToString() + " starting at " + DateTime.Now.ToString("hh.mm.ss.ffffff"));
@@ -354,15 +397,13 @@ namespace TheoryC.ViewModels
             else
             {
                 int nextTrialNumber = CurrentTrial.Number + 1;
-                MessageBox.Show("yo");
                 CurrentTrial = Trials[nextTrialNumber];
-                MessageBox.Show("yo");
                 StartNextTrial();
             }
         }
 
         public event EventHandler TrialCompleted;
-        
+
         protected virtual void OnTrialCompleted(EventArgs e)
         {
             if (TrialCompleted != null)
@@ -376,7 +417,7 @@ namespace TheoryC.ViewModels
         {
 
             Debug.Print("Tick #" + tickCounter++ + " and time is right now " + DateTime.Now.ToString("hh.mm.ss.ffffff"));
-            Debug.Print("I think the radius is " + (CurrentTrial.ShapeSizeDiameter / 2.0));
+            Debug.Print("I think the radius is " + TargetSizeRadius);
             Angle += .01; // TODO: Figure out the speed here
 
             MoveTargetOnTick();
@@ -417,22 +458,22 @@ namespace TheoryC.ViewModels
 
         private void PlaceTargetInStartingPosition()
         {
-            Point pt = Tools.GetPointForPlacingTargetInStartingPosition(trackCenter, TrackRadius, CurrentTrial.ShapeSizeDiameter / 2.0);
+            Point pt = Tools.GetPointForPlacingTargetInStartingPosition(trackCenter, TrackRadius, TargetSizeRadius);
 
             TargetPositionLeft = pt.X;
             TargetPositionTop = pt.Y;
         }
-        
+
         private void CheckIsOnTarget()
         {
             // calculate whether inside the circle
             // IsOnTarget is a DP that goes through a converter to set the color of the shape  
-            IsOnTarget = Tools.IsInsideCircle(this.MousePosition, this.TargetPositionCenter, (this.CurrentTrial.ShapeSizeDiameter / 2.0));
+            IsOnTarget = Tools.IsInsideCircle(this.MousePosition, this.TargetPositionCenter, TargetSizeRadius);
 
             if (IsOnTarget)
             {
                 timeOnTarget.Start();
-//                CurrentTrial.Results.TimeOnTargetMs += Settings.Default.MillisecondDelay;
+                //                CurrentTrial.Results.TimeOnTargetMs += Settings.Default.MillisecondDelay;
             }
             else
             {

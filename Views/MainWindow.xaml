@@ -29,8 +29,8 @@
             Canvas.Top="{Binding Source={x:Static Properties:Settings.Default}, Path=TrackTopY, Mode=OneWay}"/>
 
         <Controls:Target x:Name="Target" 
-				Width="{Binding CurrentTrial.ShapeSizeDiameter}"
-				Height="{Binding CurrentTrial.ShapeSizeDiameter}"
+	            Width="{Binding TargetSizeRadius, Converter={StaticResource RadiusToDiameter}}"
+				Height="{Binding TargetSizeRadius, Converter={StaticResource RadiusToDiameter}}"
         Canvas.Left="{Binding TargetPositionLeft, Mode=OneWay}"
                 Canvas.Top="{Binding TargetPositionTop, Mode=OneWay}"
         FillColor="{Binding IsOnTarget, Converter={StaticResource BlueWhenTrue}, Mode=OneWay}"          

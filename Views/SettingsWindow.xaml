@@ -29,25 +29,30 @@
             </i:Interaction.Triggers>
         </ListBox>
 
-        <StackPanel Grid.Column="1" DataContext="{Binding CurrentTrial}">
+        <StackPanel Grid.Column="1" >
             <StackPanel Orientation="Horizontal">
                 <TextBlock FontSize="20" Text="Current Trial #" />
-                <TextBlock FontSize="20"  Text="{Binding Number, Converter={StaticResource AddOneToTrial}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                <TextBlock FontSize="20"  Text="{Binding CurrentTrial.Number, Converter={StaticResource AddOneToTrial}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
             </StackPanel>
-
             <StackPanel Margin="0,5,0,0" Orientation="Horizontal">
                 <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Target Diameter:" VerticalAlignment="Top"/>
-                <TextBox Margin="10,0,0,0" HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" VerticalAlignment="Top" Width="86" Text="{Binding ShapeSizeDiameter, UpdateSourceTrigger=PropertyChanged}" />
+                <TextBox Margin="10,0,0,0" HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" VerticalAlignment="Top" Width="86" Text="{Binding CurrentTrial.ShapeSizeDiameter, UpdateSourceTrigger=PropertyChanged}">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="TextChanged">
+                            <i:InvokeCommandAction Command="{Binding UpdateTargetSizeRadius}"/>
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </TextBox>
             </StackPanel>
             <StackPanel Margin="0,5,0,0" Orientation="Horizontal">
                 <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Duration:" VerticalAlignment="Top"/>
-                <TextBox Margin="10,0,0,0" HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" Text="{Binding DurationSeconds}" VerticalAlignment="Top" Width="86"/>
+                <TextBox Margin="10,0,0,0" HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" Text="{Binding CurrentTrial.DurationSeconds}" VerticalAlignment="Top" Width="86"/>
             </StackPanel>
             <TextBlock Margin="0,10,0,0" Text="Results" FontWeight="SemiBold"/>
             <TextBlock Margin="0,10,0,0" Text="Time On Target MS"/>
-            <TextBox Margin="0,5,0,0" Text="{Binding Results.TimeOnTargetMs}"  />
+            <TextBox Margin="0,5,0,0" Text="{Binding CurrentTrial.Results.TimeOnTargetMs}"  />
             <TextBlock Margin="0,5,0,0" Text="Absolute Error"/>
-            <TextBox Margin="0,5,0,0" Text="{Binding Results.AbsoluteError}"  />
+            <TextBox Margin="0,5,0,0" Text="{Binding CurrentTrial.Results.AbsoluteError}"  />
         </StackPanel>
     </Grid>
 </Window>
