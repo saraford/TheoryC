@@ -13,8 +13,11 @@ namespace TheoryC.Models
         int _shapeSizeDiameter = default(int);
         public int ShapeSizeDiameter { get { return _shapeSizeDiameter; } set { base.SetProperty(ref _shapeSizeDiameter, value); } }
 
-        int _durationSeconds = default(int);
-        public int DurationSeconds { get { return _durationSeconds; } set { base.SetProperty(ref _durationSeconds, value); } }
+        double _durationSeconds = default(double);
+        public double DurationSeconds { get { return _durationSeconds; } set { base.SetProperty(ref _durationSeconds, value); } }
+
+        double _rotationSpeedInSeconds = default(double);
+        public double RotationSpeedInSeconds { get { return _rotationSpeedInSeconds; } set { base.SetProperty(ref _rotationSpeedInSeconds, value); } }
 
         int _number = default(int);
         public int Number { get { return _number; } set { base.SetProperty(ref _number, value); } }
@@ -28,7 +31,8 @@ namespace TheoryC.Models
         public Trial()
         {
             _shapeSizeDiameter = 50;
-            _durationSeconds = 1;
+            _durationSeconds = 10;
+            _rotationSpeedInSeconds = 10; 
         }
 
         internal void ClearResults()

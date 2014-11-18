@@ -20,24 +20,24 @@
         </Border.Background>
 
         <Grid>
-        <StackPanel Orientation="Horizontal"> 
-            <StackPanel>            
-            <TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="Trial Number" VerticalAlignment="Top"/>
-                <TextBox Margin="10,0,0,0"  Text="{Binding CurrentTrial.Number, Converter={StaticResource AddOneToTrial}, Mode=OneWay}" />
-            </StackPanel>
-            
-            <StackPanel>
-                <TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="Time On Target MS" VerticalAlignment="Top"/>
-                <TextBox Margin="10,0,0,0"  Text="{Binding CurrentTrial.Results.TimeOnTargetMs}" />
+            <StackPanel Orientation="Horizontal">
+                <StackPanel>
+                    <TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="Trial Number" VerticalAlignment="Top"/>
+                    <TextBox Margin="10,0,0,0"  Text="{Binding CurrentTrial.Number, Converter={StaticResource AddOneToTrial}, Mode=OneWay}" />
+                </StackPanel>
+
+                <StackPanel>
+                    <TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="Time On Target MS" VerticalAlignment="Top"/>
+                    <TextBox Margin="10,0,0,0"  Text="{Binding CurrentTrial.Results.TimeOnTargetMs}" />
+                </StackPanel>
+
+                <StackPanel>
+                    <TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="Absolute Error" VerticalAlignment="Top"/>
+                    <TextBox Margin="10,0,0,0"  Text="{Binding CurrentTrial.Results.AbsoluteError}" />
+                </StackPanel>
+
             </StackPanel>
 
-            <StackPanel>
-                <TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="Absolute Error" VerticalAlignment="Top"/>
-                <TextBox Margin="10,0,0,0"  Text="{Binding CurrentTrial.Results.AbsoluteError}" />
-            </StackPanel>
-
-        </StackPanel>
-            
-    </Grid>
-</Border>
+        </Grid>
+    </Border>
 </Window>

@@ -31,8 +31,8 @@ namespace TheoryC.ViewModels
         bool _IsExperimentRunning = default(bool);
         public bool IsExperimentRunning { get { return _IsExperimentRunning; } set { base.SetProperty(ref _IsExperimentRunning, value); } }
 
-        double _angle = default(double);
-        public double Angle { get { return _angle; } set { base.SetProperty(ref _angle, value); } }
+        double _angleInDegrees = default(double);
+        public double AngleInDegrees { get { return _angleInDegrees; } set { base.SetProperty(ref _angleInDegrees, value); } }
 
         bool _IsOnTarget = default(bool);
         public bool IsOnTarget { get { return _IsOnTarget; } set { base.SetProperty(ref _IsOnTarget, value); } }
@@ -92,12 +92,12 @@ namespace TheoryC.ViewModels
         public void Startup()
         {
             // To be eventually replaced by the researcher uploading a file or something
-            for (int i = 0; i < 3; i++)
+            for (int i = 0; i < 1; i++)
             {
                 this.Trials.Add(new Models.Trial
                 {
                     Number = i, // use a converter + 1, // no 0-based trials exposed to user
-                    Results = new Models.Result { TimeOnTargetMs = 0, AbsoluteError = 0, AbsoluteErrorForEachTickList = new List<double>() }
+                    Results = new Models.Result { TimeOnTargetMs = 0, AbsoluteError = 0, AbsoluteErrorForEachTickList = new List<double>() }                
                 });
 
                 // to see real-time updates
@@ -330,21 +330,23 @@ namespace TheoryC.ViewModels
         private void ResetScene()
         {
             this.PlaceTargetInStartingPosition();
-            this.Angle = 0;
+            this.AngleInDegrees = 0;
             IsOnTarget = false;
             xt = 0;
             yt = 0;
         }
 
         // create a test that verifies all Results and values are reset
-        Stopwatch timeOnTarget;
+        Stopwatch timeOnTarget = new Stopwatch();
+        Stopwatch totalTrialTime = new Stopwatch();
         private void StartNextTrial()
         {
             stopTime = DateTime.Now.AddSeconds(CurrentTrial.DurationSeconds);
 
             // must add an extra tick
             //  stopTime = stopTime.AddMilliseconds(Settings.Default.MillisecondDelay);
-            timeOnTarget = new Stopwatch();
+            timeOnTarget.Reset(); 
+            totalTrialTime.Reset();
 
             // this is needed to avoid flickering because of the data binding to the 
             // CurrentTrial's ShapeSize. We need to place its position first and then resize
@@ -359,6 +361,7 @@ namespace TheoryC.ViewModels
 
             // rock and roll
             Debug.Print("Trial #" + CurrentTrial.Number.ToString() + " starting at " + DateTime.Now.ToString("hh.mm.ss.ffffff"));
+            totalTrialTime.Start();
             timer.Start();
             this.IsExperimentRunning = true;
 
@@ -367,10 +370,11 @@ namespace TheoryC.ViewModels
 
         private void StopCurrentTrial(bool goToNextTrial)
         {
+            totalTrialTime.Stop();
             timer.Stop();
             CurrentTrial.Results.TimeOnTargetMs = timeOnTarget.ElapsedMilliseconds;
             Debug.Print("Trial #" + CurrentTrial.Number.ToString() + " stopped at " + DateTime.Now.ToString("hh.mm.ss.ffffff"));
-
+            Debug.Print("Trial time took " + totalTrialTime.Elapsed.ToString());
             this.IsExperimentRunning = false;
 
             // fire the event to call the next trial
@@ -410,8 +414,8 @@ namespace TheoryC.ViewModels
         {
 
             Debug.Print("Tick #" + tickCounter++ + " and time is right now " + DateTime.Now.ToString("hh.mm.ss.ffffff"));
-            Debug.Print("I think the radius is " + TargetSizeRadius);
-            Angle += .01; // TODO: Figure out the speed here
+
+            CalculateAngleBasedOnTimeSampling();
 
             MoveTargetOnTick();
 
@@ -423,6 +427,15 @@ namespace TheoryC.ViewModels
             {
                 StopCurrentTrial(goToNextTrial:true);
             }
+        }
+
+        private void CalculateAngleBasedOnTimeSampling()
+        {
+            // wp% of rotationTime = elapsed time
+            // wp% of 360 = current angle
+            double wp = totalTrialTime.ElapsedMilliseconds / (CurrentTrial.RotationSpeedInSeconds * 1000);
+            AngleInDegrees = 360.0 * wp;
+            //            Debug.Print("Angle is " + AngleInDegrees);
         }
 
         // Hmm, how might I unit test this??
@@ -438,7 +451,7 @@ namespace TheoryC.ViewModels
         double xt, yt;
         private void MoveTargetOnTick()
         {
-            Common.Tools.PointsOnACircle(TrackRadius, Angle, trackCenter, out xt, out yt);
+            Common.Tools.PointsOnACircle(TrackRadius, AngleInDegrees, trackCenter, out xt, out yt);
             TargetPositionLeft = xt - TargetSizeRadius;
             TargetPositionTop = yt - TargetSizeRadius;
         }

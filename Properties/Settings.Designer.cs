@@ -37,18 +37,6 @@ namespace TheoryC.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("500")]
-        public int TrackLeftX {
-            get {
-                return ((int)(this["TrackLeftX"]));
-            }
-            set {
-                this["TrackLeftX"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("100")]
         public int TrackTopY {
             get {
@@ -56,6 +44,18 @@ namespace TheoryC.Properties {
             }
             set {
                 this["TrackTopY"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("400")]
+        public int TrackLeftX {
+            get {
+                return ((int)(this["TrackLeftX"]));
+            }
+            set {
+                this["TrackLeftX"] = value;
             }
         }
         

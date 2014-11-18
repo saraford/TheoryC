@@ -9,8 +9,14 @@ namespace TheoryC.Common
 {
     public static class Tools
     {
-        public static void PointsOnACircle(double radius, double angle, Point center, out double x, out double y)
+        public static double DegreeToRadian(double angleInDegrees)
         {
+            return Math.PI * angleInDegrees / 180.0;
+        }
+
+        public static void PointsOnACircle(double radius, double angleInDegrees, Point center, out double x, out double y)
+        {
+            double angle = DegreeToRadian(angleInDegrees);
             x = radius * Math.Cos(angle) + center.X;
             y = radius * Math.Sin(angle) + center.Y;
         }
