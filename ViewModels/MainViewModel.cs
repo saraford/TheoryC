@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -64,6 +65,8 @@ namespace TheoryC.ViewModels
         Point trackCenter = new Point(Settings.Default.TrackLeftX + Settings.Default.TrackRadius, Settings.Default.TrackTopY + Settings.Default.TrackRadius);
 
         DispatcherTimer gameTimer;
+
+        public Point AbsoluteScreenPositionOfTarget { get; set; }
 
         #endregion
 
@@ -226,7 +229,41 @@ namespace TheoryC.ViewModels
 
                 // setup for next trial
                 this.UpdateSceneForNextTrial();
+
+                WaitForUserFeedbackToStartNextTrial();
             }
+        }
+
+        private void WaitForUserFeedbackToStartNextTrial()
+        {
+            // move the mouse to the right location
+            MoveMouseToStartingPosition();
+
+            // wait for user click
+            WaitForUserClick();
+        }
+
+        private void WaitForUserClick()
+        {
+            // enables the command tos tart next trial
+            UserReadyForNextTrial = true;
+
+        }
+
+        private void MoveMouseToStartingPosition()
+        {
+
+            double x = AbsoluteScreenPositionOfTarget.X + TargetSizeRadius;
+            double y = AbsoluteScreenPositionOfTarget.Y + TargetSizeRadius;
+
+            SetPosition((int)x, (int)y);
+        }
+
+        [DllImport("User32.dll")]
+        private static extern bool SetCursorPos(int X, int Y);
+        private void SetPosition(int x, int y)
+        {
+            SetCursorPos(x, y);
         }
 
         public int tickCounter = 0;
@@ -313,6 +350,41 @@ namespace TheoryC.ViewModels
 
         #region Commands
 
+        bool _UserReadyForNextTrial = default(bool);
+        public bool UserReadyForNextTrial { get { return _UserReadyForNextTrial; } set { base.SetProperty(ref _UserReadyForNextTrial, value); } }
+
+        DelegateCommand _UserReadyForNextTrialCommand = null;
+        public DelegateCommand UserReadyForNextTrialCommand
+        {
+            get
+            {
+                if (_UserReadyForNextTrialCommand != null)
+                    return _UserReadyForNextTrialCommand;
+
+                _UserReadyForNextTrialCommand = new DelegateCommand
+                (
+                    () =>
+                    {
+                        // start next trial
+                        StartNextTrial();
+
+                        UserReadyForNextTrial = false;
+                    },
+                    () =>
+                    {
+                        return UserReadyForNextTrial;
+                    }
+                );
+                this.PropertyChanged += (s, e) => _UserReadyForNextTrialCommand.RaiseCanExecuteChanged();
+                return _UserReadyForNextTrialCommand;
+            }
+        }
+
+
+
+
+
+
         bool _SetupWindowOpen = default(bool);
         public bool SetupWindowOpen { get { return _SetupWindowOpen; } set { base.SetProperty(ref _SetupWindowOpen, value); } }
 
@@ -347,51 +419,6 @@ namespace TheoryC.ViewModels
         private void SettingsWindowSetupCallback()
         {
             SetupWindowOpen = false;
-
-            // regardless which trial number the user left selected in the Settings window,
-            // put it back to the first trial
-            this.CurrentTrial = this.Trials.First();
-
-            // update scene
-            this.UpdateTargetSizeAndPlaceInStartingPosition();
-        }
-
-
-
-        bool _ResultsWindowOpen = default(bool);
-        public bool ResultsWindowOpen { get { return _ResultsWindowOpen; } set { base.SetProperty(ref _ResultsWindowOpen, value); } }
-
-        DelegateCommand _ShowResultsCommand = null;
-        public DelegateCommand ShowResultsCommand
-        {
-            get
-            {
-                if (_ShowResultsCommand != null)
-                    return _ShowResultsCommand;
-
-                _ShowResultsCommand = new DelegateCommand
-                (
-                    () =>
-                    {
-                        var results = new Views.ResultsWindow(ResultsWindowSetupCallback);
-                        results.DataContext = this; // to share same model data
-
-                        ResultsWindowOpen = true;
-                        results.Show();
-                    },
-                    () =>
-                    {
-                        return !SetupWindowOpen;
-                    }
-                );
-                this.PropertyChanged += (s, e) => _ShowResultsCommand.RaiseCanExecuteChanged();
-                return _ShowResultsCommand;
-            }
-        }
-
-        private void ResultsWindowSetupCallback()
-        {
-            ResultsWindowOpen = false;
 
             // regardless which trial number the user left selected in the Settings window,
             // put it back to the first trial
@@ -559,6 +586,7 @@ namespace TheoryC.ViewModels
         }
 
         #endregion
+
 
     }
 }

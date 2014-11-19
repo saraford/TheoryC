@@ -4,7 +4,8 @@
         xmlns:Controls="clr-namespace:TheoryC.Controls"
         xmlns:Converters="clr-namespace:TheoryC.Converters"
         xmlns:ViewModels="clr-namespace:TheoryC.ViewModels" 
-        xmlns:Properties="clr-namespace:TheoryC.Properties"        
+        xmlns:Properties="clr-namespace:TheoryC.Properties"     
+        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"    
         x:Class="TheoryC.Views.MainWindow"
         Title="MainWindow" Width="960" Height="530" Background="#FF656565">
     <Window.DataContext>
@@ -26,7 +27,6 @@
         <Menu DockPanel.Dock="Top">
             <MenuItem Command="{Binding StartExpCommand, Mode=OneWay}" Header="{Binding IsExperimentRunning, Converter={StaticResource StartButtonText}, Mode=OneWay}"  />
             <MenuItem Command="{Binding ShowSettingsCommand, Mode=OneWay}" Header="Settings" />
-            <MenuItem Command="{Binding ShowResultsCommand, Mode=OneWay}" Header="Results" />
             <MenuItem Command="{Binding ShowDebugCommand, Mode=OneWay}" Header="Debug" />
         </Menu>
 
@@ -43,8 +43,15 @@
 				Height="{Binding TargetSizeRadius, Converter={StaticResource RadiusToDiameter}}"
         Canvas.Left="{Binding TargetPositionLeft, Mode=OneWay}"
                 Canvas.Top="{Binding TargetPositionTop, Mode=OneWay}"
-        FillColor="{Binding IsOnTarget, Converter={StaticResource BlueWhenTrue}, Mode=OneWay}"          
-                         />
+        FillColor="{Binding IsOnTarget, Converter={StaticResource BlueWhenTrue}, Mode=OneWay}">
+
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="MouseLeftButtonUp">
+                        <i:InvokeCommandAction Command="{Binding UserReadyForNextTrialCommand}" />
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+
+            </Controls:Target>
         </Canvas>
     </DockPanel>
 </Window>
