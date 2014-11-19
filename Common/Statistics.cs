@@ -10,7 +10,7 @@ namespace TheoryC.Common
 {
     // http://www.martijnkooij.nl/2013/04/csharp-math-mean-variance-and-standard-deviation/
 
-    class Statistics
+    public class Statistics
     {
         public static double DistanceBetween2Points(Point pt1, Point pt2)
         {
