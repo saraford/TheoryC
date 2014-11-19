@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,6 +15,30 @@ namespace TheoryC.Common
         public static double DistanceBetween2Points(Point pt1, Point pt2)
         {
             return Math.Sqrt(Math.Pow(pt2.X - pt1.X, 2) + Math.Pow(pt2.Y - pt1.Y, 2));
+        }
+
+        public static double CalculateConstantError(List<double> absoluteErrors, List<bool> isInsideCircle)
+        {
+            double constantError = 0;
+
+            for (int i = 0; i < absoluteErrors.Count; i++)
+            {
+                if (isInsideCircle[i])
+                {
+                    // inside the track, so add a negative value
+                    constantError += absoluteErrors[i] * -1;
+                }
+                else
+                {
+                    // outside track, so just add positive value
+                    constantError += absoluteErrors[i];
+                }
+            }
+
+            // need to divide by the total number of ticks for the mean
+            constantError /= absoluteErrors.Count;
+
+            return constantError;
         }
 
         public static double StandardDeviation(List<double> valueList)

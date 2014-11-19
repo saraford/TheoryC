@@ -40,6 +40,8 @@ namespace TheoryC.Models
             Results.AbsoluteError = 0;
             Results.AbsoluteErrorForEachTickList.Clear();
             Results.TimeOnTargetMs = 0;
+            Results.IsInsideTrackForEachTickList.Clear();
+            Results.ConstantError = 0;
         }
     }
 }

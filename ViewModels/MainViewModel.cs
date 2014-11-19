@@ -102,7 +102,11 @@ namespace TheoryC.ViewModels
                 this.Trials.Add(new Models.Trial
                 {
                     Number = i, // use a converter + 1, // no 0-based trials exposed to user
-                    Results = new Models.Result { TimeOnTargetMs = 0, AbsoluteError = 0, AbsoluteErrorForEachTickList = new List<double>() }
+                    Results = new Models.Result { 
+                            TimeOnTargetMs = 0, 
+                            AbsoluteError = 0, 
+                            AbsoluteErrorForEachTickList = new List<double>(), 
+                            IsInsideTrackForEachTickList = new List<bool>() }
                 });
 
                 // to see real-time updates
@@ -184,16 +188,7 @@ namespace TheoryC.ViewModels
             timeOnTarget.Reset();
             totalTrialTime.Reset();
 
-            // this is needed to avoid flickering because of the data binding to the 
-            // CurrentTrial's ShapeSize. We need to place its position first and then resize
-            // the other way around causes flickering
-            if (CurrentTrial.Number != 0)
-            {
-                double dumbTargetSizeRadius = this.CurrentTrial.ShapeSizeDiameter / 2.0;
-                TargetPositionLeft = xt - dumbTargetSizeRadius;
-                TargetPositionTop = yt - dumbTargetSizeRadius;
-                TargetSizeRadius = dumbTargetSizeRadius;
-            }
+            TargetSizeRadius = this.CurrentTrial.ShapeSizeDiameter / 2.0;
 
             secondsToDoOneRotation = 1 / (CurrentTrial.RPMs / 60.0);
 
@@ -209,9 +204,14 @@ namespace TheoryC.ViewModels
         {
             totalTrialTime.Stop();
             gameTimer.Stop();
-            CurrentTrial.Results.TimeOnTargetMs = timeOnTarget.ElapsedMilliseconds;
+
             Debug.Print("Trial #" + CurrentTrial.Number.ToString() + " stopped at " + DateTime.Now.ToString("hh.mm.ss.ffffff"));
             Debug.Print("Trial time took " + totalTrialTime.Elapsed.ToString());
+
+            // save results
+            CurrentTrial.Results.TimeOnTargetMs = timeOnTarget.ElapsedMilliseconds;
+            CurrentTrial.Results.AbsoluteError = Statistics.Mean(CurrentTrial.Results.AbsoluteErrorForEachTickList);
+            CurrentTrial.Results.ConstantError = Statistics.CalculateConstantError(CurrentTrial.Results.AbsoluteErrorForEachTickList, CurrentTrial.Results.IsInsideTrackForEachTickList);
 
             // Check whether to end the experiment
             if (CurrentTrial.Number + 1 >= Trials.Count)
@@ -241,7 +241,9 @@ namespace TheoryC.ViewModels
 
             CheckIsOnTarget();
 
-            UpdateAbsoluteErrorForTrial();
+            CheckIsInsideTrackCircle(); //to calculate algebraic error
+
+            CalculateAbsoluteErrorForEachTick();
 
             if (HasTrialTimeExpired())
             {
@@ -256,12 +258,10 @@ namespace TheoryC.ViewModels
         }
 
         double distanceFromCenterOnTick;
-        private void UpdateAbsoluteErrorForTrial()
+        private void CalculateAbsoluteErrorForEachTick()
         {
-            // for entire trials               
             distanceFromCenterOnTick = Statistics.DistanceBetween2Points(this.MousePosition, this.TargetPositionCenter);
             CurrentTrial.Results.AbsoluteErrorForEachTickList.Add(distanceFromCenterOnTick);
-            CurrentTrial.Results.AbsoluteError = Statistics.StandardDeviation(CurrentTrial.Results.AbsoluteErrorForEachTickList);
         }
 
         double xt, yt;
@@ -299,6 +299,16 @@ namespace TheoryC.ViewModels
             {
                 timeOnTarget.Stop();
             }
+        }
+
+        bool isInsideTrackCircle;
+        private void CheckIsInsideTrackCircle()
+        {
+            // calculate whether inside the track for algebraic error
+            isInsideTrackCircle = Tools.IsInsideCircle(this.MousePosition, this.trackCenter, this.TrackRadius);
+
+            // save boolean
+            CurrentTrial.Results.IsInsideTrackForEachTickList.Add(isInsideTrackCircle);
         }
 
         #region Commands

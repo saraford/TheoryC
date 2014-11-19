@@ -16,5 +16,11 @@ namespace TheoryC.Models
 
         List<double> _AbsoluteErrorForEachTickList = default(List<double>);
         public List<double> AbsoluteErrorForEachTickList { get { return _AbsoluteErrorForEachTickList; } set { base.SetProperty(ref _AbsoluteErrorForEachTickList, value); } }
+
+        double _ConstantError = default(double);
+        public double ConstantError { get { return _ConstantError; } set { base.SetProperty(ref _ConstantError, value); } }
+
+        List<bool> _IsInsideTrackForEachTickList = default(List<bool>);
+        public List<bool> IsInsideTrackForEachTickList { get { return _IsInsideTrackForEachTickList; } set { base.SetProperty(ref _IsInsideTrackForEachTickList, value); } }
     }
 }
