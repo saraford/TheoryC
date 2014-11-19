@@ -15,17 +15,17 @@ using System.Windows.Shapes;
 namespace TheoryC.Views
 {
     /// <summary>
-    /// Interaction logic for SettingsWindow.xaml
+    /// Interaction logic for ResultsWindow.xaml
     /// </summary>
-    public partial class SettingsWindow : Window
+    public partial class ResultsWindow : Window
     {
-        public SettingsWindow()
+        public ResultsWindow()
         {
             InitializeComponent();
         }
 
-        private Action _closing;
-        public SettingsWindow(Action closing)
+                private Action _closing;
+        public ResultsWindow(Action closing)
         {
             InitializeComponent();
 

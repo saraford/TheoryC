@@ -21,27 +21,30 @@
         <Converters:StartButtonTextConverter x:Key="StartButtonText"/>
         <Converters:RadiusToDiameterConverter x:Key="RadiusToDiameter"/>
     </Window.Resources>
-    <Canvas x:Name="SceneCanvas" Width="960" Height="510" >
-        <Ellipse Width="{Binding TrackRadius, Converter={StaticResource RadiusToDiameter}}"
+
+    <DockPanel>
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Command="{Binding StartExpCommand, Mode=OneWay}" Header="{Binding IsExperimentRunning, Converter={StaticResource StartButtonText}, Mode=OneWay}"  />
+            <MenuItem Command="{Binding ShowSettingsCommand, Mode=OneWay}" Header="Settings" />
+            <MenuItem Command="{Binding ShowResultsCommand, Mode=OneWay}" Header="Results" />
+            <MenuItem Command="{Binding ShowDebugCommand, Mode=OneWay}" Header="Debug" />
+        </Menu>
+
+        <Canvas x:Name="SceneCanvas" Width="960" Height="510" >
+            <Ellipse Width="{Binding TrackRadius, Converter={StaticResource RadiusToDiameter}}"
 			Height="{Binding TrackRadius, Converter={StaticResource RadiusToDiameter}}"
 			Stroke="AliceBlue"
 			StrokeThickness="10"
             Canvas.Left="{Binding Source={x:Static Properties:Settings.Default}, Path=TrackLeftX, Mode=OneWay}"
             Canvas.Top="{Binding Source={x:Static Properties:Settings.Default}, Path=TrackTopY, Mode=OneWay}"/>
 
-        <Controls:Target x:Name="Target" 
+            <Controls:Target x:Name="Target" 
 	            Width="{Binding TargetSizeRadius, Converter={StaticResource RadiusToDiameter}}"
 				Height="{Binding TargetSizeRadius, Converter={StaticResource RadiusToDiameter}}"
         Canvas.Left="{Binding TargetPositionLeft, Mode=OneWay}"
                 Canvas.Top="{Binding TargetPositionTop, Mode=OneWay}"
         FillColor="{Binding IsOnTarget, Converter={StaticResource BlueWhenTrue}, Mode=OneWay}"          
                          />
-
-        <Button IsDefault="True" Content="{Binding IsExperimentRunning, Converter={StaticResource StartButtonText}, Mode=OneWay}" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="74" Command="{Binding StartCommand, Mode=OneWay}"/>
-        <Button Content="Settings" IsEnabled="{Binding IsRunning, Converter={StaticResource InvertBoolean}}" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Margin="10,38,0,0" Command="{Binding ShowSettingsCommand, Mode=OneWay}"/>
-        <Button Content="Debug" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Command="{Binding ShowDebugCommand, Mode=OneWay}" Canvas.Left="417" Canvas.Top="476"/>
-        <!--<TextBox Height="23" Canvas.Left="10" TextWrapping="Wrap" Text="{Binding MousePosition.X}" Canvas.Top="63" Width="40"/>
-        <TextBox Height="23" Canvas.Left="55" TextWrapping="Wrap" Text="{Binding MousePosition.Y}" Canvas.Top="63" Width="40"/>-->
-
-    </Canvas>
+        </Canvas>
+    </DockPanel>
 </Window>

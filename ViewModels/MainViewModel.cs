@@ -344,7 +344,7 @@ namespace TheoryC.ViewModels
             }
         }
 
-        private void SettingsWindowSetupCallback(MainViewModel viewmodel)
+        private void SettingsWindowSetupCallback()
         {
             SetupWindowOpen = false;
 
@@ -355,6 +355,53 @@ namespace TheoryC.ViewModels
             // update scene
             this.UpdateTargetSizeAndPlaceInStartingPosition();
         }
+
+
+
+        bool _ResultsWindowOpen = default(bool);
+        public bool ResultsWindowOpen { get { return _ResultsWindowOpen; } set { base.SetProperty(ref _ResultsWindowOpen, value); } }
+
+        DelegateCommand _ShowResultsCommand = null;
+        public DelegateCommand ShowResultsCommand
+        {
+            get
+            {
+                if (_ShowResultsCommand != null)
+                    return _ShowResultsCommand;
+
+                _ShowResultsCommand = new DelegateCommand
+                (
+                    () =>
+                    {
+                        var results = new Views.ResultsWindow(ResultsWindowSetupCallback);
+                        results.DataContext = this; // to share same model data
+
+                        ResultsWindowOpen = true;
+                        results.Show();
+                    },
+                    () =>
+                    {
+                        return !SetupWindowOpen;
+                    }
+                );
+                this.PropertyChanged += (s, e) => _ShowResultsCommand.RaiseCanExecuteChanged();
+                return _ShowResultsCommand;
+            }
+        }
+
+        private void ResultsWindowSetupCallback()
+        {
+            ResultsWindowOpen = false;
+
+            // regardless which trial number the user left selected in the Settings window,
+            // put it back to the first trial
+            this.CurrentTrial = this.Trials.First();
+
+            // update scene
+            this.UpdateTargetSizeAndPlaceInStartingPosition();
+        }
+
+
 
         bool _DebugWindowOpen = default(bool);
         public bool DebugWindowOpen { get { return _DebugWindowOpen; } set { base.SetProperty(ref _DebugWindowOpen, value); } }
