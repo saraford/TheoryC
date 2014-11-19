@@ -16,8 +16,8 @@ namespace TheoryC.Models
         double _durationSeconds = default(double);
         public double DurationSeconds { get { return _durationSeconds; } set { base.SetProperty(ref _durationSeconds, value); } }
 
-        double _rotationSpeedInSeconds = default(double);
-        public double RotationSpeedInSeconds { get { return _rotationSpeedInSeconds; } set { base.SetProperty(ref _rotationSpeedInSeconds, value); } }
+        double _rpm = default(double);
+        public double RPMs { get { return _rpm; } set { base.SetProperty(ref _rpm, value); } }
 
         int _number = default(int);
         public int Number { get { return _number; } set { base.SetProperty(ref _number, value); } }
@@ -31,8 +31,8 @@ namespace TheoryC.Models
         public Trial()
         {
             _shapeSizeDiameter = 50;
-            _durationSeconds = 10;
-            _rotationSpeedInSeconds = 10; 
+            _durationSeconds = 1;
+            _rpm = 30; 
         }
 
         internal void ClearResults()

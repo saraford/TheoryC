@@ -11,7 +11,8 @@
         <ViewModels:MainViewModel/>
     </Window.DataContext>
     <Window.InputBindings>
-        <KeyBinding Command="{Binding StartCommand, Mode=OneWay}"  Key="S"/>
+        <KeyBinding Command="{Binding StartExpCommand, Mode=OneWay}"  Key="S"/>
+        <KeyBinding Command="{Binding StartTrialCommand, Mode=OneWay}"  Key="T"/>
     </Window.InputBindings>
     <Window.Resources>
         <Converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>

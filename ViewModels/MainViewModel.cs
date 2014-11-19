@@ -61,10 +61,11 @@ namespace TheoryC.ViewModels
         double _TrackRadius = default(double);
         public double TrackRadius { get { return _TrackRadius; } set { base.SetProperty(ref _TrackRadius, value); } }
 
-        #endregion
-
-        DispatcherTimer timer;
         Point trackCenter = new Point(Settings.Default.TrackLeftX + Settings.Default.TrackRadius, Settings.Default.TrackTopY + Settings.Default.TrackRadius);
+
+        DispatcherTimer gameTimer;
+
+        #endregion
 
         public MainViewModel()
         {
@@ -81,10 +82,14 @@ namespace TheoryC.ViewModels
                     });
                 }
 
+                // set the current trial so user sees it on first launch
                 this.CurrentTrial = this.Trials.First();
+
+                // setup the track
                 TrackRadius = Settings.Default.TrackRadius;
-                TargetSizeRadius = this.CurrentTrial.ShapeSizeDiameter / 2.0;
-                this.PlaceTargetInStartingPosition();
+
+                // setup the target
+                this.UpdateTargetSizeAndPlaceInStartingPosition();
             }
         }
 
@@ -92,41 +97,211 @@ namespace TheoryC.ViewModels
         public void Startup()
         {
             // To be eventually replaced by the researcher uploading a file or something
-            for (int i = 0; i < 1; i++)
+            for (int i = 0; i < 3; i++)
             {
                 this.Trials.Add(new Models.Trial
                 {
                     Number = i, // use a converter + 1, // no 0-based trials exposed to user
-                    Results = new Models.Result { TimeOnTargetMs = 0, AbsoluteError = 0, AbsoluteErrorForEachTickList = new List<double>() }                
+                    Results = new Models.Result { TimeOnTargetMs = 0, AbsoluteError = 0, AbsoluteErrorForEachTickList = new List<double>() }
                 });
 
                 // to see real-time updates
                 this.Trials[i].PropertyChanged += CurrentTrial_PropertyChanged;
             }
 
+            // initialize the game timer
+            gameTimer = new DispatcherTimer(DispatcherPriority.Normal);
+            gameTimer.Interval = TimeSpan.FromMilliseconds(Settings.Default.MillisecondDelay);
+            gameTimer.Tick += GameTimer_Tick;
+
+            // set the current trial so user sees it on first launch
             this.CurrentTrial = this.Trials.First();
 
-            timer = new DispatcherTimer(DispatcherPriority.Normal);
-            timer.Interval = TimeSpan.FromMilliseconds(Settings.Default.MillisecondDelay);
-
-            timer.Tick += Timer_Tick;
-
+            // setup the track
             TrackRadius = Settings.Default.TrackRadius;
-            TargetSizeRadius = this.CurrentTrial.ShapeSizeDiameter / 2.0;
 
-            PlaceTargetInStartingPosition();
-
-            this.TrialCompleted += StartNextTrial_TrialCompleted;
+            // setup the target
+            this.UpdateTargetSizeAndPlaceInStartingPosition();
         }
 
+        // if the user changes the target radius from Settings, we need code to place it at right location
         void CurrentTrial_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            // if the shape's size is changed, we need to place it at the right spot
             if (e.PropertyName == "ShapeSizeDiameter")
             {
                 this.PlaceTargetInStartingPosition();
             }
         }
+
+        public void UpdateTargetSizeAndPlaceInStartingPosition()
+        {
+            TargetSizeRadius = CurrentTrial.ShapeSizeDiameter / 2.0;
+            this.PlaceTargetInStartingPosition();
+        }
+
+        private void InitializeExperiment()
+        {
+            this.IsExperimentRunning = true;
+            CurrentTrial = Trials.First();
+            AngleInDegrees = 0;
+
+            // clear prior results
+            foreach (var trial in Trials)
+            {
+                trial.ClearResults();
+            }
+        }
+
+        private void StopExperiment()
+        {
+            this.IsExperimentRunning = false;
+            ResetTargetValues();
+            // kepeing target wherever it is because exp has stopped
+        }
+
+        private void UpdateSceneForNextTrial()
+        {
+            ResetTargetValues();
+            UpdateTargetSizeAndPlaceInStartingPosition();
+        }
+
+        private void ResetTargetValues()
+        {
+            IsOnTarget = false;
+            xt = 0;
+            yt = 0;
+        }
+
+        DateTime stopTime;
+        Stopwatch timeOnTarget = new Stopwatch();
+        Stopwatch totalTrialTime = new Stopwatch();
+        double secondsToDoOneRotation;
+
+        private void StartNextTrial()
+        {
+            stopTime = DateTime.Now.AddSeconds(CurrentTrial.DurationSeconds);
+
+            timeOnTarget.Reset();
+            totalTrialTime.Reset();
+
+            // this is needed to avoid flickering because of the data binding to the 
+            // CurrentTrial's ShapeSize. We need to place its position first and then resize
+            // the other way around causes flickering
+            if (CurrentTrial.Number != 0)
+            {
+                double dumbTargetSizeRadius = this.CurrentTrial.ShapeSizeDiameter / 2.0;
+                TargetPositionLeft = xt - dumbTargetSizeRadius;
+                TargetPositionTop = yt - dumbTargetSizeRadius;
+                TargetSizeRadius = dumbTargetSizeRadius;
+            }
+
+            secondsToDoOneRotation = 1 / (CurrentTrial.RPMs / 60.0);
+
+            // rock and roll
+            Debug.Print("Trial #" + CurrentTrial.Number.ToString() + " starting at " + DateTime.Now.ToString("hh.mm.ss.ffffff"));
+            totalTrialTime.Start();
+            gameTimer.Start();
+
+            tickCounter = 0; // for debugging
+        }
+
+        private void StopCurrentTrial()
+        {
+            totalTrialTime.Stop();
+            gameTimer.Stop();
+            CurrentTrial.Results.TimeOnTargetMs = timeOnTarget.ElapsedMilliseconds;
+            Debug.Print("Trial #" + CurrentTrial.Number.ToString() + " stopped at " + DateTime.Now.ToString("hh.mm.ss.ffffff"));
+            Debug.Print("Trial time took " + totalTrialTime.Elapsed.ToString());
+
+            // Check whether to end the experiment
+            if (CurrentTrial.Number + 1 >= Trials.Count)
+            {
+                StopExperiment();
+            }
+            else
+            {
+                // otherwise get next trial
+                int nextTrialNumber = CurrentTrial.Number + 1;
+                CurrentTrial = Trials[nextTrialNumber];
+
+                // setup for next trial
+                this.UpdateSceneForNextTrial();
+            }
+        }
+
+        public int tickCounter = 0;
+        void GameTimer_Tick(object sender, EventArgs e)
+        {
+
+            Debug.Print("Tick #" + tickCounter++ + " and time is right now " + DateTime.Now.ToString("hh.mm.ss.ffffff"));
+
+            CalculateAngleBasedOnTimeSampling();
+
+            MoveTargetOnTick();
+
+            CheckIsOnTarget();
+
+            UpdateAbsoluteErrorForTrial();
+
+            if (HasTrialTimeExpired())
+            {
+                StopCurrentTrial();
+            }
+        }
+
+        private void CalculateAngleBasedOnTimeSampling()
+        {
+            double wp = totalTrialTime.ElapsedMilliseconds / (secondsToDoOneRotation * 1000);
+            AngleInDegrees = 360.0 * wp; 
+        }
+
+        double distanceFromCenterOnTick;
+        private void UpdateAbsoluteErrorForTrial()
+        {
+            // for entire trials               
+            distanceFromCenterOnTick = Statistics.DistanceBetween2Points(this.MousePosition, this.TargetPositionCenter);
+            CurrentTrial.Results.AbsoluteErrorForEachTickList.Add(distanceFromCenterOnTick);
+            CurrentTrial.Results.AbsoluteError = Statistics.StandardDeviation(CurrentTrial.Results.AbsoluteErrorForEachTickList);
+        }
+
+        double xt, yt;
+        private void MoveTargetOnTick()
+        {
+            Common.Tools.PointsOnACircle(TrackRadius, AngleInDegrees, trackCenter, out xt, out yt);
+            TargetPositionLeft = xt - TargetSizeRadius;
+            TargetPositionTop = yt - TargetSizeRadius;
+        }
+
+        private bool HasTrialTimeExpired()
+        {
+            int result = DateTime.Compare(DateTime.Now, stopTime);
+            return (result > 0); // true if time has expired
+        }
+
+        private void PlaceTargetInStartingPosition()
+        {
+            Point pt = Tools.GetPointForPlacingTargetInStartingPosition(trackCenter, TrackRadius, TargetSizeRadius);
+
+            TargetPositionLeft = pt.X;
+            TargetPositionTop = pt.Y;
+        }
+
+        private void CheckIsOnTarget()
+        {
+            // calculate whether inside the circle
+            IsOnTarget = Tools.IsInsideCircle(this.MousePosition, this.TargetPositionCenter, TargetSizeRadius);
+
+            if (IsOnTarget)
+            {
+                timeOnTarget.Start();
+            }
+            else
+            {
+                timeOnTarget.Stop();
+            }
+        }
+
+        #region Commands
 
         bool _SetupWindowOpen = default(bool);
         public bool SetupWindowOpen { get { return _SetupWindowOpen; } set { base.SetProperty(ref _SetupWindowOpen, value); } }
@@ -162,9 +337,13 @@ namespace TheoryC.ViewModels
         private void SettingsWindowSetupCallback(MainViewModel viewmodel)
         {
             SetupWindowOpen = false;
+
+            // regardless which trial number the user left selected in the Settings window,
+            // put it back to the first trial
             this.CurrentTrial = this.Trials.First();
-            TargetSizeRadius = CurrentTrial.ShapeSizeDiameter / 2.0;
-            this.PlaceTargetInStartingPosition();
+
+            // update scene
+            this.UpdateTargetSizeAndPlaceInStartingPosition();
         }
 
         bool _DebugWindowOpen = default(bool);
@@ -222,30 +401,25 @@ namespace TheoryC.ViewModels
             main.Focus(); // put focus back on main window
         }
 
-        DelegateCommand _UpdateScene = null;
-        public DelegateCommand UpdateScene
+        DelegateCommand _UpdateSceneWhenListboxSelectionChanges = null;
+        public DelegateCommand UpdateSceneWhenListboxSelectionChanges
         {
             get
             {
-                if (_UpdateScene != null)
-                    return _UpdateScene;
+                if (_UpdateSceneWhenListboxSelectionChanges != null)
+                    return _UpdateSceneWhenListboxSelectionChanges;
 
-                _UpdateScene = new DelegateCommand(new Action(RefreshScene), new Func<bool>(UpdateSceneCanExecute));
-                this.PropertyChanged += (s, e) => _UpdateScene.RaiseCanExecuteChanged();
-                return _UpdateScene;
+                _UpdateSceneWhenListboxSelectionChanges = new DelegateCommand(new Action(PlaceTargetInStartingPosition), new Func<bool>(UpdateSceneWhenListboxSelectionChangesCanExecute));
+                this.PropertyChanged += (s, e) => _UpdateSceneWhenListboxSelectionChanges.RaiseCanExecuteChanged();
+                return _UpdateSceneWhenListboxSelectionChanges;
             }
         }
 
-        public bool UpdateSceneCanExecute()
+        public bool UpdateSceneWhenListboxSelectionChangesCanExecute()
         {
             // oh good lord, this fires even if the user did not invoke the action
             // this command should only execute if the SettingsWindow is opened
             return SetupWindowOpen;
-        }
-
-        public void RefreshScene()
-        {
-            this.PlaceTargetInStartingPosition();
         }
 
         DelegateCommand _UpdateTargetSizeRadius = null;
@@ -256,7 +430,7 @@ namespace TheoryC.ViewModels
                 if (_UpdateTargetSizeRadius != null)
                     return _UpdateTargetSizeRadius;
 
-                _UpdateTargetSizeRadius = new DelegateCommand(new Action(UpdateTargetSize), new Func<bool>(UpdateTargetSizeCanExecute));
+                _UpdateTargetSizeRadius = new DelegateCommand(new Action(UpdateTargetSizeAndPlaceInStartingPosition), new Func<bool>(UpdateTargetSizeCanExecute));
                 this.PropertyChanged += (s, e) => _UpdateTargetSizeRadius.RaiseCanExecuteChanged();
                 return _UpdateTargetSizeRadius;
             }
@@ -269,229 +443,65 @@ namespace TheoryC.ViewModels
             return SetupWindowOpen;
         }
 
-        public void UpdateTargetSize()
-        {
-            TargetSizeRadius = CurrentTrial.ShapeSizeDiameter / 2.0;
-            this.PlaceTargetInStartingPosition();
-        }
-
-        DelegateCommand _StartCommand = null;
-        public DelegateCommand StartCommand
+        DelegateCommand _StartExpCommand = null;
+        public DelegateCommand StartExpCommand
         {
             get
             {
-                if (_StartCommand != null)
-                    return _StartCommand;
+                if (_StartExpCommand != null)
+                    return _StartExpCommand;
 
-                _StartCommand = new DelegateCommand(new Action(StartExecuted), new Func<bool>(StartCanExecute));
-                this.PropertyChanged += (s, e) => _StartCommand.RaiseCanExecuteChanged();
-                return _StartCommand;
+                _StartExpCommand = new DelegateCommand(new Action(StartExperiment), new Func<bool>(StartExpCanExecute));
+                this.PropertyChanged += (s, e) => _StartExpCommand.RaiseCanExecuteChanged();
+                return _StartExpCommand;
             }
         }
 
-        public bool StartCanExecute()
+        public bool StartExpCanExecute()
         {
             return true;
-            //  return !IsRunning; //only when not running can you start the experiment
         }
 
-        DateTime stopTime;
-        public void StartExecuted()
+        public void StartExperiment()
         {
             if (!IsExperimentRunning)
             {
-                // reset results / data
                 InitializeExperiment();
                 StartNextTrial();
             }
             else
             {
-                StopCurrentTrial(goToNextTrial:false);
+                StopCurrentTrial();
                 StopExperiment();
             }
         }
 
-        private void InitializeExperiment()
+        DelegateCommand _StartTrialCommand = null;
+        public DelegateCommand StartTrialCommand
         {
-            CurrentTrial = Trials.First();
-
-            // clear prior results
-            foreach (var trial in Trials)
+            get
             {
-                trial.ClearResults();
+                if (_StartTrialCommand != null)
+                    return _StartTrialCommand;
+
+                _StartTrialCommand = new DelegateCommand(new Action(StartTrialExecuted), new Func<bool>(StartTrialCanExecute));
+                this.PropertyChanged += (s, e) => _StartTrialCommand.RaiseCanExecuteChanged();
+                return _StartTrialCommand;
             }
         }
 
-        private void StopExperiment()
+        public bool StartTrialCanExecute()
         {
-            ResetScene();
+            // can only run if the overall experiment is running
+            return IsExperimentRunning;
         }
 
-        private void ResetScene()
+        public void StartTrialExecuted()
         {
-            this.PlaceTargetInStartingPosition();
-            this.AngleInDegrees = 0;
-            IsOnTarget = false;
-            xt = 0;
-            yt = 0;
+            StartNextTrial();
         }
 
-        // create a test that verifies all Results and values are reset
-        Stopwatch timeOnTarget = new Stopwatch();
-        Stopwatch totalTrialTime = new Stopwatch();
-        private void StartNextTrial()
-        {
-            stopTime = DateTime.Now.AddSeconds(CurrentTrial.DurationSeconds);
+        #endregion
 
-            // must add an extra tick
-            //  stopTime = stopTime.AddMilliseconds(Settings.Default.MillisecondDelay);
-            timeOnTarget.Reset(); 
-            totalTrialTime.Reset();
-
-            // this is needed to avoid flickering because of the data binding to the 
-            // CurrentTrial's ShapeSize. We need to place its position first and then resize
-            // the other way around causes flickering
-            if (CurrentTrial.Number != 0)
-            {
-                double dumbTargetSizeRadius = this.CurrentTrial.ShapeSizeDiameter / 2.0;
-                TargetPositionLeft = xt - dumbTargetSizeRadius;
-                TargetPositionTop = yt - dumbTargetSizeRadius;
-                TargetSizeRadius = dumbTargetSizeRadius;
-            }
-
-            // rock and roll
-            Debug.Print("Trial #" + CurrentTrial.Number.ToString() + " starting at " + DateTime.Now.ToString("hh.mm.ss.ffffff"));
-            totalTrialTime.Start();
-            timer.Start();
-            this.IsExperimentRunning = true;
-
-            tickCounter = 0; // for debugging
-        }
-
-        private void StopCurrentTrial(bool goToNextTrial)
-        {
-            totalTrialTime.Stop();
-            timer.Stop();
-            CurrentTrial.Results.TimeOnTargetMs = timeOnTarget.ElapsedMilliseconds;
-            Debug.Print("Trial #" + CurrentTrial.Number.ToString() + " stopped at " + DateTime.Now.ToString("hh.mm.ss.ffffff"));
-            Debug.Print("Trial time took " + totalTrialTime.Elapsed.ToString());
-            this.IsExperimentRunning = false;
-
-            // fire the event to call the next trial
-            if (goToNextTrial)
-            {
-                OnTrialCompleted(new EventArgs());
-            }
-        }
-
-        private void StartNextTrial_TrialCompleted(object sender, EventArgs e)
-        {
-            // check to see if there are any trials left to run
-            if (CurrentTrial.Number + 1 >= Trials.Count)
-            {
-                StopExperiment();
-            }
-            else
-            {
-                int nextTrialNumber = CurrentTrial.Number + 1;
-                CurrentTrial = Trials[nextTrialNumber];
-                StartNextTrial();
-            }
-        }
-
-        public event EventHandler TrialCompleted;
-
-        protected virtual void OnTrialCompleted(EventArgs e)
-        {
-            if (TrialCompleted != null)
-            {
-                TrialCompleted(this, e);
-            }
-        }
-
-        public int tickCounter = 0;
-        void Timer_Tick(object sender, EventArgs e)
-        {
-
-            Debug.Print("Tick #" + tickCounter++ + " and time is right now " + DateTime.Now.ToString("hh.mm.ss.ffffff"));
-
-            CalculateAngleBasedOnTimeSampling();
-
-            MoveTargetOnTick();
-
-            CheckIsOnTarget();
-
-            UpdateAbsoluteErrorForTrial();
-
-            if (HasTrialTimeExpired())
-            {
-                StopCurrentTrial(goToNextTrial:true);
-            }
-        }
-
-        private void CalculateAngleBasedOnTimeSampling()
-        {
-            // wp% of rotationTime = elapsed time
-            // wp% of 360 = current angle
-            double wp = totalTrialTime.ElapsedMilliseconds / (CurrentTrial.RotationSpeedInSeconds * 1000);
-            AngleInDegrees = 360.0 * wp;
-            //            Debug.Print("Angle is " + AngleInDegrees);
-        }
-
-        // Hmm, how might I unit test this??
-        double distanceFromCenterOnTick;
-        private void UpdateAbsoluteErrorForTrial()
-        {
-            // for entire trials               
-            distanceFromCenterOnTick = Statistics.DistanceBetween2Points(this.MousePosition, this.TargetPositionCenter);
-            CurrentTrial.Results.AbsoluteErrorForEachTickList.Add(distanceFromCenterOnTick);
-            CurrentTrial.Results.AbsoluteError = Statistics.StandardDeviation(CurrentTrial.Results.AbsoluteErrorForEachTickList);
-        }
-
-        double xt, yt;
-        private void MoveTargetOnTick()
-        {
-            Common.Tools.PointsOnACircle(TrackRadius, AngleInDegrees, trackCenter, out xt, out yt);
-            TargetPositionLeft = xt - TargetSizeRadius;
-            TargetPositionTop = yt - TargetSizeRadius;
-        }
-
-        private bool HasTrialTimeExpired()
-        {
-            int result = DateTime.Compare(DateTime.Now, stopTime);
-            return (result > 0); // true if time has expired
-        }
-
-        private void PlaceTargetInStartingPosition()
-        {
-            Point pt = Tools.GetPointForPlacingTargetInStartingPosition(trackCenter, TrackRadius, TargetSizeRadius);
-
-            TargetPositionLeft = pt.X;
-            TargetPositionTop = pt.Y;
-        }
-
-        private void CheckIsOnTarget()
-        {
-            // calculate whether inside the circle
-            // IsOnTarget is a DP that goes through a converter to set the color of the shape  
-            IsOnTarget = Tools.IsInsideCircle(this.MousePosition, this.TargetPositionCenter, TargetSizeRadius);
-
-            if (IsOnTarget)
-            {
-                timeOnTarget.Start();
-                //                CurrentTrial.Results.TimeOnTargetMs += Settings.Default.MillisecondDelay;
-            }
-            else
-            {
-                timeOnTarget.Stop();
-            }
-        }
-
-        // called by the MainWindow when shutting down
-        internal void Shutdown()
-        {
-            //if (debugWin != null)
-            //    debugWin.Close();
-        }
     }
 }

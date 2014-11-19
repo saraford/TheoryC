@@ -13,7 +13,6 @@ namespace TheoryC.Views
             InitializeComponent();
             MouseMove += MainWindow_MouseMove;
             Loaded += MainWindow_Loaded;
-            Closing += MainWindow_Closing;
         }
 
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
@@ -22,11 +21,6 @@ namespace TheoryC.Views
 
             this.ViewModel.Startup();
             this.ViewModel.ShowDebugWindow();
-        }
-
-        void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
-        {
-            this.ViewModel.Shutdown();
         }
 
         void MainWindow_MouseMove(object sender, MouseEventArgs e)
