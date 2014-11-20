@@ -17,7 +17,7 @@ namespace TheoryC.Common
             return Math.Sqrt(Math.Pow(pt2.X - pt1.X, 2) + Math.Pow(pt2.Y - pt1.Y, 2));
         }
 
-        public static double CalculateConstantError(List<double> absoluteErrors, List<bool> isInsideCircle)
+        public static double ConstantError(List<double> absoluteErrors, List<bool> isInsideCircle)
         {
             double constantError = 0;
 
@@ -41,19 +41,46 @@ namespace TheoryC.Common
             return constantError;
         }
 
-        public static double StandardDeviation(List<double> valueList)
+        public static double VariableError(List<double> absoluteErrors, List<bool> isInsideCircle)
         {
-            double M = 0.0;
-            double S = 0.0;
-            int k = 1;
-            foreach (double value in valueList)
+            List<double> algebraicErrors = ConvertAbsoluteErrorToAlgebraicError(absoluteErrors, isInsideCircle);
+
+            double variableError = PopulationStandardDeviation(algebraicErrors);
+
+            return variableError;
+        }
+
+        private static List<double> ConvertAbsoluteErrorToAlgebraicError(List<double> absoluteErrors, List<bool> isInsideCircle)
+        {
+            for (int i = 0; i < absoluteErrors.Count; i++)
             {
-                double tmpM = M;
-                M += (value - tmpM) / k;
-                S += (value - tmpM) * (value - M);
-                k++;
+                if (isInsideCircle[i])
+                {
+                    // inside the track, so add a negative value
+                    absoluteErrors[i] *= -1;
+                }
             }
-            return Math.Sqrt(S / (k - 1));
+
+            return absoluteErrors;
+        }
+
+        // http://stackoverflow.com/questions/2253874/linq-equivalent-for-standard-deviation
+        public static double PopulationStandardDeviation(List<double> values)
+        {
+            double answer = 0;
+            int count = values.Count();
+            if (count > 1)
+            {
+                //Compute the Average
+                double avg = values.Average();
+
+                //Perform the Sum of (value-avg)^2
+                double sum = values.Sum(d => (d - avg) * (d - avg));
+
+                //Put it all together
+                answer = Math.Sqrt(sum / count);
+            }
+            return answer;
         }
 
         public static double Mean(List<double> valueList)

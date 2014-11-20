@@ -5,7 +5,7 @@
         xmlns:Converters="clr-namespace:TheoryC.Converters"      
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
         x:Class="TheoryC.Views.SettingsWindow"
-        Title="SettingsWindow" Height="360" Width="277.113">
+        Title="SettingsWindow" Height="420" Width="277.113">
     <Window.DataContext>
         <ViewModels:MainViewModel/>
     </Window.DataContext>
@@ -71,8 +71,10 @@
             <TextBox Margin="0,5,0,0" Text="{Binding CurrentTrial.Results.AbsoluteError}"  />
             <TextBlock Margin="0,5,0,0" Text="Constant Error"/>
             <TextBox Margin="0,5,0,0" Text="{Binding CurrentTrial.Results.ConstantError}"  />
+                <TextBlock Margin="0,5,0,0" Text="Variable Error"/>
+                <TextBox Margin="0,5,0,0" Text="{Binding CurrentTrial.Results.VariableError}"  />
 
-        </StackPanel>
+            </StackPanel>
     </Grid>
     </Grid>
 </Window>

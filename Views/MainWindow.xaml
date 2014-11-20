@@ -58,8 +58,8 @@
         <Grid Visibility="{Binding ShowParticipantInstructions, Converter={StaticResource BoolToVisibilityConverter}}" >
             <Border MinWidth="250" MinHeight="250" Background="Beige" BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Center" VerticalAlignment="Center">
                 <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                    <TextBlock>I can call you Betty. And Betty when you call me. You can call me</TextBlock>
-                    <Button Margin="0,30,0,0" Content="Al!!!" MaxWidth="100" Command="{Binding ShowClickTargetToStartTrialCommand, Mode=OneWay}" ></Button>
+                    <TextBlock>Some Participant Instructions To go here</TextBlock>
+                    <Button Margin="0,30,0,0" Content="Start Experiment" MaxWidth="100" Command="{Binding ShowClickTargetToStartTrialCommand, Mode=OneWay}" ></Button>
                 </StackPanel>
             </Border>
         </Grid>
@@ -67,9 +67,9 @@
         <!--The Start Next Trial Instructions Window-->
         <Grid Margin="370,370,355,63.5" 
               Visibility="{Binding ShowClickTargetToStartTrial, Converter={StaticResource BoolToVisibilityConverter}}" >
-            <Border Background="DarkGoldenrod" BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="-10,-90,-162,-91" Width="402" >
+            <Border Background="Beige" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="-10,-90,-162,-91" Width="402" >
                 <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                    <TextBlock Foreground="White" FontSize="20" Text="Click the red ball to start the trial"></TextBlock>
+                    <TextBlock FontSize="20" Text="Click the red ball to start the trial"></TextBlock>
                 </StackPanel>
             </Border>
         </Grid>

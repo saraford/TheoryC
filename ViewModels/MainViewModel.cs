@@ -218,7 +218,8 @@ namespace TheoryC.ViewModels
             // save results
             CurrentTrial.Results.TimeOnTargetMs = timeOnTarget.ElapsedMilliseconds;
             CurrentTrial.Results.AbsoluteError = Statistics.Mean(CurrentTrial.Results.AbsoluteErrorForEachTickList);
-            CurrentTrial.Results.ConstantError = Statistics.CalculateConstantError(CurrentTrial.Results.AbsoluteErrorForEachTickList, CurrentTrial.Results.IsInsideTrackForEachTickList);
+            CurrentTrial.Results.ConstantError = Statistics.ConstantError(CurrentTrial.Results.AbsoluteErrorForEachTickList, CurrentTrial.Results.IsInsideTrackForEachTickList);
+            CurrentTrial.Results.VariableError = Statistics.VariableError(CurrentTrial.Results.AbsoluteErrorForEachTickList, CurrentTrial.Results.IsInsideTrackForEachTickList);
 
             // Check whether to end the experiment
             if (CurrentTrial.Number + 1 >= Trials.Count)
@@ -241,6 +242,7 @@ namespace TheoryC.ViewModels
         private void WaitForUserClick()
         {
             // enables the command to start next trial
+            ShowClickTargetToStartTrial = true;
             UserReadyForNextTrial = true;
         }
 
@@ -361,7 +363,7 @@ namespace TheoryC.ViewModels
                 (
                     () =>
                     {
-
+                        ShowClickTargetToStartTrial = false;
                         UserReadyForNextTrial = false;
 
                         if (!IsExperimentRunning)
@@ -396,11 +398,13 @@ namespace TheoryC.ViewModels
                 (
                     () =>
                     {
+                        ShowClickTargetToStartTrial = false;
                         ShowParticipantInstructions = true;
                     },
                     () =>
                     {
-                        return true; // what to do here????
+                        // BUG: not fully resetting experiment. Trial not going back to 0
+                        return true; // user can restart the experiment at any time 
                     }
                 );
                 this.PropertyChanged += (s, e) => _ShowParticipantInstructionsWindowCommand.RaiseCanExecuteChanged();

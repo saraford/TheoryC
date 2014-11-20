@@ -14,6 +14,9 @@ namespace TheoryC.Models
         double _AbsoluteError = default(double);
         public double AbsoluteError { get { return _AbsoluteError; } set { base.SetProperty(ref _AbsoluteError, value); } }
 
+        double _VariableError = default(double);
+        public double VariableError { get { return _VariableError; } set { base.SetProperty(ref _VariableError, value); } }
+
         List<double> _AbsoluteErrorForEachTickList = default(List<double>);
         public List<double> AbsoluteErrorForEachTickList { get { return _AbsoluteErrorForEachTickList; } set { base.SetProperty(ref _AbsoluteErrorForEachTickList, value); } }
 
