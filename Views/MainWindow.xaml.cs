@@ -13,12 +13,6 @@ namespace TheoryC.Views
             InitializeComponent();
             MouseMove += MainWindow_MouseMove;
             Loaded += MainWindow_Loaded;
-            Target.MouseLeftButtonUp += Target_MouseLeftButtonUp;
-        }
-
-        void Target_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
-        {
-            
         }
 
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
@@ -27,8 +21,6 @@ namespace TheoryC.Views
 
             this.ViewModel.Startup();
             this.ViewModel.ShowDebugWindow();
-
-            GetLocationOfTargetForSettingMouse();
         }
 
         void MainWindow_MouseMove(object sender, MouseEventArgs e)
@@ -36,10 +28,12 @@ namespace TheoryC.Views
             this.ViewModel.MousePosition = e.GetPosition(this);
         }
 
+        // NO IDEA HOW TO CALL THIS
         // only to be used to set the mouse position
         public void GetLocationOfTargetForSettingMouse()
         {
-            this.ViewModel.AbsoluteScreenPositionOfTarget = Target.PointToScreen(new Point(0, 0));
+            throw new System.NotImplementedException("Don't know how to get the view to call me. But you can call me Al");
+//            this.ViewModel.AbsoluteScreenPositionOfTarget = Target.PointToScreen(new Point(0, 0));
         }
 
         public ViewModels.MainViewModel ViewModel

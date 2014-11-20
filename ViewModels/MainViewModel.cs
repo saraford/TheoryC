@@ -62,10 +62,14 @@ namespace TheoryC.ViewModels
         double _TrackRadius = default(double);
         public double TrackRadius { get { return _TrackRadius; } set { base.SetProperty(ref _TrackRadius, value); } }
 
+        bool _ShowParticipantInstructions = default(bool);
+        public bool ShowParticipantInstructions { get { return _ShowParticipantInstructions; } set { base.SetProperty(ref _ShowParticipantInstructions, value); } }
+
+        bool _ShowClickTargetToStartTrial = default(bool);
+        public bool ShowClickTargetToStartTrial { get { return _ShowClickTargetToStartTrial; } set { base.SetProperty(ref _ShowClickTargetToStartTrial, value); } }
+
         Point trackCenter = new Point(Settings.Default.TrackLeftX + Settings.Default.TrackRadius, Settings.Default.TrackTopY + Settings.Default.TrackRadius);
-
         DispatcherTimer gameTimer;
-
         public Point AbsoluteScreenPositionOfTarget { get; set; }
 
         #endregion
@@ -146,7 +150,7 @@ namespace TheoryC.ViewModels
             this.PlaceTargetInStartingPosition();
         }
 
-        private void InitializeExperiment()
+        private void InitializeExperimentVariables()
         {
             this.IsExperimentRunning = true;
             CurrentTrial = Trials.First();
@@ -163,7 +167,7 @@ namespace TheoryC.ViewModels
         {
             this.IsExperimentRunning = false;
             ResetTargetValues();
-            // kepeing target wherever it is because exp has stopped
+            UpdateTargetSizeAndPlaceInStartingPosition();
         }
 
         private void UpdateSceneForNextTrial()
@@ -230,33 +234,25 @@ namespace TheoryC.ViewModels
                 // setup for next trial
                 this.UpdateSceneForNextTrial();
 
-                WaitForUserFeedbackToStartNextTrial();
+                WaitForUserClick();
             }
-        }
-
-        private void WaitForUserFeedbackToStartNextTrial()
-        {
-            // move the mouse to the right location
-            MoveMouseToStartingPosition();
-
-            // wait for user click
-            WaitForUserClick();
         }
 
         private void WaitForUserClick()
         {
-            // enables the command tos tart next trial
+            // enables the command to start next trial
             UserReadyForNextTrial = true;
-
         }
 
         private void MoveMouseToStartingPosition()
         {
+            throw new System.NotImplementedException("Don't know how to get the view to call AbsoluteScreenPositionOfTarget. But you can call me Al");
 
-            double x = AbsoluteScreenPositionOfTarget.X + TargetSizeRadius;
-            double y = AbsoluteScreenPositionOfTarget.Y + TargetSizeRadius;
+            //double x = AbsoluteScreenPositionOfTarget.X + TargetSizeRadius;
+            //double y = AbsoluteScreenPositionOfTarget.Y + TargetSizeRadius;
 
-            SetPosition((int)x, (int)y);
+            //// broken
+            //SetPosition((int)x, (int)y);
         }
 
         [DllImport("User32.dll")]
@@ -365,10 +361,17 @@ namespace TheoryC.ViewModels
                 (
                     () =>
                     {
-                        // start next trial
-                        StartNextTrial();
 
                         UserReadyForNextTrial = false;
+
+                        if (!IsExperimentRunning)
+                        {
+                            StartExperiment();
+                        }
+                        else
+                        {
+                            StartNextTrial();
+                        }
                     },
                     () =>
                     {
@@ -381,8 +384,56 @@ namespace TheoryC.ViewModels
         }
 
 
+        DelegateCommand _ShowParticipantInstructionsWindowCommand = null;
+        public DelegateCommand ShowParticipantInstructionsWindowCommand
+        {
+            get
+            {
+                if (_ShowParticipantInstructionsWindowCommand != null)
+                    return _ShowParticipantInstructionsWindowCommand;
+
+                _ShowParticipantInstructionsWindowCommand = new DelegateCommand
+                (
+                    () =>
+                    {
+                        ShowParticipantInstructions = true;
+                    },
+                    () =>
+                    {
+                        return true; // what to do here????
+                    }
+                );
+                this.PropertyChanged += (s, e) => _ShowParticipantInstructionsWindowCommand.RaiseCanExecuteChanged();
+                return _ShowParticipantInstructionsWindowCommand;
+            }
+        }
 
 
+        DelegateCommand _ShowClickTargetToStartTrialCommand = null;
+        public DelegateCommand ShowClickTargetToStartTrialCommand
+        {
+            get
+            {
+                if (_ShowClickTargetToStartTrialCommand != null)
+                    return _ShowClickTargetToStartTrialCommand;
+
+                _ShowClickTargetToStartTrialCommand = new DelegateCommand
+                (
+                    () =>
+                    {
+                        ShowParticipantInstructions = false;
+                        ShowClickTargetToStartTrial = true;
+                        UserReadyForNextTrial = true;
+                    },
+                    () =>
+                    {
+                        return true; // what to do here????
+                    }
+                );
+                this.PropertyChanged += (s, e) => _ShowClickTargetToStartTrialCommand.RaiseCanExecuteChanged();
+                return _ShowClickTargetToStartTrialCommand;
+            }
+        }
 
 
         bool _SetupWindowOpen = default(bool);
@@ -543,14 +594,15 @@ namespace TheoryC.ViewModels
 
         public bool StartExpCanExecute()
         {
-            return true;
+            return true; //should be changed to only start when ParticipantInstructions Window is showing
         }
 
         public void StartExperiment()
         {
             if (!IsExperimentRunning)
             {
-                InitializeExperiment();
+                ShowClickTargetToStartTrial = false;
+                InitializeExperimentVariables();
                 StartNextTrial();
             }
             else
