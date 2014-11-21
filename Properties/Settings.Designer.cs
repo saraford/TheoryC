@@ -70,5 +70,17 @@ namespace TheoryC.Properties {
                 this["TrackRadius"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute(".csv")]
+        public string CSVextension {
+            get {
+                return ((string)(this["CSVextension"]));
+            }
+            set {
+                this["CSVextension"] = value;
+            }
+        }
     }
 }

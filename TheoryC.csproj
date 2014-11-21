@@ -60,6 +60,7 @@
     </Compile>
     <Compile Include="Common\BindableBase.cs" />
     <Compile Include="Common\DelegateCommand.cs" />
+    <Compile Include="Common\DataLogger.cs" />
     <Compile Include="Common\Statistics.cs" />
     <Compile Include="Common\Tools.cs" />
     <Compile Include="Controls\Target.xaml.cs">
@@ -73,6 +74,11 @@
     <Compile Include="Converters\StartButtonTextConverter.cs" />
     <Compile Include="Models\Results.cs" />
     <Compile Include="Models\Trial.cs" />
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="Views\DebugWindow.xaml.cs">
       <DependentUpon>DebugWindow.xaml</DependentUpon>
@@ -92,11 +98,6 @@
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-    <Compile Include="Properties\Settings.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Settings.settings</DependentUpon>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

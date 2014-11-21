@@ -207,6 +207,14 @@ namespace TheoryC.ViewModels
             this.IsExperimentRunning = false;
             ResetTargetValues();
             UpdateTargetSizeAndPlaceInStartingPosition();
+
+            LogData();
+        }
+
+        private void LogData()
+        {
+            DataLogger logger = new DataLogger();
+            logger.LogExperiment(Trials);
         }
 
         private void UpdateSceneForNextTrial()
@@ -307,7 +315,7 @@ namespace TheoryC.ViewModels
             // got the file
             if (result == true)
             {
-                // must set CurrentTrials to null; otherwise because it is a DP, it will crash
+                // must set CurrentTrials to null; otherwise because it is databound to a DP, it will crash
                 CurrentTrial = null;
                 Trials.Clear();
 

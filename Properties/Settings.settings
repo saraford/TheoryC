@@ -14,5 +14,8 @@
     <Setting Name="TrackRadius" Type="System.Double" Scope="User">
       <Value Profile="(Default)">100</Value>
     </Setting>
+    <Setting Name="CSVextension" Type="System.String" Scope="User">
+      <Value Profile="(Default)">.csv</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
