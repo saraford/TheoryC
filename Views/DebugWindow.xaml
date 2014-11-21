@@ -36,6 +36,11 @@
                     <TextBox Margin="10,0,0,0"  Text="{Binding CurrentTrial.Results.AbsoluteError}" />
                 </StackPanel>
 
+                <StackPanel Orientation="Horizontal" Margin="10,10,0,10">
+                    <TextBox Margin="5,0,0,0" MinWidth="50" Text="{Binding MousePosition.X}" ></TextBox>
+                    <TextBox Margin="5,0,0,0" MinWidth="50" Text="{Binding MousePosition.Y}" ></TextBox>
+                </StackPanel>
+                
             </StackPanel>
 
         </Grid>

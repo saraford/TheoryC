@@ -31,7 +31,7 @@
 
             <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
                 <Button Content="Add Trial" Command="{Binding AddTrialCommand, Mode=OneWay}"></Button>
-                <Button Margin="10,0,0,0" Content="Import Trials"></Button>
+                <Button Margin="10,0,0,0" Content="Import Trials" Command="{Binding ImportSettingsCommand, Mode=OneWay}"></Button>
                 <Button Margin="10,0,0,0" Content="Export Trials"></Button>
             </StackPanel>
         </StackPanel>
@@ -42,7 +42,7 @@
             <ColumnDefinition />
         </Grid.ColumnDefinitions>
 
-        <ListBox Grid.Column="0"
+            <ListBox Grid.Column="0"
                          DisplayMemberPath="TrialName"
                          ItemsSource="{Binding Trials}"
                          SelectedItem="{Binding CurrentTrial, Mode=TwoWay}" >

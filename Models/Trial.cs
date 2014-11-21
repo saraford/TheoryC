@@ -10,8 +10,8 @@ namespace TheoryC.Models
     public class Trial : Common.BindableBase
     {
 
-        int _shapeSizeDiameter = default(int);
-        public int ShapeSizeDiameter { get { return _shapeSizeDiameter; } set { base.SetProperty(ref _shapeSizeDiameter, value); } }
+        double _shapeSizeDiameter = default(double);
+        public double ShapeSizeDiameter { get { return _shapeSizeDiameter; } set { base.SetProperty(ref _shapeSizeDiameter, value); } }
 
         double _durationSeconds = default(double);
         public double DurationSeconds { get { return _durationSeconds; } set { base.SetProperty(ref _durationSeconds, value); } }

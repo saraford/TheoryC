@@ -24,26 +24,29 @@
     </Window.Resources>
     <Grid>
         <DockPanel>
-            <Menu DockPanel.Dock="Top">
+            <Menu DockPanel.Dock="Top" MinHeight="20" MaxHeight="20">
                 <MenuItem Command="{Binding StartExpCommand, Mode=OneWay}" Header="{Binding IsExperimentRunning, Converter={StaticResource StartButtonText}, Mode=OneWay}"  />
                 <MenuItem Command="{Binding ShowSettingsCommand, Mode=OneWay}" Header="Settings" />
                 <MenuItem Command="{Binding ShowDebugCommand, Mode=OneWay}" Header="Debug" />
             </Menu>
 
+            <!--This must come first; don't want anything pushing this down or it screws up mouse x,y-->
             <Canvas x:Name="SceneCanvas" Width="960" Height="510" >
-                <Ellipse Width="{Binding TrackRadius, Converter={StaticResource RadiusToDiameter}}"
-			Height="{Binding TrackRadius, Converter={StaticResource RadiusToDiameter}}"
-			Stroke="AliceBlue"
+                <Ellipse 
+                    Width="{Binding TrackRadius, Converter={StaticResource RadiusToDiameter}}"
+			         Height="{Binding TrackRadius, Converter={StaticResource RadiusToDiameter}}"
+		                    
+                    Stroke="AliceBlue"
 			StrokeThickness="10"
             Canvas.Left="{Binding Source={x:Static Properties:Settings.Default}, Path=TrackLeftX, Mode=OneWay}"
             Canvas.Top="{Binding Source={x:Static Properties:Settings.Default}, Path=TrackTopY, Mode=OneWay}"/>
 
                 <Controls:Target x:Name="Target" 
-	            Width="{Binding TargetSizeRadius, Converter={StaticResource RadiusToDiameter}}"
-				Height="{Binding TargetSizeRadius, Converter={StaticResource RadiusToDiameter}}"
-        Canvas.Left="{Binding TargetPositionLeft, Mode=OneWay}"
+	            Width="{Binding CurrentTrial.ShapeSizeDiameter}"
+				Height="{Binding CurrentTrial.ShapeSizeDiameter}"
+                Canvas.Left="{Binding TargetPositionLeft, Mode=OneWay}"
                 Canvas.Top="{Binding TargetPositionTop, Mode=OneWay}"
-        FillColor="{Binding IsOnTarget, Converter={StaticResource BlueWhenTrue}, Mode=OneWay}">
+                FillColor="{Binding IsOnTarget, Converter={StaticResource BlueWhenTrue}, Mode=OneWay}">
 
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="MouseLeftButtonUp">

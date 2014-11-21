@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -38,10 +39,6 @@ namespace TheoryC.ViewModels
         bool _IsOnTarget = default(bool);
         public bool IsOnTarget { get { return _IsOnTarget; } set { base.SetProperty(ref _IsOnTarget, value); } }
 
-        // needed to avoid the flicker when sizes change during trial
-        double _TargetSizeRadius = default(double);
-        public double TargetSizeRadius { get { return _TargetSizeRadius; } set { base.SetProperty(ref _TargetSizeRadius, value); } }
-
         double _TargetPositionLeft = default(double);
         public double TargetPositionLeft { get { return _TargetPositionLeft; } set { base.SetProperty(ref _TargetPositionLeft, value); } }
 
@@ -71,7 +68,8 @@ namespace TheoryC.ViewModels
         Point trackCenter = new Point(Settings.Default.TrackLeftX + Settings.Default.TrackRadius, Settings.Default.TrackTopY + Settings.Default.TrackRadius);
         DispatcherTimer gameTimer;
         public Point AbsoluteScreenPositionOfTarget { get; set; }
-
+        private double TargetSizeRadius;
+       
         #endregion
 
         public MainViewModel()
@@ -148,6 +146,29 @@ namespace TheoryC.ViewModels
             this.Trials[currentCount].PropertyChanged += CurrentTrial_PropertyChanged;
         }
 
+        private void AddTrial(double diameter, double duration, double rpm)
+        {
+            int currentCount = Trials.Count;
+
+            this.Trials.Add(new Models.Trial
+            {
+                ShapeSizeDiameter = diameter,
+                DurationSeconds = duration,
+                RPMs = rpm,
+                Number = currentCount, // Number uses a converter + 1, // no 0-based trials exposed to user                
+                Results = new Models.Result
+                {
+                    TimeOnTargetMs = 0,
+                    AbsoluteError = 0,
+                    AbsoluteErrorForEachTickList = new List<double>(),
+                    IsInsideTrackForEachTickList = new List<bool>()
+                }
+            });
+
+            // to see real-time updates when user makes modifications in Settings Window
+            this.Trials[currentCount].PropertyChanged += CurrentTrial_PropertyChanged;
+        }
+
         // if the user changes the target radius from Settings, we need code to place it at right location
         void CurrentTrial_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
@@ -159,6 +180,11 @@ namespace TheoryC.ViewModels
 
         public void UpdateTargetSizeAndPlaceInStartingPosition()
         {
+            if (CurrentTrial == null)
+            {
+                return;
+            }
+
             TargetSizeRadius = CurrentTrial.ShapeSizeDiameter / 2.0;
             this.PlaceTargetInStartingPosition();
         }
@@ -270,6 +296,60 @@ namespace TheoryC.ViewModels
             //SetPosition((int)x, (int)y);
         }
 
+        private void ImportSettings()
+        {
+            Microsoft.Win32.OpenFileDialog dialog = new Microsoft.Win32.OpenFileDialog();
+            dialog.DefaultExt = ".csv"; // Defaults.FilePaths.SettingsExtension;
+            dialog.Filter = "CSV Files (*.csv)|*.csv";
+
+            var result = dialog.ShowDialog();
+
+            // got the file
+            if (result == true)
+            {
+                // must set CurrentTrials to null; otherwise because it is a DP, it will crash
+                CurrentTrial = null;
+                Trials.Clear();
+
+                ParseImportFile(dialog);
+
+                CurrentTrial = Trials.First();
+                UpdateTargetSizeAndPlaceInStartingPosition();
+            }
+            else
+            {
+                Debug.Print("User cancelled the operation perhaps?");
+            }
+        }
+
+        internal void ParseImportFile(Microsoft.Win32.OpenFileDialog dialog)
+        {
+            try
+            {
+                // first line is the trialOrder
+                using (StreamReader reader = new StreamReader(dialog.FileName))
+                {
+                    while (!reader.EndOfStream)
+                    {
+                        var line = reader.ReadLine();
+                        var values = line.Split(',');
+
+                        AddTrial(Convert.ToDouble(values[0]),
+                                 Convert.ToDouble(values[1]),
+                                 Convert.ToDouble(values[2]));
+                    }
+
+                }
+            }
+            catch (System.IO.IOException ex)
+            {
+                MessageBox.Show("Yo! Close the file in Excel" + ex);
+            }
+        }
+
+
+        #region "Game Code"
+
         public int tickCounter = 0;
         void GameTimer_Tick(object sender, EventArgs e)
         {
@@ -295,7 +375,7 @@ namespace TheoryC.ViewModels
         private void CalculateAngleBasedOnTimeSampling()
         {
             double wp = totalTrialTime.ElapsedMilliseconds / (secondsToDoOneRotation * 1000);
-            AngleInDegrees = 360.0 * wp; 
+            AngleInDegrees = 360.0 * wp;
         }
 
         double distanceFromCenterOnTick;
@@ -352,6 +432,7 @@ namespace TheoryC.ViewModels
             CurrentTrial.Results.IsInsideTrackForEachTickList.Add(isInsideTrackCircle);
         }
 
+        #endregion //Game Code
 
         #region Commands
 
@@ -403,7 +484,7 @@ namespace TheoryC.ViewModels
                     () =>
                     {
                         // this should only be allowed when the ParticipantWindow is showing
-                        return true; 
+                        return true;
                     }
                 );
                 this.PropertyChanged += (s, e) => _ShowParticipantInstructionsWindowCommand.RaiseCanExecuteChanged();
@@ -461,7 +542,7 @@ namespace TheoryC.ViewModels
 
                         settings.Left = main.Left + 45;
                         settings.Top = main.Top + 60;
-                        
+
                         settings.Owner = main; // whatever happens to main window happens here                                               
                         settings.ShowInTaskbar = false;
                         IsSettingsWindowOpen = true;
@@ -630,7 +711,7 @@ namespace TheoryC.ViewModels
         {
             InitializeExperimentVariables();
             ShowClickTargetToStartTrial = false;
-            ShowParticipantInstructions = true; 
+            ShowParticipantInstructions = true;
             //StartNextTrial();
         }
 
@@ -667,21 +748,44 @@ namespace TheoryC.ViewModels
                 if (_AddTrialCommand != null)
                     return _AddTrialCommand;
 
-                _AddTrialCommand = new DelegateCommand(new Action(AddTrialExecuted), new Func<bool>(AddTrialCanExecute));
+                _AddTrialCommand = new DelegateCommand(new Action(
+                    () =>
+                    {
+                        AddTrial();   // can only add a trial if the settings window is opened
+                    }),
+
+                    new Func<bool>(
+                        () =>
+                        {
+                            return IsSettingsWindowOpen;
+                        }));
                 this.PropertyChanged += (s, e) => _AddTrialCommand.RaiseCanExecuteChanged();
                 return _AddTrialCommand;
             }
         }
 
-        public bool AddTrialCanExecute()
+        DelegateCommand _ImportSettingsCommand = null;
+        public DelegateCommand ImportSettingsCommand
         {
-            // can only add a trial if the settings window is opened
-            return IsSettingsWindowOpen;
-        }
+            get
+            {
+                if (_ImportSettingsCommand != null)
+                    return _ImportSettingsCommand;
 
-        public void AddTrialExecuted()
-        {
-            AddTrial();
+                _ImportSettingsCommand = new DelegateCommand(new Action(
+                    () =>
+                    {
+                        ImportSettings();   // can only add a trial if the settings window is opened
+                    }),
+
+                    new Func<bool>(
+                        () =>
+                        {
+                            return IsSettingsWindowOpen;
+                        }));
+                this.PropertyChanged += (s, e) => _ImportSettingsCommand.RaiseCanExecuteChanged();
+                return _ImportSettingsCommand;
+            }
         }
 
         #endregion

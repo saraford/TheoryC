@@ -24,7 +24,7 @@ namespace TheoryC.Views
 
         void MainWindow_MouseMove(object sender, MouseEventArgs e)
         {
-            this.ViewModel.MousePosition = e.GetPosition(this);
+            this.ViewModel.MousePosition = e.GetPosition(SceneCanvas);
         }
 
         // NO IDEA HOW TO CALL THIS
