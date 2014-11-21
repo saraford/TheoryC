@@ -12,7 +12,7 @@
         <ViewModels:MainViewModel/>
     </Window.DataContext>
     <Window.InputBindings>
-        <KeyBinding Command="{Binding ShowParticipantInstructionsWindowCommand, Mode=OneWay}"  Key="S"/>
+        <KeyBinding Command="{Binding StartExpCommand, Mode=OneWay}"  Key="S"/>
         <KeyBinding Command="{Binding StartTrialCommand, Mode=OneWay}"  Key="T"/>
     </Window.InputBindings>
     <Window.Resources>
@@ -25,7 +25,7 @@
     <Grid>
         <DockPanel>
             <Menu DockPanel.Dock="Top">
-                <MenuItem Command="{Binding ShowParticipantInstructionsWindowCommand, Mode=OneWay}" Header="{Binding IsExperimentRunning, Converter={StaticResource StartButtonText}, Mode=OneWay}"  />
+                <MenuItem Command="{Binding StartExpCommand, Mode=OneWay}" Header="{Binding IsExperimentRunning, Converter={StaticResource StartButtonText}, Mode=OneWay}"  />
                 <MenuItem Command="{Binding ShowSettingsCommand, Mode=OneWay}" Header="Settings" />
                 <MenuItem Command="{Binding ShowDebugCommand, Mode=OneWay}" Header="Debug" />
             </Menu>

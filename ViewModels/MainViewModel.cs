@@ -366,14 +366,7 @@ namespace TheoryC.ViewModels
                         ShowClickTargetToStartTrial = false;
                         UserReadyForNextTrial = false;
 
-                        if (!IsExperimentRunning)
-                        {
-                            StartExperiment();
-                        }
-                        else
-                        {
-                            StartNextTrial();
-                        }
+                        StartNextTrial();
                     },
                     () =>
                     {
@@ -384,7 +377,6 @@ namespace TheoryC.ViewModels
                 return _UserReadyForNextTrialCommand;
             }
         }
-
 
         DelegateCommand _ShowParticipantInstructionsWindowCommand = null;
         public DelegateCommand ShowParticipantInstructionsWindowCommand
@@ -403,8 +395,8 @@ namespace TheoryC.ViewModels
                     },
                     () =>
                     {
-                        // BUG: not fully resetting experiment. Trial not going back to 0
-                        return true; // user can restart the experiment at any time 
+                        // this should only be allowed when the ParticipantWindow is showing
+                        return true; 
                     }
                 );
                 this.PropertyChanged += (s, e) => _ShowParticipantInstructionsWindowCommand.RaiseCanExecuteChanged();
@@ -463,7 +455,7 @@ namespace TheoryC.ViewModels
                     },
                     () =>
                     {
-                        return !SetupWindowOpen;
+                        return (!SetupWindowOpen) && (!IsExperimentRunning);
                     }
                 );
                 this.PropertyChanged += (s, e) => _ShowSettingsCommand.RaiseCanExecuteChanged();
@@ -590,7 +582,7 @@ namespace TheoryC.ViewModels
                 if (_StartExpCommand != null)
                     return _StartExpCommand;
 
-                _StartExpCommand = new DelegateCommand(new Action(StartExperiment), new Func<bool>(StartExpCanExecute));
+                _StartExpCommand = new DelegateCommand(new Action(StartResetExperiment), new Func<bool>(StartExpCanExecute));
                 this.PropertyChanged += (s, e) => _StartExpCommand.RaiseCanExecuteChanged();
                 return _StartExpCommand;
             }
@@ -601,19 +593,31 @@ namespace TheoryC.ViewModels
             return true; //should be changed to only start when ParticipantInstructions Window is showing
         }
 
-        public void StartExperiment()
+        public void StartResetExperiment()
         {
             if (!IsExperimentRunning)
             {
-                ShowClickTargetToStartTrial = false;
-                InitializeExperimentVariables();
-                StartNextTrial();
+                StartExperiment();
             }
             else
             {
-                StopCurrentTrial();
-                StopExperiment();
+                RestartExperiment();
             }
+        }
+
+        private void RestartExperiment()
+        {
+            StopCurrentTrial();
+            StopExperiment();
+            StartExperiment();
+        }
+
+        private void StartExperiment()
+        {
+            InitializeExperimentVariables();
+            ShowClickTargetToStartTrial = false;
+            ShowParticipantInstructions = true; 
+            //StartNextTrial();
         }
 
         DelegateCommand _StartTrialCommand = null;
