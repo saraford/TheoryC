@@ -106,18 +106,7 @@ namespace TheoryC.ViewModels
             // To be eventually replaced by the researcher uploading a file or something
             for (int i = 0; i < 3; i++)
             {
-                this.Trials.Add(new Models.Trial
-                {
-                    Number = i, // use a converter + 1, // no 0-based trials exposed to user
-                    Results = new Models.Result { 
-                            TimeOnTargetMs = 0, 
-                            AbsoluteError = 0, 
-                            AbsoluteErrorForEachTickList = new List<double>(), 
-                            IsInsideTrackForEachTickList = new List<bool>() }
-                });
-
-                // to see real-time updates
-                this.Trials[i].PropertyChanged += CurrentTrial_PropertyChanged;
+                AddTrial();
             }
 
             // initialize the game timer
@@ -133,6 +122,30 @@ namespace TheoryC.ViewModels
 
             // setup the target
             this.UpdateTargetSizeAndPlaceInStartingPosition();
+
+            // show the views we want user to see
+            this.ShowDebugCommand.Execute(null);
+            this.ShowSettingsCommand.Execute(null);
+        }
+
+        private void AddTrial()
+        {
+            int currentCount = Trials.Count;
+
+            this.Trials.Add(new Models.Trial
+            {
+                Number = currentCount, // Number uses a converter + 1, // no 0-based trials exposed to user
+                Results = new Models.Result
+                {
+                    TimeOnTargetMs = 0,
+                    AbsoluteError = 0,
+                    AbsoluteErrorForEachTickList = new List<double>(),
+                    IsInsideTrackForEachTickList = new List<bool>()
+                }
+            });
+
+            // to see real-time updates when user makes modifications in Settings Window
+            this.Trials[currentCount].PropertyChanged += CurrentTrial_PropertyChanged;
         }
 
         // if the user changes the target radius from Settings, we need code to place it at right location
@@ -257,13 +270,6 @@ namespace TheoryC.ViewModels
             //SetPosition((int)x, (int)y);
         }
 
-        [DllImport("User32.dll")]
-        private static extern bool SetCursorPos(int X, int Y);
-        private void SetPosition(int x, int y)
-        {
-            SetCursorPos(x, y);
-        }
-
         public int tickCounter = 0;
         void GameTimer_Tick(object sender, EventArgs e)
         {
@@ -345,6 +351,7 @@ namespace TheoryC.ViewModels
             // save boolean
             CurrentTrial.Results.IsInsideTrackForEachTickList.Add(isInsideTrackCircle);
         }
+
 
         #region Commands
 
@@ -432,8 +439,8 @@ namespace TheoryC.ViewModels
         }
 
 
-        bool _SetupWindowOpen = default(bool);
-        public bool SetupWindowOpen { get { return _SetupWindowOpen; } set { base.SetProperty(ref _SetupWindowOpen, value); } }
+        bool _IsSettingsWindowOpen = default(bool);
+        public bool IsSettingsWindowOpen { get { return _IsSettingsWindowOpen; } set { base.SetProperty(ref _IsSettingsWindowOpen, value); } }
 
         DelegateCommand _ShowSettingsCommand = null;
         public DelegateCommand ShowSettingsCommand
@@ -450,12 +457,19 @@ namespace TheoryC.ViewModels
                         var settings = new Views.SettingsWindow(SettingsWindowSetupCallback);
                         settings.DataContext = this; // to share same model data
 
-                        SetupWindowOpen = true;
+                        var main = Application.Current.MainWindow;
+
+                        settings.Left = main.Left + 45;
+                        settings.Top = main.Top + 60;
+                        
+                        settings.Owner = main; // whatever happens to main window happens here                                               
+                        settings.ShowInTaskbar = false;
+                        IsSettingsWindowOpen = true;
                         settings.Show();
                     },
                     () =>
                     {
-                        return (!SetupWindowOpen) && (!IsExperimentRunning);
+                        return (!IsSettingsWindowOpen) && (!IsExperimentRunning);
                     }
                 );
                 this.PropertyChanged += (s, e) => _ShowSettingsCommand.RaiseCanExecuteChanged();
@@ -465,7 +479,7 @@ namespace TheoryC.ViewModels
 
         private void SettingsWindowSetupCallback()
         {
-            SetupWindowOpen = false;
+            IsSettingsWindowOpen = false;
 
             // regardless which trial number the user left selected in the Settings window,
             // put it back to the first trial
@@ -550,7 +564,7 @@ namespace TheoryC.ViewModels
         {
             // oh good lord, this fires even if the user did not invoke the action
             // this command should only execute if the SettingsWindow is opened
-            return SetupWindowOpen;
+            return IsSettingsWindowOpen;
         }
 
         DelegateCommand _UpdateTargetSizeRadius = null;
@@ -571,7 +585,7 @@ namespace TheoryC.ViewModels
         {
             // oh good lord, this fires even if the user did not invoke the action
             // this command should only execute if the SettingsWindow is opened
-            return SetupWindowOpen;
+            return IsSettingsWindowOpen;
         }
 
         DelegateCommand _StartExpCommand = null;
@@ -643,6 +657,31 @@ namespace TheoryC.ViewModels
         public void StartTrialExecuted()
         {
             StartNextTrial();
+        }
+
+        DelegateCommand _AddTrialCommand = null;
+        public DelegateCommand AddTrialCommand
+        {
+            get
+            {
+                if (_AddTrialCommand != null)
+                    return _AddTrialCommand;
+
+                _AddTrialCommand = new DelegateCommand(new Action(AddTrialExecuted), new Func<bool>(AddTrialCanExecute));
+                this.PropertyChanged += (s, e) => _AddTrialCommand.RaiseCanExecuteChanged();
+                return _AddTrialCommand;
+            }
+        }
+
+        public bool AddTrialCanExecute()
+        {
+            // can only add a trial if the settings window is opened
+            return IsSettingsWindowOpen;
+        }
+
+        public void AddTrialExecuted()
+        {
+            AddTrial();
         }
 
         #endregion

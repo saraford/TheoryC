@@ -19,8 +19,7 @@ namespace TheoryC.Views
         {
             SetCoordinatesToTopLeftCorner();
 
-            this.ViewModel.Startup();
-            this.ViewModel.ShowDebugWindow();
+            this.ViewModel.Startup();            
         }
 
         void MainWindow_MouseMove(object sender, MouseEventArgs e)

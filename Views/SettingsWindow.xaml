@@ -5,7 +5,7 @@
         xmlns:Converters="clr-namespace:TheoryC.Converters"      
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
         x:Class="TheoryC.Views.SettingsWindow"
-        Title="SettingsWindow" Height="420" Width="277.113">
+        Title="SettingsWindow" Height="450" Width="277.113">
     <Window.DataContext>
         <ViewModels:MainViewModel/>
     </Window.DataContext>
@@ -14,13 +14,26 @@
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="50" />
+            <RowDefinition Height="100" />
             <RowDefinition />
         </Grid.RowDefinitions>
 
-        <StackPanel Margin="5,10,0,0" Orientation="Horizontal"  Grid.Row="0">
-            <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Participant ID" VerticalAlignment="Top"/>
-            <TextBox Margin="10,0,0,0" HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" VerticalAlignment="Top" Width="86" Text="TBC"/>
+        <StackPanel Margin="5,10,0,0" Orientation="Vertical"  Grid.Row="0">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Participant ID" VerticalAlignment="Top"/>
+                <TextBox Margin="10,0,0,0" HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" VerticalAlignment="Top" Width="86" Text="TBC"/>
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal">
+                <TextBlock FontSize="20" Text="Current Trial #" />
+                <TextBlock FontSize="20"  Text="{Binding CurrentTrial.Number, Converter={StaticResource AddOneToTrial}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                <Button Content="Add Trial" Command="{Binding AddTrialCommand, Mode=OneWay}"></Button>
+                <Button Margin="10,0,0,0" Content="Import Trials"></Button>
+                <Button Margin="10,0,0,0" Content="Export Trials"></Button>
+            </StackPanel>
         </StackPanel>
         
        <Grid Grid.Row="1">        
@@ -32,7 +45,7 @@
         <ListBox Grid.Column="0"
                          DisplayMemberPath="TrialName"
                          ItemsSource="{Binding Trials}"
-                         SelectedItem="{Binding CurrentTrial, Mode=TwoWay}">
+                         SelectedItem="{Binding CurrentTrial, Mode=TwoWay}" >
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="SelectionChanged">
                     <i:InvokeCommandAction Command="{Binding UpdateSceneWhenListboxSelectionChanges}"/>
@@ -41,10 +54,7 @@
         </ListBox>
 
         <StackPanel Grid.Column="1" >
-            <StackPanel Orientation="Horizontal">
-                <TextBlock FontSize="20" Text="Current Trial #" />
-                <TextBlock FontSize="20"  Text="{Binding CurrentTrial.Number, Converter={StaticResource AddOneToTrial}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-            </StackPanel>
+
             <StackPanel Margin="0,5,0,0" Orientation="Horizontal">
                 <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Target Diameter:" VerticalAlignment="Top"/>
                 <TextBox Margin="10,0,0,0" HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" VerticalAlignment="Top" Width="86" Text="{Binding CurrentTrial.ShapeSizeDiameter, UpdateSourceTrigger=PropertyChanged}">
