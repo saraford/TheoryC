@@ -12,7 +12,7 @@ namespace TheoryC.Common
     class DataLogger
     {
 
-        public void LogExperiment(ObservableCollection<Models.Trial> Trials)
+        public static void LogExperiment(string participantID, ObservableCollection<Models.Trial> Trials)
         {
             StreamWriter writer = CreateLogFile();
 
@@ -23,6 +23,9 @@ namespace TheoryC.Common
 
             try
             {
+                // Put the participant ID at the top
+                writer.WriteLine(participantID);
+
                 // Establish column headings
                 writer.WriteLine("Trial # , Time on Target , Absolute Error , Constant Error , Variable Error ");
 
@@ -41,7 +44,7 @@ namespace TheoryC.Common
 
         }
 
-        private string SeralizedResults(int trialNumber, Models.Result Result)
+        private static string SeralizedResults(int trialNumber, Models.Result Result)
         {
             //Time on Target , Absolute Error , Constant Error , Variable Error
 
@@ -56,7 +59,7 @@ namespace TheoryC.Common
             return str;   
         }
 
-        private StreamWriter CreateLogFile()
+        private static StreamWriter CreateLogFile()
         {
             StreamWriter writer = null;
 
@@ -78,12 +81,72 @@ namespace TheoryC.Common
             catch (Exception e)
             {
                 MessageBox.Show("Couldn't create data file " + e.Message);
-
             }
 
             return writer;
         }
 
+
+
+        internal static bool ExportSettings(ObservableCollection<Models.Trial> Trials)
+        {
+            bool success = false; //to avoid false positives
+            string desktop = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+
+            Microsoft.Win32.SaveFileDialog dialog = new Microsoft.Win32.SaveFileDialog();
+            dialog.InitialDirectory = desktop;
+            dialog.DefaultExt = Properties.Settings.Default.CSVextension;
+            dialog.Filter = "CSV Files (*.csv)|*.csv";
+
+            // Show save file dialog box
+            Nullable<bool> result = dialog.ShowDialog();
+
+            // Process save file dialog box results
+            string filename = "";
+            if (result == true)
+            {
+                // Save document
+                filename = dialog.FileName;
+            }
+            else
+            {
+                // user decided to cancel
+                return false; 
+            }
+
+            try
+            {
+                StreamWriter writer = new StreamWriter(filename, false);
+
+                foreach (var trial in Trials)
+                {
+                    string strResults = SeralizedSettings(trial);
+                    writer.WriteLine(strResults);
+                }
+
+                writer.Close();
+                success = true;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Yo! Couldn't save data " + ex.Message);
+            }
+
+            return success;
+        }
+
+        private static string SeralizedSettings(Models.Trial trial)
+        {
+            //shapeSizeDiameter, durationSeconds, rpm
+
+            string str;
+
+            str = trial.ShapeSizeDiameter.ToString() + ",";
+            str += trial.DurationSeconds.ToString() + ",";
+            str += trial.RPMs.ToString() + ",";
+
+            return str;
+        }
 
     }
 

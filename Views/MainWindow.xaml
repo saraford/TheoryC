@@ -77,5 +77,16 @@
             </Border>
         </Grid>
 
+        <!--My Message Box Window-->
+        <Grid Visibility="{Binding ShowMessageBoxWindow, Converter={StaticResource BoolToVisibilityConverter}}" >
+            <Border MinWidth="250" MinHeight="250" Background="Beige" BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <TextBlock Text="{Binding MessageForWindow}"></TextBlock>
+                    <Button Margin="0,30,0,0" Content="Cool" MaxWidth="100" Command="{Binding CloseMessageBoxWindowCommand, Mode=OneWay}" ></Button>
+                </StackPanel>
+            </Border>
+        </Grid>
+
+
     </Grid>
 </Window>

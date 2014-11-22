@@ -45,6 +45,9 @@ namespace TheoryC.ViewModels
         double _TargetPositionTop = default(double);
         public double TargetPositionTop { get { return _TargetPositionTop; } set { base.SetProperty(ref _TargetPositionTop, value); } }
 
+        string _ParticipantID = default(string);
+        public string ParticipantID { get { return _ParticipantID; } set { base.SetProperty(ref _ParticipantID, value); } }
+        
         Point _TargetPositionCenter = default(Point);
         public Point TargetPositionCenter
         {
@@ -65,6 +68,13 @@ namespace TheoryC.ViewModels
         bool _ShowClickTargetToStartTrial = default(bool);
         public bool ShowClickTargetToStartTrial { get { return _ShowClickTargetToStartTrial; } set { base.SetProperty(ref _ShowClickTargetToStartTrial, value); } }
 
+        bool _ShowMessageBoxWindow = default(bool);
+        public bool ShowMessageBoxWindow { get { return _ShowMessageBoxWindow; } set { base.SetProperty(ref _ShowMessageBoxWindow, value); } }
+
+        string _MessageForWindow = default(string);
+        public string MessageForWindow { get { return _MessageForWindow; } set { base.SetProperty(ref _MessageForWindow, value); } }
+
+        
         Point trackCenter = new Point(Settings.Default.TrackLeftX + Settings.Default.TrackRadius, Settings.Default.TrackTopY + Settings.Default.TrackRadius);
         DispatcherTimer gameTimer;
         public Point AbsoluteScreenPositionOfTarget { get; set; }
@@ -95,6 +105,9 @@ namespace TheoryC.ViewModels
 
                 // setup the target
                 this.UpdateTargetSizeAndPlaceInStartingPosition();
+
+                // Participant ID
+                ParticipantID = "D<Please enter>";
             }
         }
 
@@ -124,6 +137,9 @@ namespace TheoryC.ViewModels
             // show the views we want user to see
             this.ShowDebugCommand.Execute(null);
             this.ShowSettingsCommand.Execute(null);
+
+            // placeholder
+            ParticipantID = "<Please enter>"; 
         }
 
         private void AddTrial()
@@ -204,17 +220,27 @@ namespace TheoryC.ViewModels
 
         private void StopExperiment()
         {
+            // reset UI
             this.IsExperimentRunning = false;
             ResetTargetValues();
             UpdateTargetSizeAndPlaceInStartingPosition();
 
+            // self-explanatory            
             LogData();
+
+            // handle user
+            ShowEndOfExperimentWindow();
+        }
+
+        private void ShowEndOfExperimentWindow()
+        {
+            MessageForWindow = "Yay! Experiments is over. Btw, YOU ROCK!!";
+            ShowMessageBoxWindow = true;
         }
 
         private void LogData()
         {
-            DataLogger logger = new DataLogger();
-            logger.LogExperiment(Trials);
+            DataLogger.LogExperiment(ParticipantID, Trials);
         }
 
         private void UpdateSceneForNextTrial()
@@ -304,6 +330,8 @@ namespace TheoryC.ViewModels
             //SetPosition((int)x, (int)y);
         }
 
+        #region "Import Export Settings"
+
         private void ImportSettings()
         {
             Microsoft.Win32.OpenFileDialog dialog = new Microsoft.Win32.OpenFileDialog();
@@ -354,6 +382,14 @@ namespace TheoryC.ViewModels
                 MessageBox.Show("Yo! Close the file in Excel" + ex);
             }
         }
+
+        public void ExportSettings()
+        {
+            MessageForWindow = "Yay! Trials settings succesfully exported.";
+            ShowMessageBoxWindow = DataLogger.ExportSettings(Trials);
+        }
+
+        #endregion //Import export settings
 
 
         #region "Game Code"
@@ -783,7 +819,7 @@ namespace TheoryC.ViewModels
                 _ImportSettingsCommand = new DelegateCommand(new Action(
                     () =>
                     {
-                        ImportSettings();   // can only add a trial if the settings window is opened
+                        ImportSettings();   
                     }),
 
                     new Func<bool>(
@@ -793,6 +829,54 @@ namespace TheoryC.ViewModels
                         }));
                 this.PropertyChanged += (s, e) => _ImportSettingsCommand.RaiseCanExecuteChanged();
                 return _ImportSettingsCommand;
+            }
+        }
+
+        DelegateCommand _ExportSettingsCommand = null;
+        public DelegateCommand ExportSettingsCommand
+        {
+            get
+            {
+                if (_ExportSettingsCommand != null)
+                    return _ExportSettingsCommand;
+
+                _ExportSettingsCommand = new DelegateCommand(new Action(
+                    () =>
+                    {
+                        ExportSettings();   
+                    }),
+
+                    new Func<bool>(
+                        () =>
+                        {
+                            return IsSettingsWindowOpen;
+                        }));
+                this.PropertyChanged += (s, e) => _ExportSettingsCommand.RaiseCanExecuteChanged();
+                return _ExportSettingsCommand;
+            }
+        }
+
+        DelegateCommand _CloseMessageBoxWindowCommand = null;
+        public DelegateCommand CloseMessageBoxWindowCommand
+        {
+            get
+            {
+                if (_CloseMessageBoxWindowCommand != null)
+                    return _CloseMessageBoxWindowCommand;
+
+                _CloseMessageBoxWindowCommand = new DelegateCommand(new Action(
+                    () =>
+                    {
+                        ShowMessageBoxWindow = false;
+                    }),
+
+                    new Func<bool>(
+                        () =>
+                        {
+                            return ShowMessageBoxWindow; // only if this window is opened
+                        }));
+                this.PropertyChanged += (s, e) => _CloseMessageBoxWindowCommand.RaiseCanExecuteChanged();
+                return _CloseMessageBoxWindowCommand;
             }
         }
 
