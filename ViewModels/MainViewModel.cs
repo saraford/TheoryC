@@ -71,8 +71,8 @@ namespace TheoryC.ViewModels
         bool _ShowMessageBoxWindow = default(bool);
         public bool ShowMessageBoxWindow { get { return _ShowMessageBoxWindow; } set { base.SetProperty(ref _ShowMessageBoxWindow, value); } }
 
-        string _MessageForWindow = default(string);
-        public string MessageForWindow { get { return _MessageForWindow; } set { base.SetProperty(ref _MessageForWindow, value); } }
+        string _TextForMessageBoxWindow = default(string);
+        public string TextForMessageBoxWindow { get { return _TextForMessageBoxWindow; } set { base.SetProperty(ref _TextForMessageBoxWindow, value); } }
 
         
         Point trackCenter = new Point(Settings.Default.TrackLeftX + Settings.Default.TrackRadius, Settings.Default.TrackTopY + Settings.Default.TrackRadius);
@@ -218,7 +218,8 @@ namespace TheoryC.ViewModels
             }
         }
 
-        private void StopExperiment()
+        // default will be that the user finishes the experiment
+        private void StopExperiment(bool aborted = false)
         {
             // reset UI
             this.IsExperimentRunning = false;
@@ -229,12 +230,22 @@ namespace TheoryC.ViewModels
             LogData();
 
             // handle user
-            ShowEndOfExperimentWindow();
+            ShowEndOfExperimentWindow(aborted);
         }
 
-        private void ShowEndOfExperimentWindow()
+        private void ShowEndOfExperimentWindow(bool aborted)
         {
-            MessageForWindow = "Yay! Experiments is over. Btw, YOU ROCK!!";
+            if (aborted)
+            {
+                // researcher stops the experiment before it is finished
+                TextForMessageBoxWindow = "#SadTrombone - experiment aborted";
+            }
+            else
+            {
+                // user finished the experiment
+                TextForMessageBoxWindow = "Yay! Experiments is over. Btw, YOU ROCK!!";
+            }
+
             ShowMessageBoxWindow = true;
         }
 
@@ -273,11 +284,9 @@ namespace TheoryC.ViewModels
             secondsToDoOneRotation = 1 / (CurrentTrial.RPMs / 60.0);
 
             // rock and roll
-            Debug.Print("Trial #" + CurrentTrial.Number.ToString() + " starting at " + DateTime.Now.ToString("hh.mm.ss.ffffff"));
+            CurrentTrial.Results.TickCount = 0;
             totalTrialTime.Start();
             gameTimer.Start();
-
-            tickCounter = 0; // for debugging
         }
 
         private void StopCurrentTrial()
@@ -285,8 +294,8 @@ namespace TheoryC.ViewModels
             totalTrialTime.Stop();
             gameTimer.Stop();
 
-            Debug.Print("Trial #" + CurrentTrial.Number.ToString() + " stopped at " + DateTime.Now.ToString("hh.mm.ss.ffffff"));
-            Debug.Print("Trial time took " + totalTrialTime.Elapsed.ToString());
+            //Debug.Print("Trial #" + CurrentTrial.Number.ToString() + " stopped at " + DateTime.Now.ToString("hh.mm.ss.ffffff"));
+            //Debug.Print("Trial time took " + totalTrialTime.Elapsed.ToString());
 
             // save results
             CurrentTrial.Results.TimeOnTargetMs = timeOnTarget.ElapsedMilliseconds;
@@ -385,7 +394,7 @@ namespace TheoryC.ViewModels
 
         public void ExportSettings()
         {
-            MessageForWindow = "Yay! Trials settings succesfully exported.";
+            TextForMessageBoxWindow = "Yay! Trials settings succesfully exported.";
             ShowMessageBoxWindow = DataLogger.ExportSettings(Trials);
         }
 
@@ -394,11 +403,10 @@ namespace TheoryC.ViewModels
 
         #region "Game Code"
 
-        public int tickCounter = 0;
         void GameTimer_Tick(object sender, EventArgs e)
         {
-
-            Debug.Print("Tick #" + tickCounter++ + " and time is right now " + DateTime.Now.ToString("hh.mm.ss.ffffff"));
+            CurrentTrial.Results.TickCount++; 
+//            Debug.Print("Tick #" + tickCounter++ + " and time is right now " + DateTime.Now.ToString("hh.mm.ss.ffffff"));
 
             CalculateAngleBasedOnTimeSampling();
 
@@ -740,9 +748,17 @@ namespace TheoryC.ViewModels
             }
             else
             {
-                RestartExperiment();
+                AbortExperiment();
             }
         }
+
+        private void AbortExperiment()
+        {
+            StopCurrentTrial();
+            StopExperiment(aborted:true);
+            ShowClickTargetToStartTrial = false;
+        }
+
 
         private void RestartExperiment()
         {
@@ -877,6 +893,31 @@ namespace TheoryC.ViewModels
                         }));
                 this.PropertyChanged += (s, e) => _CloseMessageBoxWindowCommand.RaiseCanExecuteChanged();
                 return _CloseMessageBoxWindowCommand;
+            }
+        }
+
+        DelegateCommand _OpenResultsFolderCommand = null;
+        public DelegateCommand OpenResultsFolderCommand
+        {
+            get
+            {
+                if (_OpenResultsFolderCommand != null)
+                    return _OpenResultsFolderCommand;
+
+                _OpenResultsFolderCommand = new DelegateCommand(new Action(
+                    () =>
+                    {
+                        string dir = DataLogger.GetDesktopFolder();
+                        Process.Start(dir);
+                    }),
+
+                    new Func<bool>(
+                        () =>
+                        {
+                            return !IsExperimentRunning; // only if the experiment is not running
+                        }));
+                this.PropertyChanged += (s, e) => _OpenResultsFolderCommand.RaiseCanExecuteChanged();
+                return _OpenResultsFolderCommand;
             }
         }
 

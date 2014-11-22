@@ -25,5 +25,9 @@ namespace TheoryC.Models
 
         List<bool> _IsInsideTrackForEachTickList = default(List<bool>);
         public List<bool> IsInsideTrackForEachTickList { get { return _IsInsideTrackForEachTickList; } set { base.SetProperty(ref _IsInsideTrackForEachTickList, value); } }
+
+        int _TickCount = default(int);
+        public int TickCount { get { return _TickCount; } set { base.SetProperty(ref _TickCount, value); } }
+
     }
 }

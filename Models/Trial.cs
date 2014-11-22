@@ -42,6 +42,7 @@ namespace TheoryC.Models
             Results.TimeOnTargetMs = 0;
             Results.IsInsideTrackForEachTickList.Clear();
             Results.ConstantError = 0;
+            Results.TickCount = 0;
         }
     }
 }

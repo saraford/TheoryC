@@ -27,7 +27,7 @@ namespace TheoryC.Common
                 writer.WriteLine(participantID);
 
                 // Establish column headings
-                writer.WriteLine("Trial # , Time on Target , Absolute Error , Constant Error , Variable Error ");
+                writer.WriteLine("Trial # , Time on Target , Absolute Error , Constant Error , Variable Error , Tick Count");
 
                 foreach (var trial in Trials)
                 {
@@ -46,7 +46,7 @@ namespace TheoryC.Common
 
         private static string SeralizedResults(int trialNumber, Models.Result Result)
         {
-            //Time on Target , Absolute Error , Constant Error , Variable Error
+            //Time on Target , Absolute Error , Constant Error , Variable Error , Tick Count
 
             string str;
 
@@ -55,6 +55,7 @@ namespace TheoryC.Common
             str += Result.AbsoluteError.ToString() + ",";
             str += Result.ConstantError.ToString() + ",";
             str += Result.VariableError.ToString() + ",";
+            str += Result.TickCount.ToString() + ",";
 
             return str;   
         }
@@ -65,13 +66,7 @@ namespace TheoryC.Common
 
             try
             {
-                string desktop = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-                string filepath = System.IO.Path.Combine(desktop, "TheoryC_Results");
-
-                if (Directory.Exists(filepath) == false)
-                {
-                    Directory.CreateDirectory(filepath);
-                }
+                string filepath = GetDesktopFolder();
 
                 string filename = DateTime.Now.ToString("yyyyMMddHHmm") + Properties.Settings.Default.CSVextension;
                 string fullpath = System.IO.Path.Combine(filepath, filename);
@@ -84,6 +79,18 @@ namespace TheoryC.Common
             }
 
             return writer;
+        }
+
+        public static string GetDesktopFolder()
+        {
+            string desktop = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+            string filepath = System.IO.Path.Combine(desktop, "TheoryC_Results");
+
+            if (Directory.Exists(filepath) == false)
+            {
+                Directory.CreateDirectory(filepath);
+            }
+            return filepath;
         }
 
 

@@ -27,6 +27,7 @@
             <Menu DockPanel.Dock="Top" MinHeight="20" MaxHeight="20">
                 <MenuItem Command="{Binding StartExpCommand, Mode=OneWay}" Header="{Binding IsExperimentRunning, Converter={StaticResource StartButtonText}, Mode=OneWay}"  />
                 <MenuItem Command="{Binding ShowSettingsCommand, Mode=OneWay}" Header="Settings" />
+                <MenuItem Command="{Binding OpenResultsFolderCommand, Mode=OneWay}" Header="Results" />
                 <MenuItem Command="{Binding ShowDebugCommand, Mode=OneWay}" Header="Debug" />
             </Menu>
 
@@ -81,8 +82,8 @@
         <Grid Visibility="{Binding ShowMessageBoxWindow, Converter={StaticResource BoolToVisibilityConverter}}" >
             <Border MinWidth="250" MinHeight="250" Background="Beige" BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Center" VerticalAlignment="Center">
                 <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                    <TextBlock Text="{Binding MessageForWindow}"></TextBlock>
-                    <Button Margin="0,30,0,0" Content="Cool" MaxWidth="100" Command="{Binding CloseMessageBoxWindowCommand, Mode=OneWay}" ></Button>
+                    <TextBlock Text="{Binding TextForMessageBoxWindow}"></TextBlock>
+                    <Button Margin="0,30,0,0" Content="OK" MaxWidth="100" Command="{Binding CloseMessageBoxWindowCommand, Mode=OneWay}" ></Button>
                 </StackPanel>
             </Border>
         </Grid>
