@@ -8,10 +8,11 @@ namespace TheoryC.Views
     /// </summary>
     public partial class MainWindow : Window
     {
+        Devices.KinectDevice myKinect;
+
         public MainWindow()
         {
             InitializeComponent();
-            MouseMove += MainWindow_MouseMove;
             Loaded += MainWindow_Loaded;
         }
 
@@ -19,12 +20,38 @@ namespace TheoryC.Views
         {
             SetCoordinatesToTopLeftCorner();
 
-            this.ViewModel.Startup();            
+            this.ViewModel.Startup();
+
+            // init Kinect
+            myKinect = new Devices.KinectDevice(bodyCanvas, kinectVideoImage, ViewModel);
+            DetermineUserInputModeType();
         }
+
+        private void DetermineUserInputModeType()
+        {
+            bool isKinectAvailable = myKinect.ICanHasAKinect2();
+
+            if (isKinectAvailable)
+            {
+
+            }
+            else
+            {
+                MouseMove += MainWindow_MouseMove;
+
+                // REMOVE THIS ONCE I FIGURE OUT KINECT SCALING ISSUES
+                // gameCanvas and kinectVideo must be both at Width="960" Height="510"
+                //                this.MainWindowGrid.Height = 600;
+                //                this.gameCanvas.Height = 600;
+            }
+        }
+
 
         void MainWindow_MouseMove(object sender, MouseEventArgs e)
         {
-            this.ViewModel.MousePosition = e.GetPosition(SceneCanvas);
+            this.ViewModel.InputPosition = e.GetPosition(SceneCanvas);
+//            this.ViewModel.MousePosition = e.GetPosition(SceneCanvas);
+
         }
 
         // NO IDEA HOW TO CALL THIS

@@ -10,6 +10,7 @@
     </Window.DataContext>
     <Window.Resources>
         <Converters:AddOneConverter x:Key="AddOneToTrial"/>
+        <Converters:BoolToVisibilityConverter x:Key="BoolToVisibility"/>
     </Window.Resources>
     <Border Width="Auto" Height="Auto"     
           BorderBrush="#395984"
@@ -26,7 +27,7 @@
                     <TextBox Margin="10,0,0,0"  Text="{Binding CurrentTrial.Number, Converter={StaticResource AddOneToTrial}, Mode=OneWay}" />
                 </StackPanel>
 
-                <StackPanel>
+                <!--<StackPanel>
                     <TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="Time On Target MS" VerticalAlignment="Top"/>
                     <TextBox Margin="10,0,0,0"  Text="{Binding CurrentTrial.Results.TimeOnTargetMs}" />
                 </StackPanel>
@@ -34,13 +35,39 @@
                 <StackPanel>
                     <TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="Absolute Error" VerticalAlignment="Top"/>
                     <TextBox Margin="10,0,0,0"  Text="{Binding CurrentTrial.Results.AbsoluteError}" />
+                </StackPanel>-->
+
+                <StackPanel Margin="10,10,0,0">
+                    <TextBlock Text="Kinect Status"/>
+                    <TextBlock Text="{Binding StatusText}"/>
                 </StackPanel>
 
-                <StackPanel Orientation="Horizontal" Margin="10,10,0,10">
-                    <!--<TextBox Margin="5,0,0,0" MinWidth="50" MaxWidth="50" Text="{Binding MousePosition.X}" ></TextBox>
-                    <TextBox Margin="5,0,0,0" MinWidth="50" MaxWidth="50" Text="{Binding MousePosition.Y}" ></TextBox>-->
+                <!--<StackPanel Margin="10,0,0,0">
+                    <TextBlock Text="Kinect"></TextBlock>
+                <StackPanel Orientation="Horizontal" >
+                    <TextBox MinWidth="50" MaxWidth="50" Text="{Binding InputPosition.X}" ></TextBox>
+                    <TextBox Margin="5,0,0,0" MinWidth="50" MaxWidth="50" Text="{Binding InputPosition.Y}" ></TextBox>
                 </StackPanel>
-                
+                </StackPanel>-->
+
+                <!--<StackPanel Margin="10,0,0,0">
+                    <TextBlock Text="Mouse"></TextBlock>
+                    <StackPanel Orientation="Horizontal" >
+                        <TextBox MinWidth="50" MaxWidth="50" Text="{Binding MousePosition.X}" ></TextBox>
+                        <TextBox Margin="5,0,0,0" MinWidth="50" MaxWidth="50" Text="{Binding MousePosition.Y}" ></TextBox>
+                    </StackPanel>
+                </StackPanel>-->
+                <StackPanel Margin="10,10,0,0">
+                    <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Kinect Debug:" VerticalAlignment="Top"/>
+                    <TextBlock Visibility="{Binding IsKinectTracking, Converter={StaticResource BoolToVisibility}}">Is Tracking</TextBlock>
+            </StackPanel>
+
+            <StackPanel Margin="10,0,0,0">
+                <TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="Track Skeleton" VerticalAlignment="Top"/>
+                <CheckBox Margin="10,0,0,0" IsChecked="{Binding ShowSkeleton}" />
+            </StackPanel>
+
+
             </StackPanel>
 
         </Grid>

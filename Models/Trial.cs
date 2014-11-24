@@ -32,7 +32,7 @@ namespace TheoryC.Models
         {
             _shapeSizeDiameter = 50;
             _durationSeconds = 1;
-            _rpm = 30; 
+            _rpm = 0.00030; 
         }
 
         internal void ClearResults()

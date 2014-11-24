@@ -34,6 +34,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.Kinect, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
@@ -59,6 +60,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Common\BindableBase.cs" />
+    <Compile Include="Common\ColorExtensions.cs" />
     <Compile Include="Common\DelegateCommand.cs" />
     <Compile Include="Common\DataLogger.cs" />
     <Compile Include="Common\Statistics.cs" />
@@ -72,6 +74,7 @@
     <Compile Include="Converters\InvertBooleanConverter.cs" />
     <Compile Include="Converters\RadiusToDiameterConverter.cs" />
     <Compile Include="Converters\StartButtonTextConverter.cs" />
+    <Compile Include="Devices\KinectDevice.cs" />
     <Compile Include="Models\Results.cs" />
     <Compile Include="Models\Trial.cs" />
     <Compile Include="Properties\Settings.Designer.cs">

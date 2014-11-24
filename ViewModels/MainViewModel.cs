@@ -27,8 +27,12 @@ namespace TheoryC.ViewModels
         Models.Trial _currentTrial = default(Models.Trial);
         public Models.Trial CurrentTrial { get { return _currentTrial; } set { base.SetProperty(ref _currentTrial, value); } }
 
-        Point _MousePosition = default(Point);
-        public Point MousePosition { get { return _MousePosition; } set { base.SetProperty(ref _MousePosition, value); } }
+        Point _InputPosition = default(Point);
+        public Point InputPosition { get { return _InputPosition; } set { base.SetProperty(ref _InputPosition, value); } }
+
+        // for debugging
+        //Point _MousePosition = default(Point);
+        //public Point MousePosition { get { return _MousePosition; } set { base.SetProperty(ref _MousePosition, value); } }
 
         bool _IsExperimentRunning = default(bool);
         public bool IsExperimentRunning { get { return _IsExperimentRunning; } set { base.SetProperty(ref _IsExperimentRunning, value); } }
@@ -74,7 +78,15 @@ namespace TheoryC.ViewModels
         string _TextForMessageBoxWindow = default(string);
         public string TextForMessageBoxWindow { get { return _TextForMessageBoxWindow; } set { base.SetProperty(ref _TextForMessageBoxWindow, value); } }
 
-        
+        bool _ShowSkeleton = default(bool);
+        public bool ShowSkeleton { get { return _ShowSkeleton; } set { base.SetProperty(ref _ShowSkeleton, value); } }
+
+        bool _IsKinectTracking = default(bool);
+        public bool IsKinectTracking { get { return _IsKinectTracking; } set { base.SetProperty(ref _IsKinectTracking, value); } }
+
+        string _StatusText = default(string);
+        public string StatusText { get { return _StatusText; } set { base.SetProperty(ref _StatusText, value); } }
+
         Point trackCenter = new Point(Settings.Default.TrackLeftX + Settings.Default.TrackRadius, Settings.Default.TrackTopY + Settings.Default.TrackRadius);
         DispatcherTimer gameTimer;
         public Point AbsoluteScreenPositionOfTarget { get; set; }
@@ -100,14 +112,13 @@ namespace TheoryC.ViewModels
                 // set the current trial so user sees it on first launch
                 this.CurrentTrial = this.Trials.First();
 
-                // setup the track
+                // setup the UI
                 TrackRadius = Settings.Default.TrackRadius;
-
-                // setup the target
                 this.UpdateTargetSizeAndPlaceInStartingPosition();
 
-                // Participant ID
+                // some designer info
                 ParticipantID = "D<Please enter>";
+                StatusText = "D: Status";       
             }
         }
 
@@ -433,7 +444,7 @@ namespace TheoryC.ViewModels
         double distanceFromCenterOnTick;
         private void CalculateAbsoluteErrorForEachTick()
         {
-            distanceFromCenterOnTick = Statistics.DistanceBetween2Points(this.MousePosition, this.TargetPositionCenter);
+            distanceFromCenterOnTick = Statistics.DistanceBetween2Points(this.InputPosition, this.TargetPositionCenter);
             CurrentTrial.Results.AbsoluteErrorForEachTickList.Add(distanceFromCenterOnTick);
         }
 
@@ -462,7 +473,7 @@ namespace TheoryC.ViewModels
         private void CheckIsOnTarget()
         {
             // calculate whether inside the circle
-            IsOnTarget = Tools.IsInsideCircle(this.MousePosition, this.TargetPositionCenter, TargetSizeRadius);
+            IsOnTarget = Tools.IsInsideCircle(this.InputPosition, this.TargetPositionCenter, TargetSizeRadius);
 
             if (IsOnTarget)
             {
@@ -478,7 +489,7 @@ namespace TheoryC.ViewModels
         private void CheckIsInsideTrackCircle()
         {
             // calculate whether inside the track for algebraic error
-            isInsideTrackCircle = Tools.IsInsideCircle(this.MousePosition, this.trackCenter, this.TrackRadius);
+            isInsideTrackCircle = Tools.IsInsideCircle(this.InputPosition, this.trackCenter, this.TrackRadius);
 
             // save boolean
             CurrentTrial.Results.IsInsideTrackForEachTickList.Add(isInsideTrackCircle);

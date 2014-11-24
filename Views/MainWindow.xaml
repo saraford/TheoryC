@@ -31,7 +31,11 @@
                 <MenuItem Command="{Binding ShowDebugCommand, Mode=OneWay}" Header="Debug" />
             </Menu>
 
-            <!--This must come first; don't want anything pushing this down or it screws up mouse x,y-->
+            <Grid x:Name="MainWindowGrid" Height="510" HorizontalAlignment="Left" VerticalAlignment="Top" Width="960" >
+                <Image x:Name="kinectVideoImage" Width="960" Height="510" />
+                <Canvas x:Name="bodyCanvas" Width="960" Height="510" HorizontalAlignment="Left" VerticalAlignment="Top" />
+
+            <!--This must come first before any windows; don't want anything pushing this down or it screws up mouse x,y-->
             <Canvas x:Name="SceneCanvas" Width="960" Height="510" >
                 <Ellipse 
                     Width="{Binding TrackRadius, Converter={StaticResource RadiusToDiameter}}"
@@ -56,6 +60,8 @@
                     </i:Interaction.Triggers>
                 </Controls:Target>
             </Canvas>
+            </Grid>
+
         </DockPanel>
 
         <!--The Participant Instructions Window-->
