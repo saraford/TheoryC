@@ -362,17 +362,22 @@ namespace TheoryC.ViewModels
         {
             if (IsUsingKinect)
             {
-                // Show Countdown Window
+                // In kinect mode, Show Countdown Window
                 ShowCountdownWindowUI();
             }
             else
             {
-                // wait for user to click the target
-                ShowInstructionsToStartTrial = true;
-                ShowInstructionsToStartTrialText = "Click the red ball to start the trial";
-                MouseUserReadyForNextTrialCanExecute = true;
+                // in mouse mode, wait for user to click the target
+                WaitForUserToClickTarget();
             }
 
+        }
+
+        private void WaitForUserToClickTarget()
+        {
+            ShowInstructionsToStartTrial = true;
+            ShowInstructionsToStartTrialText = "Click the red ball to start the trial";
+            MouseUserReadyForNextTrialCanExecute = true;
         }
 
         private DispatcherTimer waitForHandInsideTargetTimer;
@@ -635,16 +640,16 @@ namespace TheoryC.ViewModels
                 (
                     () =>
                     {
+                        // hide instructions window
+                        ShowParticipantInstructions = false;
+
                         if (IsUsingKinect)
                         {                            
                             ShowCountdownWindowUI();
                         }
                         else
                         {
-                            ShowParticipantInstructions = false;
-                            ShowInstructionsToStartTrial = true;
-                            MouseUserReadyForNextTrialCanExecute = true;
-                            ShowInstructionsToStartTrialText = "Click the red ball to start the trial";
+                            WaitForUserToClickTarget();
                         }
 
                     },
@@ -664,7 +669,6 @@ namespace TheoryC.ViewModels
 
         private void ShowCountdownWindowUI()
         {
-            ShowParticipantInstructions = false;
             ShowCountdownWindow = true;
             CountdownCount = CountdownInSeconds;
 
