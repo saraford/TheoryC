@@ -51,7 +51,7 @@ namespace TheoryC.ViewModels
 
         string _ParticipantID = default(string);
         public string ParticipantID { get { return _ParticipantID; } set { base.SetProperty(ref _ParticipantID, value); } }
-        
+
         Point _TargetPositionCenter = default(Point);
         public Point TargetPositionCenter
         {
@@ -69,8 +69,14 @@ namespace TheoryC.ViewModels
         bool _ShowParticipantInstructions = default(bool);
         public bool ShowParticipantInstructions { get { return _ShowParticipantInstructions; } set { base.SetProperty(ref _ShowParticipantInstructions, value); } }
 
-        bool _ShowClickTargetToStartTrial = default(bool);
-        public bool ShowClickTargetToStartTrial { get { return _ShowClickTargetToStartTrial; } set { base.SetProperty(ref _ShowClickTargetToStartTrial, value); } }
+        bool _ShowInstructionsToStartTrial = default(bool);
+        public bool ShowInstructionsToStartTrial { get { return _ShowInstructionsToStartTrial; } set { base.SetProperty(ref _ShowInstructionsToStartTrial, value); } }
+
+        string _ShowInstructionsToStartTrialText = default(string);
+        public string ShowInstructionsToStartTrialText { get { return _ShowInstructionsToStartTrialText; } set { base.SetProperty(ref _ShowInstructionsToStartTrialText, value); } }
+
+        bool _ShowCountdownWindow = default(bool);
+        public bool ShowCountdownWindow { get { return _ShowCountdownWindow; } set { base.SetProperty(ref _ShowCountdownWindow, value); } }
 
         bool _ShowMessageBoxWindow = default(bool);
         public bool ShowMessageBoxWindow { get { return _ShowMessageBoxWindow; } set { base.SetProperty(ref _ShowMessageBoxWindow, value); } }
@@ -80,6 +86,9 @@ namespace TheoryC.ViewModels
 
         bool _ShowSkeleton = default(bool);
         public bool ShowSkeleton { get { return _ShowSkeleton; } set { base.SetProperty(ref _ShowSkeleton, value); } }
+
+        bool _ShowFingerTip = default(bool);
+        public bool ShowFingerTip { get { return _ShowFingerTip; } set { base.SetProperty(ref _ShowFingerTip, value); } }
 
         bool _IsKinectTracking = default(bool);
         public bool IsKinectTracking { get { return _IsKinectTracking; } set { base.SetProperty(ref _IsKinectTracking, value); } }
@@ -91,7 +100,20 @@ namespace TheoryC.ViewModels
         DispatcherTimer gameTimer;
         public Point AbsoluteScreenPositionOfTarget { get; set; }
         private double TargetSizeRadius;
-       
+
+
+        private bool _isUsingKinect;
+
+        public bool IsUsingKinect
+        {
+            get { return _isUsingKinect; }
+            set { _isUsingKinect = value; }
+        }
+
+        int _CountdownCount = default(int);
+        public int CountdownCount { get { return _CountdownCount; } set { base.SetProperty(ref _CountdownCount, value); } }
+
+
         #endregion
 
         public MainViewModel()
@@ -105,7 +127,7 @@ namespace TheoryC.ViewModels
                     this.Trials.Add(new Models.Trial
                     {
                         Number = i, //; //use a converter + 1, // no 0-based trials exposed to user
-                        Results = new Models.Result { TimeOnTargetMs = 0, AbsoluteError = 0, AbsoluteErrorForEachTickList = new List<double>() }
+                        Results = new Models.Result { TimeOnTarget = 0, AbsoluteError = 0, AbsoluteErrorForEachTickList = new List<double>() }
                     });
                 }
 
@@ -118,7 +140,7 @@ namespace TheoryC.ViewModels
 
                 // some designer info
                 ParticipantID = "D<Please enter>";
-                StatusText = "D: Status";       
+                StatusText = "D: Status";
             }
         }
 
@@ -145,12 +167,12 @@ namespace TheoryC.ViewModels
             // setup the target
             this.UpdateTargetSizeAndPlaceInStartingPosition();
 
-            // show the views we want user to see
+            // show the UI we want user to see
             this.ShowDebugCommand.Execute(null);
             this.ShowSettingsCommand.Execute(null);
 
             // placeholder
-            ParticipantID = "<Please enter>"; 
+            ParticipantID = "<Please enter>";
         }
 
         private void AddTrial()
@@ -162,7 +184,7 @@ namespace TheoryC.ViewModels
                 Number = currentCount, // Number uses a converter + 1, // no 0-based trials exposed to user
                 Results = new Models.Result
                 {
-                    TimeOnTargetMs = 0,
+                    TimeOnTarget = 0,
                     AbsoluteError = 0,
                     AbsoluteErrorForEachTickList = new List<double>(),
                     IsInsideTrackForEachTickList = new List<bool>()
@@ -185,7 +207,7 @@ namespace TheoryC.ViewModels
                 Number = currentCount, // Number uses a converter + 1, // no 0-based trials exposed to user                
                 Results = new Models.Result
                 {
-                    TimeOnTargetMs = 0,
+                    TimeOnTarget = 0,
                     AbsoluteError = 0,
                     AbsoluteErrorForEachTickList = new List<double>(),
                     IsInsideTrackForEachTickList = new List<bool>()
@@ -279,7 +301,8 @@ namespace TheoryC.ViewModels
         }
 
         DateTime stopTime;
-        Stopwatch timeOnTarget = new Stopwatch();
+//        Stopwatch timeOnTarget = new Stopwatch();
+        int ticksOnTarget = 0; // stopwatch is not reliable. Going to count the ticks on target and derive the ToT based on percentage of perfect ToT time
         Stopwatch totalTrialTime = new Stopwatch();
         double secondsToDoOneRotation;
 
@@ -287,7 +310,8 @@ namespace TheoryC.ViewModels
         {
             stopTime = DateTime.Now.AddSeconds(CurrentTrial.DurationSeconds);
 
-            timeOnTarget.Reset();
+//            timeOnTarget.Reset();
+            ticksOnTarget = 0;
             totalTrialTime.Reset();
 
             TargetSizeRadius = this.CurrentTrial.ShapeSizeDiameter / 2.0;
@@ -309,7 +333,9 @@ namespace TheoryC.ViewModels
             //Debug.Print("Trial time took " + totalTrialTime.Elapsed.ToString());
 
             // save results
-            CurrentTrial.Results.TimeOnTargetMs = timeOnTarget.ElapsedMilliseconds;
+            double percentageOnTarget = (double)ticksOnTarget / (double)CurrentTrial.Results.TickCount;
+
+            CurrentTrial.Results.TimeOnTarget = percentageOnTarget * CurrentTrial.DurationSeconds;  //timeOnTarget.ElapsedMilliseconds;
             CurrentTrial.Results.AbsoluteError = Statistics.Mean(CurrentTrial.Results.AbsoluteErrorForEachTickList);
             CurrentTrial.Results.ConstantError = Statistics.ConstantError(CurrentTrial.Results.AbsoluteErrorForEachTickList, CurrentTrial.Results.IsInsideTrackForEachTickList);
             CurrentTrial.Results.VariableError = Statistics.VariableError(CurrentTrial.Results.AbsoluteErrorForEachTickList, CurrentTrial.Results.IsInsideTrackForEachTickList);
@@ -328,16 +354,56 @@ namespace TheoryC.ViewModels
                 // setup for next trial
                 this.UpdateSceneForNextTrial();
 
-                WaitForUserClick();
+                WaitForUserToStartNextTrial();
             }
         }
 
-        private void WaitForUserClick()
+        private void WaitForUserToStartNextTrial()
         {
-            // enables the command to start next trial
-            ShowClickTargetToStartTrial = true;
-            UserReadyForNextTrial = true;
+            if (IsUsingKinect)
+            {
+                // Show Countdown Window
+                ShowCountdownWindowUI();
+            }
+            else
+            {
+                // wait for user to click the target
+                ShowInstructionsToStartTrial = true;
+                ShowInstructionsToStartTrialText = "Click the red ball to start the trial";
+                MouseUserReadyForNextTrialCanExecute = true;
+            }
+
         }
+
+        private DispatcherTimer waitForHandInsideTargetTimer;
+        private void WaitForUserToPutHandInsideTarget()
+        {
+
+            waitForHandInsideTargetTimer = new DispatcherTimer();
+            waitForHandInsideTargetTimer.Interval = TimeSpan.FromMilliseconds(Settings.Default.MillisecondDelay);
+            waitForHandInsideTargetTimer.Tick += CheckForHandInsideTargetTick;
+            waitForHandInsideTargetTimer.Start();
+        }
+
+        private void CheckForHandInsideTargetTick(object sender, EventArgs e)
+        {
+            // check whether inside target
+            bool result = Tools.IsInsideCircle(this.InputPosition, this.TargetPositionCenter, TargetSizeRadius);
+
+            if (result)
+            {
+                // stop listening to this event and start the next trial
+                waitForHandInsideTargetTimer.Tick -= CheckForHandInsideTargetTick;
+
+                // hide instructions
+                ShowInstructionsToStartTrial = false;
+
+                // start next trial
+                StartNextTrial();
+            }        
+        }
+
+        
 
         private void MoveMouseToStartingPosition()
         {
@@ -416,8 +482,8 @@ namespace TheoryC.ViewModels
 
         void GameTimer_Tick(object sender, EventArgs e)
         {
-            CurrentTrial.Results.TickCount++; 
-//            Debug.Print("Tick #" + tickCounter++ + " and time is right now " + DateTime.Now.ToString("hh.mm.ss.ffffff"));
+            CurrentTrial.Results.TickCount++;
+            //            Debug.Print("Tick #" + tickCounter++ + " and time is right now " + DateTime.Now.ToString("hh.mm.ss.ffffff"));
 
             CalculateAngleBasedOnTimeSampling();
 
@@ -477,12 +543,13 @@ namespace TheoryC.ViewModels
 
             if (IsOnTarget)
             {
-                timeOnTarget.Start();
+                ticksOnTarget++;
+//                timeOnTarget.Start();
             }
-            else
-            {
-                timeOnTarget.Stop();
-            }
+            //else
+            //{
+            //    timeOnTarget.Stop();
+            //}
         }
 
         bool isInsideTrackCircle;
@@ -499,33 +566,33 @@ namespace TheoryC.ViewModels
 
         #region Commands
 
-        bool _UserReadyForNextTrial = default(bool);
-        public bool UserReadyForNextTrial { get { return _UserReadyForNextTrial; } set { base.SetProperty(ref _UserReadyForNextTrial, value); } }
+        bool _MouseUserReadyForNextTrialCanExecute = default(bool);
+        public bool MouseUserReadyForNextTrialCanExecute { get { return _MouseUserReadyForNextTrialCanExecute; } set { base.SetProperty(ref _MouseUserReadyForNextTrialCanExecute, value); } }
 
-        DelegateCommand _UserReadyForNextTrialCommand = null;
-        public DelegateCommand UserReadyForNextTrialCommand
+        DelegateCommand _UserClickedTargetToStartNextTrialCommand = null;
+        public DelegateCommand UserClickedTargetToStartNextTrialCommand
         {
             get
             {
-                if (_UserReadyForNextTrialCommand != null)
-                    return _UserReadyForNextTrialCommand;
+                if (_UserClickedTargetToStartNextTrialCommand != null)
+                    return _UserClickedTargetToStartNextTrialCommand;
 
-                _UserReadyForNextTrialCommand = new DelegateCommand
+                _UserClickedTargetToStartNextTrialCommand = new DelegateCommand
                 (
                     () =>
                     {
-                        ShowClickTargetToStartTrial = false;
-                        UserReadyForNextTrial = false;
+                        ShowInstructionsToStartTrial = false;
+                        MouseUserReadyForNextTrialCanExecute = false;
 
                         StartNextTrial();
                     },
                     () =>
                     {
-                        return UserReadyForNextTrial;
+                        return MouseUserReadyForNextTrialCanExecute;
                     }
                 );
-                this.PropertyChanged += (s, e) => _UserReadyForNextTrialCommand.RaiseCanExecuteChanged();
-                return _UserReadyForNextTrialCommand;
+                this.PropertyChanged += (s, e) => _UserClickedTargetToStartNextTrialCommand.RaiseCanExecuteChanged();
+                return _UserClickedTargetToStartNextTrialCommand;
             }
         }
 
@@ -541,7 +608,7 @@ namespace TheoryC.ViewModels
                 (
                     () =>
                     {
-                        ShowClickTargetToStartTrial = false;
+                        ShowInstructionsToStartTrial = false;
                         ShowParticipantInstructions = true;
                     },
                     () =>
@@ -555,32 +622,81 @@ namespace TheoryC.ViewModels
             }
         }
 
-
-        DelegateCommand _ShowClickTargetToStartTrialCommand = null;
-        public DelegateCommand ShowClickTargetToStartTrialCommand
+        // for both kinect mode and mouse mode - the researcher has clicked Start Experiment
+        DelegateCommand _StartExperimentCommand = null;
+        public DelegateCommand StartExperimentCommand
         {
             get
             {
-                if (_ShowClickTargetToStartTrialCommand != null)
-                    return _ShowClickTargetToStartTrialCommand;
+                if (_StartExperimentCommand != null)
+                    return _StartExperimentCommand;
 
-                _ShowClickTargetToStartTrialCommand = new DelegateCommand
+                _StartExperimentCommand = new DelegateCommand
                 (
                     () =>
                     {
-                        ShowParticipantInstructions = false;
-                        ShowClickTargetToStartTrial = true;
-                        UserReadyForNextTrial = true;
+                        if (IsUsingKinect)
+                        {                            
+                            ShowCountdownWindowUI();
+                        }
+                        else
+                        {
+                            ShowParticipantInstructions = false;
+                            ShowInstructionsToStartTrial = true;
+                            MouseUserReadyForNextTrialCanExecute = true;
+                            ShowInstructionsToStartTrialText = "Click the red ball to start the trial";
+                        }
+
                     },
                     () =>
                     {
                         return true; // what to do here????
                     }
                 );
-                this.PropertyChanged += (s, e) => _ShowClickTargetToStartTrialCommand.RaiseCanExecuteChanged();
-                return _ShowClickTargetToStartTrialCommand;
+                this.PropertyChanged += (s, e) => _StartExperimentCommand.RaiseCanExecuteChanged();
+                return _StartExperimentCommand;
             }
         }
+
+        // create into its own class???
+        const int CountdownInSeconds = 3;
+        private DispatcherTimer countdownWindowTimer;
+
+        private void ShowCountdownWindowUI()
+        {
+            ShowParticipantInstructions = false;
+            ShowCountdownWindow = true;
+            CountdownCount = CountdownInSeconds;
+
+            countdownWindowTimer = new DispatcherTimer();
+            countdownWindowTimer.Interval = TimeSpan.FromSeconds(1);
+            countdownWindowTimer.Tick += CountdownWindowTimerTick;
+            countdownWindowTimer.Start();
+        }
+
+        private void CountdownWindowTimerTick(object sender, EventArgs e)
+        {
+            CountdownCount--;
+
+            // hide when we hit 0
+            if (CountdownCount <= 0)
+            {
+                countdownWindowTimer.Stop();
+                countdownWindowTimer.Tick -= CountdownWindowTimerTick;
+                
+                // update UI
+                ShowCountdownWindow = false;
+
+                // show instructions to user to put their hand in target and wait for the event
+                ShowInstructionsToStartTrial = true;
+                ShowInstructionsToStartTrialText = "Put your hand in the target to start next trial";
+
+                // wait for user to put their hand inside the target
+                WaitForUserToPutHandInsideTarget();
+            }
+        }
+
+
 
 
         bool _IsSettingsWindowOpen = default(bool);
@@ -745,7 +861,6 @@ namespace TheoryC.ViewModels
                 return _StartExpCommand;
             }
         }
-
         public bool StartExpCanExecute()
         {
             return true; //should be changed to only start when ParticipantInstructions Window is showing
@@ -766,8 +881,8 @@ namespace TheoryC.ViewModels
         private void AbortExperiment()
         {
             StopCurrentTrial();
-            StopExperiment(aborted:true);
-            ShowClickTargetToStartTrial = false;
+            StopExperiment(aborted: true);
+            ShowInstructionsToStartTrial = false;
         }
 
 
@@ -781,7 +896,7 @@ namespace TheoryC.ViewModels
         private void StartExperiment()
         {
             InitializeExperimentVariables();
-            ShowClickTargetToStartTrial = false;
+            ShowInstructionsToStartTrial = false;
             ShowParticipantInstructions = true;
             //StartNextTrial();
         }
@@ -846,7 +961,7 @@ namespace TheoryC.ViewModels
                 _ImportSettingsCommand = new DelegateCommand(new Action(
                     () =>
                     {
-                        ImportSettings();   
+                        ImportSettings();
                     }),
 
                     new Func<bool>(
@@ -870,7 +985,7 @@ namespace TheoryC.ViewModels
                 _ExportSettingsCommand = new DelegateCommand(new Action(
                     () =>
                     {
-                        ExportSettings();   
+                        ExportSettings();
                     }),
 
                     new Func<bool>(

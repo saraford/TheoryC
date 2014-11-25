@@ -8,8 +8,8 @@ namespace TheoryC.Models
 {
     public class Result : Common.BindableBase
     {
-        double _TimeOnTargetMs = default(double);
-        public double TimeOnTargetMs { get { return _TimeOnTargetMs; } set { base.SetProperty(ref _TimeOnTargetMs, value); } }
+        double _TimeOnTarget = default(double);
+        public double TimeOnTarget { get { return _TimeOnTarget; } set { base.SetProperty(ref _TimeOnTarget, value); } }
 
         double _AbsoluteError = default(double);
         public double AbsoluteError { get { return _AbsoluteError; } set { base.SetProperty(ref _AbsoluteError, value); } }

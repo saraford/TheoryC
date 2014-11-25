@@ -51,7 +51,7 @@ namespace TheoryC.Common
             string str;
 
             str = trialNumber.ToString() + ",";
-            str += Result.TimeOnTargetMs.ToString() + ",";
+            str += Result.TimeOnTarget.ToString() + ",";
             str += Result.AbsoluteError.ToString() + ",";
             str += Result.ConstantError.ToString() + ",";
             str += Result.VariableError.ToString() + ",";

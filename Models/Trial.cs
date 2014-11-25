@@ -32,17 +32,18 @@ namespace TheoryC.Models
         {
             _shapeSizeDiameter = 50;
             _durationSeconds = 1;
-            _rpm = 0.00030; 
+            _rpm = 30; 
         }
 
         internal void ClearResults()
         {
             Results.AbsoluteError = 0;
             Results.AbsoluteErrorForEachTickList.Clear();
-            Results.TimeOnTargetMs = 0;
+            Results.TimeOnTarget = 0;
             Results.IsInsideTrackForEachTickList.Clear();
             Results.ConstantError = 0;
             Results.TickCount = 0;
+            Results.VariableError = 0;
         }
     }
 }

@@ -38,50 +38,45 @@ namespace TheoryC.Devices
         Image kinectVideoImage;
         ViewModels.MainViewModel ViewModel;
 
-        public KinectDevice(Canvas bodyCanvas, Image kinectVideoImage, ViewModels.MainViewModel ViewModel)
+        public KinectDevice()
         {
-            this.bodyCanvas = bodyCanvas;
-            this.kinectVideoImage = kinectVideoImage;
-            this.ViewModel = ViewModel;
         }
 
         #region "Kinect Setup and Teardown"
 
-        internal bool ICanHasAKinect2()
+        internal bool IsKinectAvailable()
         {
             kinectSensor = KinectSensor.GetDefault();
-
-            // set IsAvailableChanged event notifier
-            this.kinectSensor.IsAvailableChanged += this.Sensor_IsAvailableChanged;
 
             kinectSensor.Open();
 
             // need to give it time to find the sensor
             Thread.Sleep(2000);
 
-            this.ViewModel.StatusText = this.kinectSensor.IsAvailable ? Properties.Resources.RunningStatusText
-                                                            : Properties.Resources.NoSensorStatusText;
-
-            if (this.kinectSensor.IsAvailable)
-            {
-
-                // get the coordinate mapper
-                this.cm = this.kinectSensor.CoordinateMapper;
-
-                CreateSkeletonList();
-                reader = kinectSensor.OpenMultiSourceFrameReader(FrameSourceTypes.Color | FrameSourceTypes.Body);
-                reader.MultiSourceFrameArrived += Reader_MultiSourceFrameArrived;
-            }
-            else
-            {
-                // assuming right now i'll always want to run in debug mode
-                MessageBox.Show("No Kinects Detected. Running in Mouse input mode");
-                //                StartExperimentButton.IsEnabled = true;
-                return false;
-            }
-            return true; // I can has a kinect!
+            return this.kinectSensor.IsAvailable;
         }
 
+        internal void InitializeKinect(Canvas bodyCanvas, Image kinectVideoImage, ViewModels.MainViewModel ViewModel)
+        {
+            this.bodyCanvas = bodyCanvas;
+            this.kinectVideoImage = kinectVideoImage;
+            this.ViewModel = ViewModel;
+
+            // set IsAvailableChanged event notifier
+            this.kinectSensor.IsAvailableChanged += this.Sensor_IsAvailableChanged;
+
+            // get the coordinate mapper
+            this.cm = this.kinectSensor.CoordinateMapper;
+
+            // in case we want to show the skeleton later
+            CreateBonesList();
+
+            reader = kinectSensor.OpenMultiSourceFrameReader(FrameSourceTypes.Color | FrameSourceTypes.Body);
+            reader.MultiSourceFrameArrived += Reader_MultiSourceFrameArrived;
+
+            this.ViewModel.StatusText = this.kinectSensor.IsAvailable ? Properties.Resources.RunningStatusText
+                                                : Properties.Resources.NoSensorStatusText;
+        }
 
         private void Sensor_IsAvailableChanged(object sender, IsAvailableChangedEventArgs e)
         {
@@ -105,7 +100,7 @@ namespace TheoryC.Devices
 
                     frame.GetAndRefreshBodyData(bodies);
 
-                    this.DrawSkeletons(bodies);
+                    this.TrackSkeleton(bodies);
                 }
             }
 
@@ -120,14 +115,13 @@ namespace TheoryC.Devices
 
         }
 
-        private void DrawSkeletons(IList<Body> bodies)
+        private void TrackSkeleton(IList<Body> bodies)
         {
-            // draw the bodies 
             foreach (Body body in bodies)
             {
+                // find the first tracked body - if there are more than one, this will fail miserably
                 if (body.IsTracked)
                 {
-
                     IReadOnlyDictionary<JointType, Joint> joints = body.Joints;
 
                     // convert the joint points to depth (display) space
@@ -146,44 +140,50 @@ namespace TheoryC.Devices
                         ColorSpacePoint colorSpacePoint = this.cm.MapCameraPointToColorSpace(position);
                         jointPoints[jointType] = new Point(colorSpacePoint.X, colorSpacePoint.Y);
 
-                        if (jointType == JointType.HandTipRight)
-                        {
-                            // is this right??? WTF are these units in??
-                            rightHandTipDepth = position.Z;
-                        }
-                        else if (jointType == JointType.HandLeft)
-                        {
-                            // is this right??? WTF are these units in??
-                            leftHandTipDepth = position.Z;
-                        }
-
                         // track lean
-                        // Leaning left and right corresponds to X movement; leaning forward and back corresponds to Y movement. 
-                        // The values range between -1 and 1 in both drections, where 1 roughly corresponds to 45 degrees of lean.
                         if (body.LeanTrackingState == TrackingState.Tracked)
                         {
+                            // Leaning left and right corresponds to X movement; leaning forward and back corresponds to Y movement. 
+                            // The values range between -1 and 1 in both drections, where 1 roughly corresponds to 45 degrees of lean.
                             leanAmount = body.Lean;
                         }
 
-                    }
-
-                    if (this.ViewModel.ShowSkeleton)
-                    {
-                        this.DrawBody(joints, jointPoints);
-                    }
-
-                    foreach (JointType jointType in joints.Keys)
-                    {
+                        // track specific joints
                         if (jointType == JointType.HandTipRight)
                         {
                             rightHandTip.X = ConvertToCanvasX(jointPoints[jointType].X);
                             rightHandTip.Y = ConvertToCanvasY(jointPoints[jointType].Y);
+                            rightHandTipDepth = position.Z;
+
+                            // draws a circle for the tip of the hand
+                            if (this.ViewModel.ShowFingerTip)
+                            {
+                                Brush drawBrush = null;
+
+                                TrackingState trackingState = joints[jointType].TrackingState;
+
+                                if (trackingState == TrackingState.Tracked)
+                                {
+                                    drawBrush = this.trackedJointBrush;
+                                }
+                                else if (trackingState == TrackingState.Inferred)
+                                {
+                                    drawBrush = this.inferredJointBrush;
+                                }
+
+                                if (drawBrush != null)
+                                {
+                                    this.DrawEllipse(drawBrush, jointPoints[jointType], JointThickness);
+                                }
+                            }
+
                         }
 
                         else if (jointType == JointType.HandTipLeft)
                         {
                             leftHandTip.X = ConvertToCanvasX(jointPoints[jointType].X);
                             leftHandTip.Y = ConvertToCanvasY(jointPoints[jointType].Y);
+                            leftHandTipDepth = position.Z;
                         }
 
                         else if (jointType == JointType.ElbowRight)
@@ -203,10 +203,17 @@ namespace TheoryC.Devices
                     // here we go
                     this.ViewModel.InputPosition = rightHandTip;
 
-                    //                    // are we ready? either hand will work
+                    // are we ready? either hand will work
                     if (rightHandTip.X > 0)
                     {
                         this.ViewModel.IsKinectTracking = true;
+                        // do I need the else to set to false?
+                    }
+
+                    // if we want to show the skeleton
+                    if (this.ViewModel.ShowSkeleton)
+                    {
+                        this.DrawBody(joints, jointPoints);
                     }
                 }
             }
@@ -338,7 +345,7 @@ namespace TheoryC.Devices
         #endregion //Kinect Setup and Teardown
 
 
-        private void CreateSkeletonList()
+        private void CreateBonesList()
         {
             // a bone defined as a line between two joints
             this.bones = new List<Tuple<JointType, JointType>>();
@@ -394,7 +401,5 @@ namespace TheoryC.Devices
             }
 
         }
-
-
     }
 }
