@@ -27,7 +27,7 @@ namespace TheoryC.Devices
         private const double JointThickness = 5;
         public bool useRightShoulder = true;
         public Point leftShoulderCenter; // by default use the center of the screen
-        public Point rightShoulderCenter; // by default use the center of the screen
+        public Point rightElbowCenter; // by default use the center of the screen
         private readonly Brush trackedJointBrush = new SolidColorBrush(Color.FromArgb(255, 68, 192, 68));
         private readonly Brush inferredJointBrush = Brushes.Yellow;
         private readonly Brush inferredBoneBrush = Brushes.Gray;
@@ -185,29 +185,30 @@ namespace TheoryC.Devices
 
                         }
 
-                        else if (jointType == JointType.HandTipLeft)
-                        {
-                            leftHandTip.X = ConvertToCanvasX(jointPoints[jointType].X);
-                            leftHandTip.Y = ConvertToCanvasY(jointPoints[jointType].Y);
-                            leftHandTipDepth = position.Z;
-                        }
-
                         else if (jointType == JointType.ElbowRight)
                         {
-                            rightShoulderCenter.X = ConvertToCanvasX(jointPoints[jointType].X);
-                            rightShoulderCenter.Y = ConvertToCanvasY(jointPoints[jointType].Y);
+                            rightElbowCenter.X = ConvertToCanvasX(jointPoints[jointType].X);
+                            rightElbowCenter.Y = ConvertToCanvasY(jointPoints[jointType].Y);
                         }
+                        
+                        //else if (jointType == JointType.ShoulderLeft)
+                        //{
+                        //    leftShoulderCenter.X = ConvertToCanvasX(jointPoints[jointType].X);
+                        //    leftShoulderCenter.Y = ConvertToCanvasY(jointPoints[jointType].Y);
+                        //}
 
-                        else if (jointType == JointType.ShoulderLeft)
-                        {
-                            leftShoulderCenter.X = ConvertToCanvasX(jointPoints[jointType].X);
-                            leftShoulderCenter.Y = ConvertToCanvasY(jointPoints[jointType].Y);
-                        }
+                        //else if (jointType == JointType.HandTipLeft)
+                        //{
+                        //    leftHandTip.X = ConvertToCanvasX(jointPoints[jointType].X);
+                        //    leftHandTip.Y = ConvertToCanvasY(jointPoints[jointType].Y);
+                        //    leftHandTipDepth = position.Z;
+                        //}
 
                     }
 
                     // here we go
                     this.ViewModel.InputPosition = rightHandTip;
+                    this.ViewModel.RightElbow = rightElbowCenter;
 
                     // are we ready? either hand will work
                     if (rightHandTip.X > 0)

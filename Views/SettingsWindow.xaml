@@ -22,6 +22,7 @@
             <StackPanel Orientation="Horizontal">
                 <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Participant ID" VerticalAlignment="Top"/>
                 <TextBox Margin="10,0,0,0" HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" VerticalAlignment="Top" Width="100" Text="{Binding ParticipantID}"/>
+                <Button Margin="10,0,0,0" Content="Set Target" Command="{Binding CenterTargetOnParticipantElbow, Mode=OneWay}"/>
             </StackPanel>
 
             <StackPanel Orientation="Horizontal">

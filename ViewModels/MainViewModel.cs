@@ -97,7 +97,7 @@ namespace TheoryC.ViewModels
         string _StatusText = default(string);
         public string StatusText { get { return _StatusText; } set { base.SetProperty(ref _StatusText, value); } }
 
-        Point trackCenter = new Point(Settings.Default.TrackLeftX + Settings.Default.TrackRadius, Settings.Default.TrackTopY + Settings.Default.TrackRadius);
+        Point TrackCenter = new Point(Settings.Default.TrackLeftX + Settings.Default.TrackRadius, Settings.Default.TrackTopY + Settings.Default.TrackRadius);
         DispatcherTimer gameTimer;
         public Point AbsoluteScreenPositionOfTarget { get; set; }
         private double TargetSizeRadius;
@@ -113,7 +113,11 @@ namespace TheoryC.ViewModels
 
         private PointF _TickLeanAmount;
         public PointF TickLeanAmount { get { return _TickLeanAmount; } set { _TickLeanAmount = value; } }
-        
+
+        private Point _RightElbow;
+        public Point RightElbow { get { return _RightElbow; } set { _RightElbow = value; } }
+
+
         #endregion
 
         public MainViewModel()
@@ -540,7 +544,7 @@ namespace TheoryC.ViewModels
         double xt, yt;
         private void MoveTargetOnTick()
         {
-            Common.Tools.PointsOnACircle(TrackRadius, AngleInDegrees, trackCenter, out xt, out yt);
+            Common.Tools.PointsOnACircle(TrackRadius, AngleInDegrees, TrackCenter, out xt, out yt);
             TargetPositionLeft = xt - TargetSizeRadius;
             TargetPositionTop = yt - TargetSizeRadius;
         }
@@ -553,7 +557,7 @@ namespace TheoryC.ViewModels
 
         private void PlaceTargetInStartingPosition()
         {
-            Point pt = Tools.GetPointForPlacingTargetInStartingPosition(trackCenter, TrackRadius, TargetSizeRadius);
+            Point pt = Tools.GetPointForPlacingTargetInStartingPosition(TrackCenter, TrackRadius, TargetSizeRadius);
 
             TargetPositionLeft = pt.X;
             TargetPositionTop = pt.Y;
@@ -579,7 +583,7 @@ namespace TheoryC.ViewModels
         private void CheckIsInsideTrackCircle()
         {
             // calculate whether inside the track for algebraic error
-            isInsideTrackCircle = Tools.IsInsideCircle(this.InputPosition, this.trackCenter, this.TrackRadius);
+            isInsideTrackCircle = Tools.IsInsideCircle(this.InputPosition, this.TrackCenter, this.TrackRadius);
 
             // save boolean
             CurrentTrial.Results.IsInsideTrackForEachTickList.Add(isInsideTrackCircle);
@@ -1066,6 +1070,36 @@ namespace TheoryC.ViewModels
                         }));
                 this.PropertyChanged += (s, e) => _OpenResultsFolderCommand.RaiseCanExecuteChanged();
                 return _OpenResultsFolderCommand;
+            }
+        }
+
+        DelegateCommand _CenterTargetOnParticipantElbow = null;
+        public DelegateCommand CenterTargetOnParticipantElbow
+        {
+            get
+            {
+                if (_CenterTargetOnParticipantElbow != null)
+                    return _CenterTargetOnParticipantElbow;
+
+                _CenterTargetOnParticipantElbow = new DelegateCommand(new Action(
+                    () =>
+                    {
+                        Settings.Default.TrackLeftX = this.RightElbow.X - Settings.Default.TrackRadius;
+                        Settings.Default.TrackTopY = this.RightElbow.Y - Settings.Default.TrackRadius;
+
+                        TrackCenter.X = this.RightElbow.X;
+                        TrackCenter.Y = this.RightElbow.Y;
+                        this.PlaceTargetInStartingPosition();
+                        
+                    }),
+
+                    new Func<bool>(
+                        () =>
+                        {
+                            return IsSettingsWindowOpen; // only if settings window is showing
+                        }));
+                this.PropertyChanged += (s, e) => _CenterTargetOnParticipantElbow.RaiseCanExecuteChanged();
+                return _CenterTargetOnParticipantElbow;
             }
         }
 
