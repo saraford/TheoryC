@@ -45,6 +45,9 @@ namespace TheoryC.Models
             Results.TickCount = 0;
             Results.VariableError = 0;
             Results.HandDepthForEachTickList.Clear();
+            Results.LeanForwardBackY = 0;
+            Results.LeanLeftRightX = 0;
+            Results.LeanAmountForEachTickList.Clear();
         }
     }
 }

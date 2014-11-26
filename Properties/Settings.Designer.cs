@@ -37,7 +37,7 @@ namespace TheoryC.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("100")]
+        [global::System.Configuration.DefaultSettingValueAttribute("200")]
         public int TrackTopY {
             get {
                 return ((int)(this["TrackTopY"]));
@@ -61,7 +61,7 @@ namespace TheoryC.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("100")]
+        [global::System.Configuration.DefaultSettingValueAttribute("50")]
         public double TrackRadius {
             get {
                 return ((double)(this["TrackRadius"]));
