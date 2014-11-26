@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Kinect;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
@@ -107,8 +108,11 @@ namespace TheoryC.ViewModels
         int _CountdownCount = default(int);
         public int CountdownCount { get { return _CountdownCount; } set { base.SetProperty(ref _CountdownCount, value); } }
 
-        private double _HandDepth;
-        public double HandDepth { get { return _HandDepth; } set { _HandDepth = value; } }
+        private double _TickHandDepth;
+        public double TickHandDepth { get { return _TickHandDepth; } set { _TickHandDepth = value; } }
+
+        private PointF _TickLeanAmount;
+        public PointF TickLeanAmount { get { return _TickLeanAmount; } set { _TickLeanAmount = value; } }
         
         #endregion
 
@@ -189,7 +193,8 @@ namespace TheoryC.ViewModels
                     AbsoluteError = 0,
                     AbsoluteErrorForEachTickList = new List<double>(),
                     IsInsideTrackForEachTickList = new List<bool>(),
-                    HandDepthForEachTickList = new List<double>()
+                    HandDepthForEachTickList = new List<double>(),
+                    LeanAmountForEachTickList = new List<PointF>()
                 }
             });
 
@@ -213,7 +218,8 @@ namespace TheoryC.ViewModels
                     AbsoluteError = 0,
                     AbsoluteErrorForEachTickList = new List<double>(),
                     IsInsideTrackForEachTickList = new List<bool>(),
-                    HandDepthForEachTickList = new List<double>()
+                    HandDepthForEachTickList = new List<double>(),
+                    LeanAmountForEachTickList = new List<PointF>()
                 }
             });
 
@@ -342,7 +348,9 @@ namespace TheoryC.ViewModels
             CurrentTrial.Results.AbsoluteError = Statistics.Mean(CurrentTrial.Results.AbsoluteErrorForEachTickList);
             CurrentTrial.Results.ConstantError = Statistics.ConstantError(CurrentTrial.Results.AbsoluteErrorForEachTickList, CurrentTrial.Results.IsInsideTrackForEachTickList);
             CurrentTrial.Results.VariableError = Statistics.VariableError(CurrentTrial.Results.AbsoluteErrorForEachTickList, CurrentTrial.Results.IsInsideTrackForEachTickList);
-            CurrentTrial.Results.HandDepth = Statistics.PopulationStandardDeviation(CurrentTrial.Results.HandDepthForEachTickList);
+            CurrentTrial.Results.HandDepthStdDev = Statistics.PopulationStandardDeviation(CurrentTrial.Results.HandDepthForEachTickList);
+            CurrentTrial.Results.LeanLeftRightX = Statistics.PopulationStandardDeviation(CurrentTrial.Results.LeanAmountForEachTickList, DesiredCoord.X);
+            CurrentTrial.Results.LeanForwardBackY = Statistics.PopulationStandardDeviation(CurrentTrial.Results.LeanAmountForEachTickList, DesiredCoord.Y);
 
             // Check whether to end the experiment
             if (CurrentTrial.Number + 1 >= Trials.Count)
@@ -506,7 +514,8 @@ namespace TheoryC.ViewModels
 
             if (IsUsingKinect)
             {
-                CurrentTrial.Results.HandDepthForEachTickList.Add(HandDepth);
+                CurrentTrial.Results.LeanAmountForEachTickList.Add(TickLeanAmount);
+                CurrentTrial.Results.HandDepthForEachTickList.Add(TickHandDepth);
             }
 
             if (HasTrialTimeExpired())

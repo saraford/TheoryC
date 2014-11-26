@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Kinect;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +10,12 @@ using System.Windows;
 namespace TheoryC.Common
 {
     // http://www.martijnkooij.nl/2013/04/csharp-math-mean-variance-and-standard-deviation/
+
+    public enum DesiredCoord
+    {
+        X,
+        Y
+    }
 
     public class Statistics
     {
@@ -81,6 +88,28 @@ namespace TheoryC.Common
                 answer = Math.Sqrt(sum / count);
             }
             return answer;
+        }
+
+        public static double PopulationStandardDeviation(List<PointF> pointfs, DesiredCoord desiredCoord)
+        {
+            if (desiredCoord == DesiredCoord.X)
+            {
+                List<double> xValues = new List<double>();
+                foreach (var item in pointfs)
+                {
+                    xValues.Add(item.X);
+                }
+                return PopulationStandardDeviation(xValues);
+            }
+            else
+            {
+                List<double> yValues = new List<double>();
+                foreach (var item in pointfs)
+                {
+                    yValues.Add(item.Y);
+                }
+                return PopulationStandardDeviation(yValues);
+            }
         }
 
         public static double Mean(List<double> valueList)

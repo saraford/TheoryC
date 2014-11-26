@@ -23,7 +23,6 @@ namespace TheoryC.Devices
 //        public double rightHandTipDepth;
         public Point leftHandTip;
         public double leftHandTipDepth;
-        public PointF leanAmount;
         private List<Tuple<JointType, JointType>> bones;
         private const double JointThickness = 5;
         public bool useRightShoulder = true;
@@ -146,7 +145,7 @@ namespace TheoryC.Devices
                         {
                             // Leaning left and right corresponds to X movement; leaning forward and back corresponds to Y movement. 
                             // The values range between -1 and 1 in both drections, where 1 roughly corresponds to 45 degrees of lean.
-                            leanAmount = body.Lean;
+                            this.ViewModel.TickLeanAmount = body.Lean;
                         }
 
                         // track specific joints
@@ -157,7 +156,7 @@ namespace TheoryC.Devices
                             
                             // The depth of an object 1 unit = 1 meter
                             // http://msdn.microsoft.com/en-us/library/windowspreview.kinect.cameraspacepoint.aspx
-                            this.ViewModel.HandDepth = position.Z;
+                            this.ViewModel.TickHandDepth = position.Z;
                             
                             // draws a circle for the tip of the hand
                             if (this.ViewModel.ShowFingerTip)

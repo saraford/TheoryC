@@ -5,7 +5,7 @@
         xmlns:Converters="clr-namespace:TheoryC.Converters"      
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
         x:Class="TheoryC.Views.SettingsWindow"
-        Title="SettingsWindow" Height="520" Width="277.113">
+        Title="SettingsWindow" Height="600" Width="277.113">
     <Window.DataContext>
         <ViewModels:MainViewModel/>
     </Window.DataContext>
@@ -83,8 +83,16 @@
                 <TextBox Margin="0,5,0,0" Text="{Binding CurrentTrial.Results.ConstantError}"  />
                 <TextBlock Margin="0,5,0,0" Text="Variable Error"/>
                 <TextBox Margin="0,5,0,0" Text="{Binding CurrentTrial.Results.VariableError}"  />
+
                 <TextBlock Margin="0,5,0,0" Text="Depth StdDev"/>
-                <TextBox Margin="0,5,0,0" Text="{Binding CurrentTrial.Results.HandDepth}"  />
+                <TextBox Margin="0,5,0,0" Text="{Binding CurrentTrial.Results.HandDepthStdDev}"  />
+
+                <TextBlock Margin="0,5,0,0" Text="Lean Left Right StdDev"/>
+                <TextBox Margin="0,5,0,0" Text="{Binding CurrentTrial.Results.LeanLeftRightX}"  />
+
+                <TextBlock Margin="0,5,0,0" Text="Lean Forward Backward StdDev"/>
+                <TextBox Margin="0,5,0,0" Text="{Binding CurrentTrial.Results.LeanForwardBackY}"  />
+
                 <TextBlock Margin="0,5,0,0" Text="Tick Count"/>
                 <TextBox Margin="0,5,0,0" Text="{Binding CurrentTrial.Results.TickCount}"  />
             </StackPanel>
