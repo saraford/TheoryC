@@ -70,6 +70,9 @@ namespace TheoryC.Devices
             // in case we want to show the skeleton later
             CreateBonesList();
 
+            // and by default we'll show the finger tip
+            this.ViewModel.ShowFingerTip = true;
+ 
             reader = kinectSensor.OpenMultiSourceFrameReader(FrameSourceTypes.Color | FrameSourceTypes.Body);
             reader.MultiSourceFrameArrived += Reader_MultiSourceFrameArrived;
 
