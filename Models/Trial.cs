@@ -44,6 +44,7 @@ namespace TheoryC.Models
             Results.ConstantError = 0;
             Results.TickCount = 0;
             Results.VariableError = 0;
+            Results.HandDepthForEachTickList.Clear();
         }
     }
 }

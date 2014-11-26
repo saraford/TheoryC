@@ -100,20 +100,16 @@ namespace TheoryC.ViewModels
         DispatcherTimer gameTimer;
         public Point AbsoluteScreenPositionOfTarget { get; set; }
         private double TargetSizeRadius;
-
-
         private bool _isUsingKinect;
 
-        public bool IsUsingKinect
-        {
-            get { return _isUsingKinect; }
-            set { _isUsingKinect = value; }
-        }
+        public bool IsUsingKinect { get { return _isUsingKinect; } set { _isUsingKinect = value; } }
 
         int _CountdownCount = default(int);
         public int CountdownCount { get { return _CountdownCount; } set { base.SetProperty(ref _CountdownCount, value); } }
 
-
+        private double _HandDepth;
+        public double HandDepth { get { return _HandDepth; } set { _HandDepth = value; } }
+        
         #endregion
 
         public MainViewModel()
@@ -127,7 +123,12 @@ namespace TheoryC.ViewModels
                     this.Trials.Add(new Models.Trial
                     {
                         Number = i, //; //use a converter + 1, // no 0-based trials exposed to user
-                        Results = new Models.Result { TimeOnTarget = 0, AbsoluteError = 0, AbsoluteErrorForEachTickList = new List<double>() }
+                        Results = new Models.Result 
+                        { 
+                            TimeOnTarget = 0, 
+                            AbsoluteError = 0, 
+                            AbsoluteErrorForEachTickList = new List<double>(),
+                        }
                     });
                 }
 
@@ -187,7 +188,8 @@ namespace TheoryC.ViewModels
                     TimeOnTarget = 0,
                     AbsoluteError = 0,
                     AbsoluteErrorForEachTickList = new List<double>(),
-                    IsInsideTrackForEachTickList = new List<bool>()
+                    IsInsideTrackForEachTickList = new List<bool>(),
+                    HandDepthForEachTickList = new List<double>()
                 }
             });
 
@@ -210,7 +212,8 @@ namespace TheoryC.ViewModels
                     TimeOnTarget = 0,
                     AbsoluteError = 0,
                     AbsoluteErrorForEachTickList = new List<double>(),
-                    IsInsideTrackForEachTickList = new List<bool>()
+                    IsInsideTrackForEachTickList = new List<bool>(),
+                    HandDepthForEachTickList = new List<double>()
                 }
             });
 
@@ -339,6 +342,7 @@ namespace TheoryC.ViewModels
             CurrentTrial.Results.AbsoluteError = Statistics.Mean(CurrentTrial.Results.AbsoluteErrorForEachTickList);
             CurrentTrial.Results.ConstantError = Statistics.ConstantError(CurrentTrial.Results.AbsoluteErrorForEachTickList, CurrentTrial.Results.IsInsideTrackForEachTickList);
             CurrentTrial.Results.VariableError = Statistics.VariableError(CurrentTrial.Results.AbsoluteErrorForEachTickList, CurrentTrial.Results.IsInsideTrackForEachTickList);
+            CurrentTrial.Results.HandDepth = Statistics.PopulationStandardDeviation(CurrentTrial.Results.HandDepthForEachTickList);
 
             // Check whether to end the experiment
             if (CurrentTrial.Number + 1 >= Trials.Count)
@@ -499,6 +503,11 @@ namespace TheoryC.ViewModels
             CheckIsInsideTrackCircle(); //to calculate algebraic error
 
             CalculateAbsoluteErrorForEachTick();
+
+            if (IsUsingKinect)
+            {
+                CurrentTrial.Results.HandDepthForEachTickList.Add(HandDepth);
+            }
 
             if (HasTrialTimeExpired())
             {

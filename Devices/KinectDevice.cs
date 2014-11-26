@@ -20,7 +20,7 @@ namespace TheoryC.Devices
         IList<Body> bodies;
         private const float InferredZPositionClamp = 0.1f;
         public Point rightHandTip;
-        public double rightHandTipDepth;
+//        public double rightHandTipDepth;
         public Point leftHandTip;
         public double leftHandTipDepth;
         public PointF leanAmount;
@@ -131,6 +131,7 @@ namespace TheoryC.Devices
                     {
                         // sometimes the depth(Z) of an inferred joint may show as negative
                         // clamp down to 0.1f to prevent coordinatemapper from returning (-Infinity, -Infinity)
+                        // this is only needed for showing the skeleton
                         CameraSpacePoint position = joints[jointType].Position;
                         if (position.Z < 0)
                         {
@@ -153,8 +154,11 @@ namespace TheoryC.Devices
                         {
                             rightHandTip.X = ConvertToCanvasX(jointPoints[jointType].X);
                             rightHandTip.Y = ConvertToCanvasY(jointPoints[jointType].Y);
-                            rightHandTipDepth = position.Z;
-
+                            
+                            // The depth of an object 1 unit = 1 meter
+                            // http://msdn.microsoft.com/en-us/library/windowspreview.kinect.cameraspacepoint.aspx
+                            this.ViewModel.HandDepth = position.Z;
+                            
                             // draws a circle for the tip of the hand
                             if (this.ViewModel.ShowFingerTip)
                             {

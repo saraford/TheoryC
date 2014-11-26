@@ -27,7 +27,7 @@ namespace TheoryC.Common
                 writer.WriteLine(participantID);
 
                 // Establish column headings
-                writer.WriteLine("Trial # , Time on Target , Absolute Error , Constant Error , Variable Error , Tick Count");
+                writer.WriteLine("Trial # , Time on Target , Absolute Error , Constant Error , Variable Error , Hand Depth StdDev , Tick Count");
 
                 foreach (var trial in Trials)
                 {
@@ -55,6 +55,7 @@ namespace TheoryC.Common
             str += Result.AbsoluteError.ToString() + ",";
             str += Result.ConstantError.ToString() + ",";
             str += Result.VariableError.ToString() + ",";
+            str += Result.HandDepth.ToString() + ",";
             str += Result.TickCount.ToString() + ",";
 
             return str;   

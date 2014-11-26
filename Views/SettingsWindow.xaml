@@ -5,7 +5,7 @@
         xmlns:Converters="clr-namespace:TheoryC.Converters"      
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
         x:Class="TheoryC.Views.SettingsWindow"
-        Title="SettingsWindow" Height="470" Width="277.113">
+        Title="SettingsWindow" Height="520" Width="277.113">
     <Window.DataContext>
         <ViewModels:MainViewModel/>
     </Window.DataContext>
@@ -53,39 +53,41 @@
             </i:Interaction.Triggers>
         </ListBox>
 
-        <StackPanel Grid.Column="1" >
+            <StackPanel Grid.Column="1" >
 
-            <StackPanel Margin="0,5,0,0" Orientation="Horizontal">
-                <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Target Diameter:" VerticalAlignment="Top"/>
-                <TextBox Margin="10,0,0,0" HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" VerticalAlignment="Top" Width="86" Text="{Binding CurrentTrial.ShapeSizeDiameter, UpdateSourceTrigger=PropertyChanged}">
-                    <i:Interaction.Triggers>
-                        <i:EventTrigger EventName="TextChanged">
-                            <i:InvokeCommandAction Command="{Binding UpdateTargetSizeRadius}"/>
-                        </i:EventTrigger>
-                    </i:Interaction.Triggers>
-                </TextBox>
-            </StackPanel>
-            <StackPanel Margin="0,5,0,0" Orientation="Horizontal">
-                <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Duration:" VerticalAlignment="Top"/>
-                <TextBox Margin="10,0,0,0" HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" Text="{Binding CurrentTrial.DurationSeconds}" VerticalAlignment="Top" Width="86"/>
-            </StackPanel>
-            <StackPanel Margin="0,5,0,0" Orientation="Horizontal">
-                <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="RPMs:" VerticalAlignment="Top"/>
-                <TextBox Margin="10,0,0,0" HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" Text="{Binding CurrentTrial.RPMs}" VerticalAlignment="Top" Width="86"/>
-            </StackPanel>
+                <StackPanel Margin="0,5,0,0" Orientation="Horizontal">
+                    <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Target Diameter:" VerticalAlignment="Top"/>
+                    <TextBox Margin="10,0,0,0" HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" VerticalAlignment="Top" Width="86" Text="{Binding CurrentTrial.ShapeSizeDiameter, UpdateSourceTrigger=PropertyChanged}">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="TextChanged">
+                                <i:InvokeCommandAction Command="{Binding UpdateTargetSizeRadius}"/>
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </TextBox>
+                </StackPanel>
+                <StackPanel Margin="0,5,0,0" Orientation="Horizontal">
+                    <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Duration:" VerticalAlignment="Top"/>
+                    <TextBox Margin="10,0,0,0" HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" Text="{Binding CurrentTrial.DurationSeconds}" VerticalAlignment="Top" Width="86"/>
+                </StackPanel>
+                <StackPanel Margin="0,5,0,0" Orientation="Horizontal">
+                    <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="RPMs:" VerticalAlignment="Top"/>
+                    <TextBox Margin="10,0,0,0" HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" Text="{Binding CurrentTrial.RPMs}" VerticalAlignment="Top" Width="86"/>
+                </StackPanel>
 
-            <TextBlock Margin="0,10,0,0" Text="Results" FontWeight="SemiBold"/>
-            <TextBlock Margin="0,10,0,0" Text="Time On Target MS"/>
-            <TextBox Margin="0,5,0,0" Text="{Binding CurrentTrial.Results.TimeOnTarget}"  />
-            <TextBlock Margin="0,5,0,0" Text="Absolute Error"/>
-            <TextBox Margin="0,5,0,0" Text="{Binding CurrentTrial.Results.AbsoluteError}"  />
-            <TextBlock Margin="0,5,0,0" Text="Constant Error"/>
-            <TextBox Margin="0,5,0,0" Text="{Binding CurrentTrial.Results.ConstantError}"  />
+                <TextBlock Margin="0,10,0,0" Text="Results" FontWeight="SemiBold"/>
+                <TextBlock Margin="0,10,0,0" Text="Time On Target Seconds"/>
+                <TextBox Margin="0,5,0,0" Text="{Binding CurrentTrial.Results.TimeOnTarget}"  />
+                <TextBlock Margin="0,5,0,0" Text="Absolute Error"/>
+                <TextBox Margin="0,5,0,0" Text="{Binding CurrentTrial.Results.AbsoluteError}"  />
+                <TextBlock Margin="0,5,0,0" Text="Constant Error"/>
+                <TextBox Margin="0,5,0,0" Text="{Binding CurrentTrial.Results.ConstantError}"  />
                 <TextBlock Margin="0,5,0,0" Text="Variable Error"/>
                 <TextBox Margin="0,5,0,0" Text="{Binding CurrentTrial.Results.VariableError}"  />
+                <TextBlock Margin="0,5,0,0" Text="Depth StdDev"/>
+                <TextBox Margin="0,5,0,0" Text="{Binding CurrentTrial.Results.HandDepth}"  />
                 <TextBlock Margin="0,5,0,0" Text="Tick Count"/>
                 <TextBox Margin="0,5,0,0" Text="{Binding CurrentTrial.Results.TickCount}"  />
             </StackPanel>
-    </Grid>
+        </Grid>
     </Grid>
 </Window>
