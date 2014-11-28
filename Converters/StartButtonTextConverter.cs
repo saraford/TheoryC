@@ -14,7 +14,8 @@ namespace TheoryC.Converters
         {
             bool original = (bool)value;
             if (original) {
-                return "Abort";
+//                return "Abort";
+                return "Start";
             }
             else
             {

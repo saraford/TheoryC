@@ -889,7 +889,8 @@ namespace TheoryC.ViewModels
         }
         public bool StartExpCanExecute()
         {
-            return true; //should be changed to only start when ParticipantInstructions Window is showing
+            // wanted to abort experiment but can't figure out what is going on with Countdown Window always executing
+            return !IsExperimentRunning;
         }
 
         public void StartResetExperiment()
@@ -898,18 +899,18 @@ namespace TheoryC.ViewModels
             {
                 StartExperiment();
             }
-            else
-            {
-                AbortExperiment();
-            }
+            //else
+            //{
+            //    AbortExperiment();
+            //}
         }
 
-        private void AbortExperiment()
-        {
-            StopCurrentTrial();
-            StopExperiment(aborted: true);
-            ShowInstructionsToStartTrial = false;
-        }
+        //private void AbortExperiment()
+        //{
+        //    StopCurrentTrial();
+        //    StopExperiment(aborted: true);
+        //    ShowInstructionsToStartTrial = false;
+        //}
 
 
         private void RestartExperiment()
