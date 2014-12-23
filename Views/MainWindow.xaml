@@ -27,7 +27,6 @@
             <Menu DockPanel.Dock="Top" MinHeight="20" MaxHeight="20">
                 <MenuItem Command="{Binding StartExpCommand, Mode=OneWay}" Header="{Binding IsExperimentRunning, Converter={StaticResource StartButtonText}, Mode=OneWay}"  />
                 <MenuItem Command="{Binding ShowSettingsCommand, Mode=OneWay}" Header="Settings" />
-                <MenuItem Command="{Binding OpenResultsFolderCommand, Mode=OneWay}" Header="Results" />
                 <MenuItem Command="{Binding ShowSetupCommand, Mode=OneWay}" Header="Setup" />
                 <MenuItem Command="{Binding ShowDebugCommand, Mode=OneWay}" Header="Debug" />
             </Menu>

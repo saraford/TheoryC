@@ -36,14 +36,9 @@ namespace TheoryC.Views
             }
             else
             {
-                // yeah, i know I'm being lazy here
+                // yeah, i know I'm being lazy here using a message box
                 MessageBox.Show("kinect not detected. using mouse mode");
                 MouseMove += MainWindow_MouseMove;
-
-                // REMOVE THIS ONCE I FIGURE OUT KINECT SCALING ISSUES
-                // gameCanvas and kinectVideo must be both at Width="960" Height="510"
-                //                this.MainWindowGrid.Height = 600;
-                //                this.gameCanvas.Height = 600;
             }
         }
 
@@ -52,7 +47,7 @@ namespace TheoryC.Views
         {
             this.ViewModel.InputPosition = e.GetPosition(SceneCanvas);
 
-            // use for any mouse debugging
+            // Uncomment to use for any mouse debugging
             //            this.ViewModel.MousePosition = e.GetPosition(SceneCanvas);
         }
 

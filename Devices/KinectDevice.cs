@@ -50,7 +50,8 @@ namespace TheoryC.Devices
             kinectSensor.Open();
 
             // need to give it time to find the sensor
-            Thread.Sleep(2000);
+            // how to not block the main thread
+            Thread.Sleep(2000); 
 
             return this.kinectSensor.IsAvailable;
         }
