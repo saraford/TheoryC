@@ -20,13 +20,13 @@ namespace TheoryC.Devices
         IList<Body> bodies;
         private const float InferredZPositionClamp = 0.1f;
         public Point rightHandTip;
-//        public double rightHandTipDepth;
+        //        public double rightHandTipDepth;
         public Point leftHandTip;
         public double leftHandTipDepth;
         private List<Tuple<JointType, JointType>> bones;
         private const double JointThickness = 5;
         public bool useRightShoulder = true;
-        public Point leftShoulderCenter; // by default use the center of the screen
+        public Point leftElbowCenter; // by default use the center of the screen
         public Point rightElbowCenter; // by default use the center of the screen
         private readonly Brush trackedJointBrush = new SolidColorBrush(Color.FromArgb(255, 68, 192, 68));
         private readonly Brush inferredJointBrush = Brushes.Yellow;
@@ -72,7 +72,7 @@ namespace TheoryC.Devices
 
             // and by default we'll show the finger tip
             this.ViewModel.ShowFingerTip = true;
- 
+
             reader = kinectSensor.OpenMultiSourceFrameReader(FrameSourceTypes.Color | FrameSourceTypes.Body);
             reader.MultiSourceFrameArrived += Reader_MultiSourceFrameArrived;
 
@@ -151,64 +151,52 @@ namespace TheoryC.Devices
                             this.ViewModel.TickLeanAmount = body.Lean;
                         }
 
-                        // track specific joints
-                        if (jointType == JointType.HandTipRight)
+                        if (this.ViewModel.Handedness == TheoryC.ViewModels.Side.Right)
                         {
-                            rightHandTip.X = ConvertToCanvasX(jointPoints[jointType].X);
-                            rightHandTip.Y = ConvertToCanvasY(jointPoints[jointType].Y);
-                            
-                            // The depth of an object 1 unit = 1 meter
-                            // http://msdn.microsoft.com/en-us/library/windowspreview.kinect.cameraspacepoint.aspx
-                            this.ViewModel.TickHandDepth = position.Z;
-                            
-                            // draws a circle for the tip of the hand
-                            if (this.ViewModel.ShowFingerTip)
+                            // track specific joints
+                            if (jointType == JointType.HandTipRight)
                             {
-                                Brush drawBrush = null;
+                                rightHandTip.X = ConvertToCanvasX(jointPoints[jointType].X);
+                                rightHandTip.Y = ConvertToCanvasY(jointPoints[jointType].Y);
 
-                                TrackingState trackingState = joints[jointType].TrackingState;
+                                // The depth of an object 1 unit = 1 meter
+                                // http://msdn.microsoft.com/en-us/library/windowspreview.kinect.cameraspacepoint.aspx
+                                this.ViewModel.TickHandDepth = position.Z;
 
-                                if (trackingState == TrackingState.Tracked)
-                                {
-                                    drawBrush = this.trackedJointBrush;
-                                }
-                                else if (trackingState == TrackingState.Inferred)
-                                {
-                                    drawBrush = this.inferredJointBrush;
-                                }
-
-                                if (drawBrush != null)
-                                {
-                                    this.DrawEllipse(drawBrush, jointPoints[jointType], JointThickness);
-                                }
+                                DrawCircleAtFingerTip(joints, jointPoints, jointType);
                             }
 
+                            else if (jointType == JointType.ElbowRight)
+                            {
+                                rightElbowCenter.X = ConvertToCanvasX(jointPoints[jointType].X);
+                                rightElbowCenter.Y = ConvertToCanvasY(jointPoints[jointType].Y);
+                            }
+                            this.ViewModel.InputPosition = rightHandTip;
+                            this.ViewModel.Elbow = rightElbowCenter;
+
                         }
 
-                        else if (jointType == JointType.ElbowRight)
+                        else // left elbow/hand 
                         {
-                            rightElbowCenter.X = ConvertToCanvasX(jointPoints[jointType].X);
-                            rightElbowCenter.Y = ConvertToCanvasY(jointPoints[jointType].Y);
+                            if (jointType == JointType.ElbowLeft)
+                            {
+                                leftElbowCenter.X = ConvertToCanvasX(jointPoints[jointType].X);
+                                leftElbowCenter.Y = ConvertToCanvasY(jointPoints[jointType].Y);
+                            }
+
+                            else if (jointType == JointType.HandTipLeft)
+                            {
+                                leftHandTip.X = ConvertToCanvasX(jointPoints[jointType].X);
+                                leftHandTip.Y = ConvertToCanvasY(jointPoints[jointType].Y);
+                                leftHandTipDepth = position.Z;
+
+                                DrawCircleAtFingerTip(joints, jointPoints, jointType);
+                            }
+
+                            this.ViewModel.InputPosition = leftHandTip;
+                            this.ViewModel.Elbow = leftElbowCenter;
                         }
-                        
-                        //else if (jointType == JointType.ShoulderLeft)
-                        //{
-                        //    leftShoulderCenter.X = ConvertToCanvasX(jointPoints[jointType].X);
-                        //    leftShoulderCenter.Y = ConvertToCanvasY(jointPoints[jointType].Y);
-                        //}
-
-                        //else if (jointType == JointType.HandTipLeft)
-                        //{
-                        //    leftHandTip.X = ConvertToCanvasX(jointPoints[jointType].X);
-                        //    leftHandTip.Y = ConvertToCanvasY(jointPoints[jointType].Y);
-                        //    leftHandTipDepth = position.Z;
-                        //}
-
                     }
-
-                    // here we go
-                    this.ViewModel.InputPosition = rightHandTip;
-                    this.ViewModel.RightElbow = rightElbowCenter;
 
                     // are we ready? either hand will work
                     if (rightHandTip.X > 0)
@@ -225,6 +213,31 @@ namespace TheoryC.Devices
                 }
             }
 
+        }
+
+        private void DrawCircleAtFingerTip(IReadOnlyDictionary<JointType, Joint> joints, Dictionary<JointType, Point> jointPoints, JointType jointType)
+        {
+            // draws a circle for the tip of the hand
+            if (this.ViewModel.ShowFingerTip)
+            {
+                Brush drawBrush = null;
+
+                TrackingState trackingState = joints[jointType].TrackingState;
+
+                if (trackingState == TrackingState.Tracked)
+                {
+                    drawBrush = this.trackedJointBrush;
+                }
+                else if (trackingState == TrackingState.Inferred)
+                {
+                    drawBrush = this.inferredJointBrush;
+                }
+
+                if (drawBrush != null)
+                {
+                    this.DrawEllipse(drawBrush, jointPoints[jointType], JointThickness);
+                }
+            }
         }
 
         private void DrawBody(IReadOnlyDictionary<JointType, Joint> joints, IDictionary<JointType, Point> jointPoints)

@@ -17,6 +17,8 @@ using TheoryC.Properties;
 
 namespace TheoryC.ViewModels
 {
+    public enum Side { Right, Left }
+
     public class MainViewModel : Common.BindableBase
     {
 
@@ -114,9 +116,11 @@ namespace TheoryC.ViewModels
         private PointF _TickLeanAmount;
         public PointF TickLeanAmount { get { return _TickLeanAmount; } set { _TickLeanAmount = value; } }
 
-        private Point _RightElbow;
-        public Point RightElbow { get { return _RightElbow; } set { _RightElbow = value; } }
+        private Point _Elbow;
+        public Point Elbow { get { return _Elbow; } set { _Elbow = value; } }
 
+        private Side _Handedness;
+        public Side Handedness { get { return _Handedness; } set { base.SetProperty(ref _Handedness, value); } }
 
         #endregion
 
@@ -178,6 +182,9 @@ namespace TheoryC.ViewModels
             // show the UI we want user to see
             this.ShowDebugCommand.Execute(null);
             this.ShowSettingsCommand.Execute(null);
+
+            // for testing without the UI
+            Handedness = Side.Right;
         }
 
         private void AddTrial()
@@ -1110,11 +1117,11 @@ namespace TheoryC.ViewModels
                 _CenterTargetOnParticipantElbow = new DelegateCommand(new Action(
                     () =>
                     {
-                        Settings.Default.TrackLeftX = this.RightElbow.X - Settings.Default.TrackRadius;
-                        Settings.Default.TrackTopY = this.RightElbow.Y - Settings.Default.TrackRadius;
+                        Settings.Default.TrackLeftX = this.Elbow.X - Settings.Default.TrackRadius;
+                        Settings.Default.TrackTopY = this.Elbow.Y - Settings.Default.TrackRadius;
 
-                        TrackCenter.X = this.RightElbow.X;
-                        TrackCenter.Y = this.RightElbow.Y;
+                        TrackCenter.X = this.Elbow.X;
+                        TrackCenter.Y = this.Elbow.Y;
                         this.PlaceTargetInStartingPosition();
                         
                     }),
