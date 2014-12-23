@@ -5,98 +5,130 @@
         xmlns:Converters="clr-namespace:TheoryC.Converters"      
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
         x:Class="TheoryC.Views.SettingsWindow"
-        Title="SettingsWindow" Height="600" Width="277.113">
+        Title="SettingsWindow" Height="550" Width="500">
     <Window.DataContext>
         <ViewModels:MainViewModel/>
     </Window.DataContext>
     <Window.Resources>
         <Converters:AddOneConverter x:Key="AddOneToTrial"/>
     </Window.Resources>
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="100" />
-            <RowDefinition />
-        </Grid.RowDefinitions>
+    <DockPanel>
+        <Menu DockPanel.Dock="Top" MinHeight="20" MaxHeight="20">
+            <MenuItem Command="{Binding AddTrialCommand, Mode=OneWay}" Header="Add Trial"/>
+            <MenuItem Command="{Binding ImportSettingsCommand, Mode=OneWay}" Header="Import" />
+            <MenuItem Command="{Binding ExportSettingsCommand, Mode=OneWay}" Header="Export" />
+            <MenuItem Command="{Binding ClearResultsCommand, Mode=OneWay}" Header="Clear Results" />
+        </Menu>
 
-        <StackPanel Margin="5,10,0,0" Orientation="Vertical"  Grid.Row="0">
-            <StackPanel Orientation="Horizontal">
-                <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Participant ID" VerticalAlignment="Top"/>
-                <TextBox Margin="10,0,0,0" HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" VerticalAlignment="Top" Width="100" Text="{Binding ParticipantID}"/>
-                <Button Margin="10,0,0,0" Content="Set Target" Command="{Binding CenterTargetOnParticipantElbow, Mode=OneWay}"/>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="31*"/>
+                <ColumnDefinition Width="239*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="100" />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+
+            <StackPanel Margin="5,10,0.4,0.4" Orientation="Vertical"  Grid.Row="0" Grid.ColumnSpan="2">
+                <TextBlock Text="Participant Info" FontSize="14" FontWeight="SemiBold"></TextBlock>
+                
+                <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                    <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Participant ID" VerticalAlignment="Top"/>
+                    <TextBox Margin="10,0,0,0" HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" VerticalAlignment="Top" Width="160" Text="{Binding ParticipantID}"/>
+                </StackPanel>
+
+                <TextBlock Text="Trials and Results" Margin="0,10,0,0" FontSize="14" FontWeight="SemiBold"></TextBlock>
             </StackPanel>
 
-            <StackPanel Orientation="Horizontal">
-                <TextBlock FontSize="20" Text="Current Trial #" />
-                <TextBlock FontSize="20"  Text="{Binding CurrentTrial.Number, Converter={StaticResource AddOneToTrial}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-            </StackPanel>
+            <Grid Grid.ColumnSpan="2" Grid.Row="1" Margin="5,0,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="50" />
+                    <ColumnDefinition Width="20" />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
 
-            <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
-                <Button Content="Add Trial" Command="{Binding AddTrialCommand, Mode=OneWay}"></Button>
-                <Button Margin="10,0,0,0" Content="Import Trials" Command="{Binding ImportSettingsCommand, Mode=OneWay}"></Button>
-                <Button Margin="10,0,0,0" Content="Export Trials" Command="{Binding ExportSettingsCommand, Mode=OneWay}"></Button>
-            </StackPanel>
-        </StackPanel>
-        
-       <Grid Grid.Row="1">        
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="50" />
-            <ColumnDefinition />
-        </Grid.ColumnDefinitions>
-
-            <ListBox Grid.Column="0"
+                <ListBox Grid.Column="0"
                          DisplayMemberPath="TrialName"
+                         HorizontalContentAlignment="Center"
                          ItemsSource="{Binding Trials}"
                          SelectedItem="{Binding CurrentTrial, Mode=TwoWay}" >
-            <i:Interaction.Triggers>
-                <i:EventTrigger EventName="SelectionChanged">
-                    <i:InvokeCommandAction Command="{Binding UpdateSceneWhenListboxSelectionChanges}"/>
-                </i:EventTrigger>
-            </i:Interaction.Triggers>
-        </ListBox>
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="SelectionChanged">
+                            <i:InvokeCommandAction Command="{Binding UpdateSceneWhenListboxSelectionChanges}"/>
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </ListBox>
 
-            <StackPanel Grid.Column="1" >
+                <StackPanel Grid.Column="2" >
 
-                <StackPanel Margin="0,5,0,0" Orientation="Horizontal">
-                    <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Target Diameter:" VerticalAlignment="Top"/>
-                    <TextBox Margin="10,0,0,0" HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" VerticalAlignment="Top" Width="86" Text="{Binding CurrentTrial.ShapeSizeDiameter, UpdateSourceTrigger=PropertyChanged}">
-                        <i:Interaction.Triggers>
-                            <i:EventTrigger EventName="TextChanged">
-                                <i:InvokeCommandAction Command="{Binding UpdateTargetSizeRadius}"/>
-                            </i:EventTrigger>
-                        </i:Interaction.Triggers>
-                    </TextBox>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock FontWeight="SemiBold" FontSize="13" Text="Trial #" />
+                        <TextBlock FontWeight="SemiBold" FontSize="13"  Text="{Binding CurrentTrial.Number, Converter={StaticResource AddOneToTrial}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    </StackPanel>
+
+                    <StackPanel Margin="0,10,0,0" Orientation="Vertical">
+                                                
+                        <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Target Diameter" VerticalAlignment="Top"/>
+                        <TextBox Margin="0,5,0,0" HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" VerticalAlignment="Top" Width="85" Text="{Binding CurrentTrial.ShapeSizeDiameter, UpdateSourceTrigger=PropertyChanged}">
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="TextChanged">
+                                    <i:InvokeCommandAction Command="{Binding UpdateTargetSizeRadius}"/>
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
+                        </TextBox>
+                    </StackPanel>
+                    
+                    <StackPanel Margin="0,5,0,0" Orientation="Vertical">
+                        <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Duration" VerticalAlignment="Top"/>
+                        <TextBox Margin="0,5,0,0" HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" Text="{Binding CurrentTrial.DurationSeconds}" VerticalAlignment="Top" Width="86"/>
+                    </StackPanel>
+                    
+                    <StackPanel Margin="0,5,0,0" Orientation="Vertical">
+                        <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="RPMs" VerticalAlignment="Top"/>
+                        <TextBox Margin="0,5,0,0" HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" Text="{Binding CurrentTrial.RPMs}" VerticalAlignment="Top" Width="86"/>                   
+                    </StackPanel>
+
+                    <TextBlock Margin="0,10,0,0" FontSize="13" Text="Results" FontWeight="SemiBold"/>
+
+                    <Grid Margin="0,10,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="10" />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Grid.Column="0" >
+
+                            <TextBlock Margin="0,0,0,0" Text="Time On Target Seconds"/>
+                            <TextBox Margin="0,5,0,0" Text="{Binding CurrentTrial.Results.TimeOnTarget}"  />
+                            <TextBlock Margin="0,5,0,0" Text="Absolute Error"/>
+                            <TextBox Margin="0,5,0,0" Text="{Binding CurrentTrial.Results.AbsoluteError}"  />
+                            <TextBlock Margin="0,5,0,0" Text="Constant Error"/>
+                            <TextBox Margin="0,5,0,0" Text="{Binding CurrentTrial.Results.ConstantError}"  />
+                            <TextBlock Margin="0,5,0,0" Text="Variable Error"/>
+                            <TextBox Margin="0,5,0,0" Text="{Binding CurrentTrial.Results.VariableError}"  />
+
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="2">
+                            <TextBlock Margin="0,0,0,0" Text="Depth StdDev"/>
+                            <TextBox Margin="0,5,0,0" Text="{Binding CurrentTrial.Results.HandDepthStdDev}"  />
+
+                            <TextBlock Margin="0,5,0,0" Text="Lean Left Right StdDev"/>
+                            <TextBox Margin="0,5,0,0" Text="{Binding CurrentTrial.Results.LeanLeftRightX}"  />
+
+                            <TextBlock Margin="0,5,0,0" Text="Lean Forward Backward StdDev"/>
+                            <TextBox Margin="0,5,0,0" Text="{Binding CurrentTrial.Results.LeanForwardBackY}"  />
+
+                            <TextBlock Margin="0,5,0,0" Text="Tick Count"/>
+                            <TextBox Margin="0,5,0,0" Text="{Binding CurrentTrial.Results.TickCount}"  />
+
+                        </StackPanel>
+
+                    </Grid>
                 </StackPanel>
-                <StackPanel Margin="0,5,0,0" Orientation="Horizontal">
-                    <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Duration:" VerticalAlignment="Top"/>
-                    <TextBox Margin="10,0,0,0" HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" Text="{Binding CurrentTrial.DurationSeconds}" VerticalAlignment="Top" Width="86"/>
-                </StackPanel>
-                <StackPanel Margin="0,5,0,0" Orientation="Horizontal">
-                    <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="RPMs:" VerticalAlignment="Top"/>
-                    <TextBox Margin="10,0,0,0" HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" Text="{Binding CurrentTrial.RPMs}" VerticalAlignment="Top" Width="86"/>
-                </StackPanel>
-
-                <TextBlock Margin="0,10,0,0" Text="Results" FontWeight="SemiBold"/>
-                <TextBlock Margin="0,10,0,0" Text="Time On Target Seconds"/>
-                <TextBox Margin="0,5,0,0" Text="{Binding CurrentTrial.Results.TimeOnTarget}"  />
-                <TextBlock Margin="0,5,0,0" Text="Absolute Error"/>
-                <TextBox Margin="0,5,0,0" Text="{Binding CurrentTrial.Results.AbsoluteError}"  />
-                <TextBlock Margin="0,5,0,0" Text="Constant Error"/>
-                <TextBox Margin="0,5,0,0" Text="{Binding CurrentTrial.Results.ConstantError}"  />
-                <TextBlock Margin="0,5,0,0" Text="Variable Error"/>
-                <TextBox Margin="0,5,0,0" Text="{Binding CurrentTrial.Results.VariableError}"  />
-
-                <TextBlock Margin="0,5,0,0" Text="Depth StdDev"/>
-                <TextBox Margin="0,5,0,0" Text="{Binding CurrentTrial.Results.HandDepthStdDev}"  />
-
-                <TextBlock Margin="0,5,0,0" Text="Lean Left Right StdDev"/>
-                <TextBox Margin="0,5,0,0" Text="{Binding CurrentTrial.Results.LeanLeftRightX}"  />
-
-                <TextBlock Margin="0,5,0,0" Text="Lean Forward Backward StdDev"/>
-                <TextBox Margin="0,5,0,0" Text="{Binding CurrentTrial.Results.LeanForwardBackY}"  />
-
-                <TextBlock Margin="0,5,0,0" Text="Tick Count"/>
-                <TextBox Margin="0,5,0,0" Text="{Binding CurrentTrial.Results.TickCount}"  />
-            </StackPanel>
+            </Grid>
         </Grid>
-    </Grid>
+    </DockPanel>
 </Window>

@@ -147,9 +147,8 @@ namespace TheoryC.ViewModels
                 TrackRadius = Settings.Default.TrackRadius;
                 this.UpdateTargetSizeAndPlaceInStartingPosition();
 
-                // some designer info
-                ParticipantID = "D<Please enter>";
-                StatusText = "D: Status";
+                // some designer info                
+                StatusText = "D: Status";                
             }
         }
 
@@ -179,9 +178,6 @@ namespace TheoryC.ViewModels
             // show the UI we want user to see
             this.ShowDebugCommand.Execute(null);
             this.ShowSettingsCommand.Execute(null);
-
-            // placeholder
-            ParticipantID = "<Please enter>";
         }
 
         private void AddTrial()
@@ -257,7 +253,11 @@ namespace TheoryC.ViewModels
             CurrentTrial = Trials.First();
             AngleInDegrees = 0;
 
-            // clear prior results
+            ClearAllResults();
+        }
+
+        private void ClearAllResults()
+        {
             foreach (var trial in Trials)
             {
                 trial.ClearResults();
@@ -355,7 +355,10 @@ namespace TheoryC.ViewModels
             CurrentTrial.Results.HandDepthStdDev = Statistics.PopulationStandardDeviation(CurrentTrial.Results.HandDepthForEachTickList);
             CurrentTrial.Results.LeanLeftRightX = Statistics.PopulationStandardDeviation(CurrentTrial.Results.LeanAmountForEachTickList, DesiredCoord.X);
             CurrentTrial.Results.LeanForwardBackY = Statistics.PopulationStandardDeviation(CurrentTrial.Results.LeanAmountForEachTickList, DesiredCoord.Y);
+        }
 
+        private void SetupNextTrial() 
+        {
             // Check whether to end the experiment
             if (CurrentTrial.Number + 1 >= Trials.Count)
             {
@@ -525,6 +528,7 @@ namespace TheoryC.ViewModels
             if (HasTrialTimeExpired())
             {
                 StopCurrentTrial();
+                SetupNextTrial();
             }
         }
 
@@ -702,11 +706,14 @@ namespace TheoryC.ViewModels
 
         private void CountdownWindowTimerTick(object sender, EventArgs e)
         {
+
             CountdownCount--;
+
+            Debug.Print(CountdownCount.ToString());
 
             // hide when we hit 0
             if (CountdownCount <= 0)
-            {
+            {               
                 countdownWindowTimer.Stop();
                 countdownWindowTimer.Tick -= CountdownWindowTimerTick;
                 
@@ -722,7 +729,22 @@ namespace TheoryC.ViewModels
             }
         }
 
+        private void AbortCountdownTimer()
+        {
+            if (countdownWindowTimer == null)
+            {
+                return;
+            }
 
+            if (!countdownWindowTimer.IsEnabled)
+            {
+                return;
+            }
+
+            countdownWindowTimer.Stop();
+            countdownWindowTimer.Tick -= CountdownWindowTimerTick;
+            ShowCountdownWindow = false;
+        }
 
 
         bool _IsSettingsWindowOpen = default(bool);
@@ -890,7 +912,8 @@ namespace TheoryC.ViewModels
         public bool StartExpCanExecute()
         {
             // wanted to abort experiment but can't figure out what is going on with Countdown Window always executing
-            return !IsExperimentRunning;
+            //return !IsExperimentRunning;
+            return true;
         }
 
         public void StartResetExperiment()
@@ -899,18 +922,20 @@ namespace TheoryC.ViewModels
             {
                 StartExperiment();
             }
-            //else
-            //{
-            //    AbortExperiment();
-            //}
+            else
+            {
+                AbortExperiment();
+            }
         }
 
-        //private void AbortExperiment()
-        //{
-        //    StopCurrentTrial();
-        //    StopExperiment(aborted: true);
-        //    ShowInstructionsToStartTrial = false;
-        //}
+        private void AbortExperiment()
+        {
+            StopCurrentTrial();
+            AbortCountdownTimer(); // function checks whether countdown window is enabled
+            
+            StopExperiment(aborted: true);
+            ShowInstructionsToStartTrial = false;
+        }
 
 
         private void RestartExperiment()
@@ -1097,10 +1122,34 @@ namespace TheoryC.ViewModels
                     new Func<bool>(
                         () =>
                         {
-                            return IsSettingsWindowOpen; // only if settings window is showing
+                            return !IsExperimentRunning; // only if experiment is not running
                         }));
                 this.PropertyChanged += (s, e) => _CenterTargetOnParticipantElbow.RaiseCanExecuteChanged();
                 return _CenterTargetOnParticipantElbow;
+            }
+        }
+
+        DelegateCommand _ClearResultsCommand = null;
+        public DelegateCommand ClearResultsCommand
+        {
+            get
+            {
+                if (_ClearResultsCommand != null)
+                    return _ClearResultsCommand;
+
+                _ClearResultsCommand = new DelegateCommand(new Action(
+                    () =>
+                    {
+                        ClearAllResults();
+                    }),
+
+                    new Func<bool>(
+                        () =>
+                        {
+                            return IsSettingsWindowOpen; // only if settings window is showing
+                        }));
+                this.PropertyChanged += (s, e) => _ClearResultsCommand.RaiseCanExecuteChanged();
+                return _ClearResultsCommand;
             }
         }
 

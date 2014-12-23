@@ -14,7 +14,7 @@ namespace TheoryC.Common
 
         public static void LogExperiment(string participantID, ObservableCollection<Models.Trial> Trials)
         {
-            StreamWriter writer = CreateLogFile();
+            StreamWriter writer = CreateResultsLogFile(participantID);
 
             if (writer == null)
             {
@@ -63,16 +63,33 @@ namespace TheoryC.Common
             return str;   
         }
 
-        private static StreamWriter CreateLogFile()
+        private static StreamWriter CreateResultsLogFile(string participantID)
         {
             StreamWriter writer = null;
 
+            if (participantID == null || participantID == "")
+            {
+                participantID = "No Name";
+            }
+                
             try
             {
-                string filepath = GetDesktopFolder();
 
-                string filename = DateTime.Now.ToString("yyyyMMddHHmm") + Properties.Settings.Default.CSVextension;
-                string fullpath = System.IO.Path.Combine(filepath, filename);
+                string timestamp = DateTime.Now.ToString("MMM dd yyyy");
+                string filenameOrg =  participantID + " " + timestamp;
+                string filepath = GetDesktopFolder(); 
+                string fullpath = System.IO.Path.Combine(filepath, filenameOrg + Properties.Settings.Default.CSVextension);
+
+                string filename;
+                for (int i = 1; ; ++i)
+                {
+                    if (!File.Exists(fullpath))
+                        break;
+
+                    filename = filenameOrg + "_" + i;
+                    fullpath = Path.Combine(filepath, filename + Properties.Settings.Default.CSVextension);
+                }
+
                 writer = new StreamWriter(fullpath, false);                
 
             }
