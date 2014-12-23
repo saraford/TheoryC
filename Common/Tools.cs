@@ -51,5 +51,11 @@ namespace TheoryC.Common
 
             return pt;
         }
+
+        public static double DistanceBetween2Points(Point pt1, Point pt2)
+        {
+            return Math.Sqrt(Math.Pow(pt2.X - pt1.X, 2) + Math.Pow(pt2.Y - pt1.Y, 2));
+        }
+
     }
 }

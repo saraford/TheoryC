@@ -19,11 +19,6 @@ namespace TheoryC.Common
 
     public class Statistics
     {
-        public static double DistanceBetween2Points(Point pt1, Point pt2)
-        {
-            return Math.Sqrt(Math.Pow(pt2.X - pt1.X, 2) + Math.Pow(pt2.Y - pt1.Y, 2));
-        }
-
         public static double ConstantError(List<double> absoluteErrors, List<bool> isInsideCircle)
         {
             double constantError = 0;

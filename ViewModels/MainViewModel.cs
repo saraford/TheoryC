@@ -548,7 +548,7 @@ namespace TheoryC.ViewModels
         double distanceFromCenterOnTick;
         private void CalculateAbsoluteErrorForEachTick()
         {
-            distanceFromCenterOnTick = Statistics.DistanceBetween2Points(this.InputPosition, this.TargetPositionCenter);
+            distanceFromCenterOnTick = Tools.DistanceBetween2Points(this.InputPosition, this.TargetPositionCenter);
             CurrentTrial.Results.AbsoluteErrorForEachTickList.Add(distanceFromCenterOnTick);
         }
 
@@ -1117,13 +1117,16 @@ namespace TheoryC.ViewModels
                 _CenterTargetOnParticipantElbow = new DelegateCommand(new Action(
                     () =>
                     {
-                        Settings.Default.TrackLeftX = this.Elbow.X - Settings.Default.TrackRadius;
-                        Settings.Default.TrackTopY = this.Elbow.Y - Settings.Default.TrackRadius;
+                        CalculatePursuitTrackRadius();
+
+                        Settings.Default.TrackLeftX = this.Elbow.X - TrackRadius;
+                        Settings.Default.TrackTopY = this.Elbow.Y - TrackRadius;
 
                         TrackCenter.X = this.Elbow.X;
                         TrackCenter.Y = this.Elbow.Y;
+
                         this.PlaceTargetInStartingPosition();
-                        
+
                     }),
 
                     new Func<bool>(
@@ -1135,6 +1138,13 @@ namespace TheoryC.ViewModels
                 return _CenterTargetOnParticipantElbow;
             }
         }
+
+        private void CalculatePursuitTrackRadius()
+        {
+            double distance = Tools.DistanceBetween2Points(this.Elbow, this.InputPosition);
+            TrackRadius = distance;
+        }
+
 
         DelegateCommand _ClearResultsCommand = null;
         public DelegateCommand ClearResultsCommand
@@ -1236,7 +1246,7 @@ namespace TheoryC.ViewModels
                     },
                     () =>
                     {
-                        return (!IsSetupWindowOpen) && (!IsExperimentRunning);
+                        return (!IsSetupWindowOpen) && (!IsExperimentRunning) && (IsKinectTracking);
                     }
                 );
                 this.PropertyChanged += (s, e) => _ShowSetupCommand.RaiseCanExecuteChanged();
