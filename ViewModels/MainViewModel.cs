@@ -1160,8 +1160,96 @@ namespace TheoryC.ViewModels
             }
         }
 
-        #endregion
+        DelegateCommand _SetLeftHandedness = null;
+        public DelegateCommand SetLeftHandedness
+        {
+            get
+            {
+                if (_SetLeftHandedness != null)
+                    return _SetLeftHandedness;
 
+                _SetLeftHandedness = new DelegateCommand(new Action(
+                    () =>
+                    {
+                        Handedness = Side.Left;
+                    }),
+
+                    new Func<bool>(
+                        () =>
+                        {
+                            return !IsExperimentRunning; // only if settings window is showing
+                        }));
+                this.PropertyChanged += (s, e) => _SetLeftHandedness.RaiseCanExecuteChanged();
+                return _SetLeftHandedness;
+            }
+        }
+
+        DelegateCommand _SetRightHandedness = null;
+        public DelegateCommand SetRightHandedness
+        {
+            get
+            {
+                if (_SetRightHandedness != null)
+                    return _SetRightHandedness;
+
+                _SetRightHandedness = new DelegateCommand(new Action(
+                    () =>
+                    {
+                        Handedness = Side.Right;
+                    }),
+
+                    new Func<bool>(
+                        () =>
+                        {
+                            return !IsExperimentRunning; // only if settings window is showing
+                        }));
+                this.PropertyChanged += (s, e) => _SetRightHandedness.RaiseCanExecuteChanged();
+                return _SetRightHandedness;
+            }
+        }
+
+        private bool IsSetupWindowOpen = false;
+        DelegateCommand _ShowSetupCommand = null;
+        public DelegateCommand ShowSetupCommand
+        {
+            get
+            {
+                if (_ShowSetupCommand != null)
+                    return _ShowSetupCommand;
+
+                _ShowSetupCommand = new DelegateCommand
+                (
+                    () =>
+                    {
+                        var setup = new Views.SetupWindow(SetupWindowSetupCallback);
+                        setup.DataContext = this; // to share same model data
+
+                        var main = Application.Current.MainWindow;
+
+                        setup.Left = main.Left + 45;
+                        setup.Top = main.Top + 60;
+
+                        setup.Owner = main; // whatever happens to main window happens here                                               
+                        setup.ShowInTaskbar = false;
+                        IsSetupWindowOpen = true;
+                        setup.Show();
+                    },
+                    () =>
+                    {
+                        return (!IsSetupWindowOpen) && (!IsExperimentRunning);
+                    }
+                );
+                this.PropertyChanged += (s, e) => _ShowSetupCommand.RaiseCanExecuteChanged();
+                return _ShowSetupCommand;
+            }
+        }
+
+        private void SetupWindowSetupCallback()
+        {
+            IsSetupWindowOpen = false;
+        }
+
+        #endregion
 
     }
 }
