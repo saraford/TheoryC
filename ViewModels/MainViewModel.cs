@@ -180,10 +180,9 @@ namespace TheoryC.ViewModels
             this.UpdateTargetSizeAndPlaceInStartingPosition();
 
             // show the UI we want user to see
-            this.ShowDebugCommand.Execute(null);
             this.ShowSettingsCommand.Execute(null);
 
-            // for testing without the UI
+            // use as default
             Handedness = Side.Right;
         }
 
