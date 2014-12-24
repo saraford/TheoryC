@@ -177,21 +177,24 @@ namespace TheoryC.Devices
 
                         else // left elbow/hand 
                         {
-                            if (jointType == JointType.ElbowLeft)
-                            {
-                                leftElbowCenter.X = ConvertToCanvasX(jointPoints[jointType].X);
-                                leftElbowCenter.Y = ConvertToCanvasY(jointPoints[jointType].Y);
-                            }
-
-                            else if (jointType == JointType.HandTipLeft)
+                            if (jointType == JointType.HandTipLeft)
                             {
                                 leftHandTip.X = ConvertToCanvasX(jointPoints[jointType].X);
                                 leftHandTip.Y = ConvertToCanvasY(jointPoints[jointType].Y);
-                                leftHandTipDepth = position.Z;
+
+                                // The depth of an object 1 unit = 1 meter
+                                // http://msdn.microsoft.com/en-us/library/windowspreview.kinect.cameraspacepoint.aspx
+                                this.ViewModel.TickHandDepth = position.Z;
 
                                 DrawCircleAtFingerTip(joints, jointPoints, jointType);
                             }
 
+                            else if (jointType == JointType.ElbowLeft)
+                            {
+                                leftElbowCenter.X = ConvertToCanvasX(jointPoints[jointType].X);
+                                leftElbowCenter.Y = ConvertToCanvasY(jointPoints[jointType].Y);
+                            }
+                            
                             this.ViewModel.InputPosition = leftHandTip;
                             this.ViewModel.Elbow = leftElbowCenter;
                         }
