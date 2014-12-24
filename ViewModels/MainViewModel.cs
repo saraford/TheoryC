@@ -78,6 +78,9 @@ namespace TheoryC.ViewModels
         string _ShowInstructionsToStartTrialText = default(string);
         public string ShowInstructionsToStartTrialText { get { return _ShowInstructionsToStartTrialText; } set { base.SetProperty(ref _ShowInstructionsToStartTrialText, value); } }
 
+        string _ShowParticipantInstructionsText = default(string);
+        public string ShowParticipantInstructionsText { get { return _ShowParticipantInstructionsText; } set { base.SetProperty(ref _ShowParticipantInstructionsText, value); } }
+
         bool _ShowCountdownWindow = default(bool);
         public bool ShowCountdownWindow { get { return _ShowCountdownWindow; } set { base.SetProperty(ref _ShowCountdownWindow, value); } }
 
@@ -135,10 +138,10 @@ namespace TheoryC.ViewModels
                     this.Trials.Add(new Models.Trial
                     {
                         Number = i, //; //use a converter + 1, // no 0-based trials exposed to user
-                        Results = new Models.Result 
-                        { 
-                            TimeOnTarget = 0, 
-                            AbsoluteError = 0, 
+                        Results = new Models.Result
+                        {
+                            TimeOnTarget = 0,
+                            AbsoluteError = 0,
                             AbsoluteErrorForEachTickList = new List<double>(),
                         }
                     });
@@ -152,7 +155,7 @@ namespace TheoryC.ViewModels
                 this.UpdateTargetSizeAndPlaceInStartingPosition();
 
                 // some designer info                
-                StatusText = "D: Status";                
+                StatusText = "D: Status";
             }
         }
 
@@ -293,7 +296,10 @@ namespace TheoryC.ViewModels
             if (aborted)
             {
                 // researcher stops the experiment before it is finished
-                TextForMessageBoxWindow = "#SadTrombone - experiment aborted";
+                TextForMessageBoxWindow = 
+                    "Experiment aborted.\n" + 
+                    "\n" +
+                    "All data collected (including in-progress trials) have been recorded and saved.";
             }
             else
             {
@@ -323,7 +329,7 @@ namespace TheoryC.ViewModels
         }
 
         DateTime stopTime;
-//        Stopwatch timeOnTarget = new Stopwatch();
+        //        Stopwatch timeOnTarget = new Stopwatch();
         int ticksOnTarget = 0; // stopwatch is not reliable. Going to count the ticks on target and derive the ToT based on percentage of perfect ToT time
         Stopwatch totalTrialTime = new Stopwatch();
         double secondsToDoOneRotation;
@@ -332,7 +338,7 @@ namespace TheoryC.ViewModels
         {
             stopTime = DateTime.Now.AddSeconds(CurrentTrial.DurationSeconds);
 
-//            timeOnTarget.Reset();
+            //            timeOnTarget.Reset();
             ticksOnTarget = 0;
             totalTrialTime.Reset();
 
@@ -366,7 +372,7 @@ namespace TheoryC.ViewModels
             CurrentTrial.Results.LeanForwardBackY = Statistics.PopulationStandardDeviation(CurrentTrial.Results.LeanAmountForEachTickList, DesiredCoord.Y);
         }
 
-        private void SetupNextTrial() 
+        private void SetupNextTrial()
         {
             // Check whether to end the experiment
             if (CurrentTrial.Number + 1 >= Trials.Count)
@@ -382,6 +388,7 @@ namespace TheoryC.ViewModels
                 // setup for next trial
                 this.UpdateSceneForNextTrial();
 
+                // wait for user to put their hand inside the ball
                 WaitForUserToStartNextTrial();
             }
         }
@@ -433,10 +440,10 @@ namespace TheoryC.ViewModels
 
                 // start next trial
                 StartNextTrial();
-            }        
+            }
         }
 
-        
+
 
         private void MoveMouseToStartingPosition()
         {
@@ -584,7 +591,7 @@ namespace TheoryC.ViewModels
             if (IsOnTarget)
             {
                 ticksOnTarget++;
-//                timeOnTarget.Start();
+                //                timeOnTarget.Start();
             }
             //else
             //{
@@ -649,7 +656,7 @@ namespace TheoryC.ViewModels
                     () =>
                     {
                         ShowInstructionsToStartTrial = false;
-                        ShowParticipantInstructions = true;
+                        ShowParticipantInstructionsUI();
                     },
                     () =>
                     {
@@ -659,6 +666,68 @@ namespace TheoryC.ViewModels
                 );
                 this.PropertyChanged += (s, e) => _ShowParticipantInstructionsWindowCommand.RaiseCanExecuteChanged();
                 return _ShowParticipantInstructionsWindowCommand;
+            }
+        }
+
+        private void ShowParticipantInstructionsUI()
+        {
+            ShowParticipantInstructions = true;
+
+            string experimentRunTimeInMinutes = CalculateExperimentRunTimeInMinutes();
+          
+            if (IsUsingKinect)
+            {
+                ShowParticipantInstructionsText =
+                    "In this experiment, you will track a red circle moving\n" +
+                    "steadily around a circular path. Try to keep the tips of\n" +
+                    "your fingers of your dominant hand within the red circle\n" +
+                    "at all times.\n" +
+                    "\n" +
+                    "Please keep your arm out as far away from your body as comfortable.\n" +
+                    "\n" +
+                    "There will be a total of " + Trials.Count + " trials. Between each trial,\n" +
+                    "you will have a 10 second break where you will rest your arm\n" +
+                    "at your side.\n" +
+                    "\n" +
+                    "The experiment will last approximately " + experimentRunTimeInMinutes + "\n" +
+                    "\n" +
+                    "Say \"Ready\" to being the experiment.";
+            }
+            else
+            {
+                ShowParticipantInstructionsText =
+                    "In this experiment, you will track a red circle moving\n" +
+                    "steadily around a circular path. Try to keep your mouse\n" +
+                    "button on the path at all times.\n" +
+                    "\n" +
+                    "There will be a total of " + Trials.Count + " trials\n" +
+                    "\n" +
+                    "The experiment will last approximately " + experimentRunTimeInMinutes + "\n" +
+                    "\n" +
+                    "Say \"Ready\" to being the experiment.";
+            }
+
+        }
+
+        private string CalculateExperimentRunTimeInMinutes()
+        {
+            double time = 0; 
+
+            foreach (var trial in Trials)
+            {
+                time += trial.DurationSeconds;
+            }
+
+            // convert into minutes
+            int seconds = (int) time % 60;
+            int minutes = (int) time / 60;
+
+            if (seconds == 0){
+                return minutes + " minutes ";
+            }
+            else
+            {
+                return minutes + " minutes and " + seconds + " seconds";
             }
         }
 
@@ -679,7 +748,7 @@ namespace TheoryC.ViewModels
                         ShowParticipantInstructions = false;
 
                         if (IsUsingKinect)
-                        {                            
+                        {
                             ShowCountdownWindowUI();
                         }
                         else
@@ -690,7 +759,7 @@ namespace TheoryC.ViewModels
                     },
                     () =>
                     {
-                        return true; // what to do here????
+                        return true; // can always either start or abort
                     }
                 );
                 this.PropertyChanged += (s, e) => _StartExperimentCommand.RaiseCanExecuteChanged();
@@ -698,7 +767,7 @@ namespace TheoryC.ViewModels
             }
         }
 
-        // create into its own class???
+        // probably should have created it into its own class
         const int CountdownInSeconds = 3;
         private DispatcherTimer countdownWindowTimer;
 
@@ -722,10 +791,10 @@ namespace TheoryC.ViewModels
 
             // hide when we hit 0
             if (CountdownCount <= 0)
-            {               
+            {
                 countdownWindowTimer.Stop();
                 countdownWindowTimer.Tick -= CountdownWindowTimerTick;
-                
+
                 // update UI
                 ShowCountdownWindow = false;
 
@@ -966,8 +1035,9 @@ namespace TheoryC.ViewModels
         {
             StopCurrentTrial();
             AbortCountdownTimer(); // function checks whether countdown window is enabled
-            
+
             StopExperiment(aborted: true);
+            ShowParticipantInstructions = false;
             ShowInstructionsToStartTrial = false;
         }
 
@@ -983,7 +1053,7 @@ namespace TheoryC.ViewModels
         {
             InitializeExperimentVariables();
             ShowInstructionsToStartTrial = false;
-            ShowParticipantInstructions = true;
+            ShowParticipantInstructionsUI();
             //StartNextTrial();
         }
 

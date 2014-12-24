@@ -41,7 +41,7 @@ namespace TheoryC.Views
             // using a WPF Message box to keep things simple
             // unfortunately, you can't customize a WPF Message box and I don't want to use the ViewModel (more work than worth it)      
             // so this text will have to do
-            if (MessageBox.Show("Do you want to use a Kinect? Click Yes for Kinect mode. Click No for Mouse mode.", "TheoryC in Kinect or Mouse Mode?", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+            if (MessageBox.Show("Do you want to use a Kinect? \n\nClick Yes for Kinect mode. Click No for Mouse mode.", "TheoryC in Kinect or Mouse Mode?", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
             {
                 // User requested Kinect mode
                 myKinect = new Devices.KinectDevice();
