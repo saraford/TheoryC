@@ -5,7 +5,7 @@
         xmlns:Converters="clr-namespace:TheoryC.Converters"      
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
         x:Class="TheoryC.Views.SettingsWindow"
-        Title="SettingsWindow" Height="560" Width="500">
+        Title="SettingsWindow" Height="600" Width="500">
     <Window.DataContext>
         <ViewModels:MainViewModel/>
     </Window.DataContext>
@@ -127,9 +127,12 @@
                             <TextBlock Margin="0,5,0,0" Text="Tick Count"/>
                             <TextBox Margin="0,5,0,0" Text="{Binding CurrentTrial.Results.TickCount}"  />
 
-                        </StackPanel>
-
+                        </StackPanel>                       
                     </Grid>
+
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button Margin="10" Content="OK" Width="80" Command="{Binding CloseSettingsWindowCommand, Mode=OneWay}" ></Button>
+                    </StackPanel>
                 </StackPanel>
             </Grid>
         </Grid>

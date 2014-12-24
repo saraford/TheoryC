@@ -26,8 +26,8 @@
         <DockPanel>
             <Menu DockPanel.Dock="Top" MinHeight="20" MaxHeight="20">
                 <MenuItem Command="{Binding StartExpCommand, Mode=OneWay}" Header="{Binding IsExperimentRunning, Converter={StaticResource StartButtonText}, Mode=OneWay}"  />
-                <MenuItem Command="{Binding ShowSettingsCommand, Mode=OneWay}" Header="Settings" />
-                <MenuItem Command="{Binding ShowSetupCommand, Mode=OneWay}" Header="Setup" />
+                <MenuItem Command="{Binding ShowSettingsCommand, Mode=OneWay}" Header="Trials" />
+                <MenuItem Command="{Binding ShowSetupCommand, Mode=OneWay}" Header="Participant Setup" />
                 <MenuItem Command="{Binding ShowDebugCommand, Mode=OneWay}" Header="Debug" />
             </Menu>
 
@@ -35,9 +35,9 @@
                 <Image x:Name="kinectVideoImage" Width="960" Height="510" />
                 <Canvas x:Name="bodyCanvas" Width="960" Height="510" HorizontalAlignment="Left" VerticalAlignment="Top" />
 
-            <!--This must come first before any windows; don't want anything pushing this down or it screws up mouse x,y-->
-            <Canvas x:Name="SceneCanvas" Width="960" Height="510" >
-                <Ellipse 
+                <!--This must come first before any windows; don't want anything pushing this down or it screws up mouse x,y-->
+                <Canvas x:Name="SceneCanvas" Width="960" Height="510" >
+                    <Ellipse 
                     Width="{Binding TrackRadius, Converter={StaticResource RadiusToDiameter}}"
 			         Height="{Binding TrackRadius, Converter={StaticResource RadiusToDiameter}}"
 		                    
@@ -46,20 +46,20 @@
             Canvas.Left="{Binding Source={x:Static Properties:Settings.Default}, Path=TrackLeftX, Mode=OneWay}"
             Canvas.Top="{Binding Source={x:Static Properties:Settings.Default}, Path=TrackTopY, Mode=OneWay}"/>
 
-                <Controls:Target x:Name="Target" 
+                    <Controls:Target x:Name="Target" 
 	            Width="{Binding CurrentTrial.ShapeSizeDiameter}"
 				Height="{Binding CurrentTrial.ShapeSizeDiameter}"
                 Canvas.Left="{Binding TargetPositionLeft, Mode=OneWay}"
                 Canvas.Top="{Binding TargetPositionTop, Mode=OneWay}"
                 FillColor="{Binding IsOnTarget, Converter={StaticResource BlueWhenTrue}, Mode=OneWay}">
 
-                    <i:Interaction.Triggers>
-                        <i:EventTrigger EventName="MouseLeftButtonUp">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="MouseLeftButtonUp">
                                 <i:InvokeCommandAction Command="{Binding UserClickedTargetToStartNextTrialCommand}" />
-                        </i:EventTrigger>
-                    </i:Interaction.Triggers>
-                </Controls:Target>
-            </Canvas>
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </Controls:Target>
+                </Canvas>
             </Grid>
 
         </DockPanel>
@@ -94,8 +94,9 @@
             </Border>
         </Grid>
 
+
         <!-- Countdown window-->
-        <Grid Visibility="{Binding ShowCountdownWindow, Converter={StaticResource BoolToVisibilityConverter}}" >           
+        <Grid Visibility="{Binding ShowCountdownWindow, Converter={StaticResource BoolToVisibilityConverter}}" >
             <Border MinWidth="250" MinHeight="250" BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Center" VerticalAlignment="Center">
                 <Border.Background>
                     <SolidColorBrush Opacity="0.5" Color="White"/>

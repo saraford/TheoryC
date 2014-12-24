@@ -43,15 +43,13 @@ namespace TheoryC.Devices
 
         #region "Kinect Setup and Teardown"
 
-        internal bool IsKinectAvailable()
+        internal bool CheckIsKinectAvailable()
         {
-            kinectSensor = KinectSensor.GetDefault();
-
-            kinectSensor.Open();
-
-            // need to give it time to find the sensor
-            // how to not block the main thread
-            Thread.Sleep(2000); 
+            if (kinectSensor == null)
+            {
+                kinectSensor = KinectSensor.GetDefault();
+                kinectSensor.Open();
+            }
 
             return this.kinectSensor.IsAvailable;
         }

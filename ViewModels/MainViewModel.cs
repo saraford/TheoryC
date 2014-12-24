@@ -179,11 +179,14 @@ namespace TheoryC.ViewModels
             // setup the target
             this.UpdateTargetSizeAndPlaceInStartingPosition();
 
-            // show the UI we want user to see
-            this.ShowSettingsCommand.Execute(null);
-
             // use as default
             Handedness = Side.Right;
+        }
+
+        public void ShowSettingsOnLaunch()
+        {
+            // show the UI we want user to see
+            this.ShowSettingsCommand.Execute(null);
         }
 
         private void AddTrial()
@@ -860,6 +863,31 @@ namespace TheoryC.ViewModels
             main.Focus(); // put focus back on main window
         }
 
+        DelegateCommand _CloseSettingsWindowCommand = null;
+        public DelegateCommand CloseSettingsWindowCommand
+        {
+            get
+            {
+                if (_CloseSettingsWindowCommand != null)
+                    return _CloseSettingsWindowCommand;
+
+                _CloseSettingsWindowCommand = new DelegateCommand(new Action(
+                    () =>
+                    {
+                        var settingsWin = Application.Current.Windows.OfType<Views.SettingsWindow>().First();
+                        settingsWin.Close();
+                    }),
+
+                    new Func<bool>(
+                        () =>
+                        {
+                            return IsSettingsWindowOpen; // only if this window is opened
+                        }));
+                this.PropertyChanged += (s, e) => _CloseSettingsWindowCommand.RaiseCanExecuteChanged();
+                return _CloseSettingsWindowCommand;
+            }
+        }
+
         DelegateCommand _UpdateSceneWhenListboxSelectionChanges = null;
         public DelegateCommand UpdateSceneWhenListboxSelectionChanges
         {
@@ -1079,6 +1107,8 @@ namespace TheoryC.ViewModels
                 return _CloseMessageBoxWindowCommand;
             }
         }
+
+
 
         DelegateCommand _OpenResultsFolderCommand = null;
         public DelegateCommand OpenResultsFolderCommand
