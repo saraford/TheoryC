@@ -571,8 +571,7 @@ namespace TheoryC.ViewModels
 
         private bool HasTrialTimeExpired()
         {
-            int result = DateTime.Compare(DateTime.Now, stopTime);
-            return (result > 0); // true if time has expired
+            return (DateTime.Now > stopTime);
         }
 
         private void PlaceTargetInStartingPosition()
