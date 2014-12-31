@@ -7,7 +7,7 @@
         xmlns:Properties="clr-namespace:TheoryC.Properties"     
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"    
         x:Class="TheoryC.Views.MainWindow"
-        Title="MainWindow" Width="960" Height="530" Background="#FF656565">
+        Title="MainWindow" Width="960" Height="600" Background="#FF656565">
     <Window.DataContext>
         <ViewModels:MainViewModel/>
     </Window.DataContext>
@@ -31,12 +31,12 @@
                 <MenuItem Command="{Binding ShowDebugCommand, Mode=OneWay}" Header="Debug" />
             </Menu>
 
-            <Grid x:Name="MainWindowGrid" Height="510" HorizontalAlignment="Left" VerticalAlignment="Top" Width="960" >
-                <Image x:Name="kinectVideoImage" Width="960" Height="510" />
-                <Canvas x:Name="bodyCanvas" Width="960" Height="510" HorizontalAlignment="Left" VerticalAlignment="Top" />
+            <Grid x:Name="MainWindowGrid" Height="540" HorizontalAlignment="Left" VerticalAlignment="Top" Width="960" >
+                <Image x:Name="kinectVideoImage" Width="960" Height="540" />
+                <Canvas x:Name="bodyCanvas" Width="960" Height="540" HorizontalAlignment="Left" VerticalAlignment="Top" />
 
                 <!--This must come first before any windows; don't want anything pushing this down or it screws up mouse x,y-->
-                <Canvas x:Name="SceneCanvas" Width="960" Height="510" >
+                <Canvas x:Name="SceneCanvas" Width="960" Height="540" >
                     <Ellipse 
                     Width="{Binding TrackRadius, Converter={StaticResource RadiusToDiameter}}"
 			         Height="{Binding TrackRadius, Converter={StaticResource RadiusToDiameter}}"

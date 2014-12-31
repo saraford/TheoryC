@@ -70,7 +70,7 @@
 
                     <StackPanel Margin="0,10,0,0" Orientation="Vertical">
                                                 
-                        <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Target Diameter" VerticalAlignment="Top"/>
+                        <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Target Diameter in pixels" VerticalAlignment="Top"/>
                         <TextBox Margin="0,5,0,0" HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" VerticalAlignment="Top" Width="85" Text="{Binding CurrentTrial.ShapeSizeDiameter, UpdateSourceTrigger=PropertyChanged}">
                             <i:Interaction.Triggers>
                                 <i:EventTrigger EventName="TextChanged">
@@ -81,7 +81,7 @@
                     </StackPanel>
                     
                     <StackPanel Margin="0,5,0,0" Orientation="Vertical">
-                        <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Duration" VerticalAlignment="Top"/>
+                        <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Duration in seconds" VerticalAlignment="Top"/>
                         <TextBox Margin="0,5,0,0" HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" Text="{Binding CurrentTrial.DurationSeconds}" VerticalAlignment="Top" Width="86"/>
                     </StackPanel>
                     
@@ -103,25 +103,25 @@
 
                         <StackPanel Grid.Column="0" >
 
-                            <TextBlock Margin="0,0,0,0" Text="Time On Target Seconds"/>
+                            <TextBlock Margin="0,0,0,0" Text="Time On Target in seconds"/>
                             <TextBox Margin="0,5,0,0" Text="{Binding CurrentTrial.Results.TimeOnTarget}"  />
-                            <TextBlock Margin="0,5,0,0" Text="Absolute Error"/>
+                            <TextBlock Margin="0,5,0,0" Text="Absolute Error in pixels"/>
                             <TextBox Margin="0,5,0,0" Text="{Binding CurrentTrial.Results.AbsoluteError}"  />
-                            <TextBlock Margin="0,5,0,0" Text="Constant Error"/>
+                            <TextBlock Margin="0,5,0,0" Text="Constant Error in pixels"/>
                             <TextBox Margin="0,5,0,0" Text="{Binding CurrentTrial.Results.ConstantError}"  />
-                            <TextBlock Margin="0,5,0,0" Text="Variable Error"/>
+                            <TextBlock Margin="0,5,0,0" Text="Variable Error in pixels"/>
                             <TextBox Margin="0,5,0,0" Text="{Binding CurrentTrial.Results.VariableError}"  />
 
                         </StackPanel>
 
                         <StackPanel Grid.Column="2">
-                            <TextBlock Margin="0,0,0,0" Text="Depth StdDev"/>
+                            <TextBlock Margin="0,0,0,0" Text="Depth StdDev in meters"/>
                             <TextBox Margin="0,5,0,0" Text="{Binding CurrentTrial.Results.HandDepthStdDev}"  />
 
-                            <TextBlock Margin="0,5,0,0" Text="Lean Left Right StdDev"/>
+                            <TextBlock Margin="0,5,0,0" Text="Lean Left Right StdDev in meters"/>
                             <TextBox Margin="0,5,0,0" Text="{Binding CurrentTrial.Results.LeanLeftRightX}"  />
 
-                            <TextBlock Margin="0,5,0,0" Text="Lean Forward Backward StdDev"/>
+                            <TextBlock Margin="0,5,0,0" Text="Lean Forward/Back StdDev in meters"/>
                             <TextBox Margin="0,5,0,0" Text="{Binding CurrentTrial.Results.LeanForwardBackY}"  />
 
                             <TextBlock Margin="0,5,0,0" Text="Tick Count"/>

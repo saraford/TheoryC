@@ -434,6 +434,7 @@ namespace TheoryC.ViewModels
             {
                 // stop listening to this event and start the next trial
                 waitForHandInsideTargetTimer.Tick -= CheckForHandInsideTargetTick;
+                waitForHandInsideTargetTimer.Stop();
 
                 // hide instructions
                 ShowInstructionsToStartTrial = false;
@@ -697,7 +698,7 @@ namespace TheoryC.ViewModels
                 ShowParticipantInstructionsText =
                     "In this experiment, you will track a red circle moving\n" +
                     "steadily around a circular path. Try to keep your mouse\n" +
-                    "button on the path at all times.\n" +
+                    "pointer within the red circle at all times.\n" +
                     "\n" +
                     "There will be a total of " + Trials.Count + " trials\n" +
                     "\n" +
@@ -710,11 +711,17 @@ namespace TheoryC.ViewModels
 
         private string CalculateExperimentRunTimeInMinutes()
         {
-            double time = 0; 
+            double time = 0;
+            double breakTime = 0;
+           
+            if (IsUsingKinect)
+            {
+                breakTime = CountdownInSeconds;
+            }
 
             foreach (var trial in Trials)
             {
-                time += trial.DurationSeconds;
+                time += trial.DurationSeconds + breakTime;
             }
 
             // convert into minutes
@@ -767,7 +774,7 @@ namespace TheoryC.ViewModels
         }
 
         // probably should have created it into its own class
-        const int CountdownInSeconds = 3;
+        const int CountdownInSeconds = 10;
         private DispatcherTimer countdownWindowTimer;
 
         private void ShowCountdownWindowUI()

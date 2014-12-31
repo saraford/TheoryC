@@ -130,15 +130,18 @@ namespace TheoryC.Devices
 
                     foreach (JointType jointType in joints.Keys)
                     {
+                        // this gets the position of the joints in meters
+                        CameraSpacePoint position = joints[jointType].Position;
+                        
                         // sometimes the depth(Z) of an inferred joint may show as negative
                         // clamp down to 0.1f to prevent coordinatemapper from returning (-Infinity, -Infinity)
-                        // this is only needed for showing the skeleton
-                        CameraSpacePoint position = joints[jointType].Position;
+                        // this is *only* needed for showing the skeleton in case the user gets too close to screen
                         if (position.Z < 0)
                         {
                             position.Z = InferredZPositionClamp;
                         }
 
+                        // this converts the 3D camera space point in meters to a 2D pixel on the RGB camera/video
                         ColorSpacePoint colorSpacePoint = this.cm.MapCameraPointToColorSpace(position);
                         jointPoints[jointType] = new Point(colorSpacePoint.X, colorSpacePoint.Y);
 
@@ -150,6 +153,7 @@ namespace TheoryC.Devices
                             this.ViewModel.TickLeanAmount = body.Lean;
                         }
 
+                        // if tracking Right Hand
                         if (this.ViewModel.Handedness == TheoryC.ViewModels.Side.Right)
                         {
                             // track specific joints
@@ -170,12 +174,14 @@ namespace TheoryC.Devices
                                 rightElbowCenter.X = ConvertToCanvasX(jointPoints[jointType].X);
                                 rightElbowCenter.Y = ConvertToCanvasY(jointPoints[jointType].Y);
                             }
+
+                            // set the input position to be the right hand tip
                             this.ViewModel.InputPosition = rightHandTip;
                             this.ViewModel.Elbow = rightElbowCenter;
-
                         }
 
-                        else // left elbow/hand 
+                        // If tracking left hand
+                        else 
                         {
                             if (jointType == JointType.HandTipLeft)
                             {
@@ -194,20 +200,21 @@ namespace TheoryC.Devices
                                 leftElbowCenter.X = ConvertToCanvasX(jointPoints[jointType].X);
                                 leftElbowCenter.Y = ConvertToCanvasY(jointPoints[jointType].Y);
                             }
-                            
+
+                            // set the input position to be the left hand tip
                             this.ViewModel.InputPosition = leftHandTip;
                             this.ViewModel.Elbow = leftElbowCenter;
                         }
                     }
 
-                    // are we ready? either hand will work
-                    if (rightHandTip.X > 0)
+                    // is the Kinect tracking the skeleton yet? 
+                    if (rightHandTip.X > 0 || leftHandTip.X > 0)
                     {
-                        this.ViewModel.IsKinectTracking = true;
-                        // do I need the else to set to false?
+                        // once this is tracked, we assume tracked from here on out for the experiment
+                        this.ViewModel.IsKinectTracking = true;                        
                     }
 
-                    // if we want to show the skeleton
+                    // if we want to show the skeleton, but note there are some performance issues
                     if (this.ViewModel.ShowSkeleton)
                     {
                         this.DrawBody(joints, jointPoints);
