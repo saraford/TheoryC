@@ -8,88 +8,34 @@ using System.Runtime.InteropServices;
 
 namespace TheoryC
 {
-    // TODO: I'll have to redo this with actual sample code
-
     /// <summary>
-    /// Provides some common functionality for manipulating color frames.
+    /// This class comes from the following article 
+    /// http://www.codeproject.com/Articles/730842/Kinect-for-Windows-version-Color-depth-and-infra
+    /// licensed under The Code Project Open License 1.02 http://www.codeproject.com/info/cpol10.aspx
     /// </summary>
     public static class ColorExtensions
     {
-        /// <summary>
-        /// Kinect DPI.
-        /// </summary>
-        public static readonly double DPI = 96.0;
 
-        /// <summary>
-        /// Default format.
-        /// </summary>
-        public static readonly PixelFormat FORMAT = PixelFormats.Bgr32;
-
-        /// <summary>
-        /// Bytes per pixel.
-        /// </summary>
-        public static readonly int BYTES_PER_PIXEL = (FORMAT.BitsPerPixel + 7) / 8;
-
-        #region Members
-
-        /// <summary>
-        /// The bitmap source.
-        /// </summary>
-        static WriteableBitmap _bitmap = null;
-
-        /// <summary>
-        /// Frame width.
-        /// </summary>
-        static int _width;
-
-        /// <summary>
-        /// Frame height.
-        /// </summary>
-        static int _height;
-
-        /// <summary>
-        /// The RGB pixel values.
-        /// </summary>
-        static byte[] _pixels = null;
-
-        #endregion
-
-        #region Public methods
-
-        /// <summary>
-        /// Converts a color frame to a System.Media.Imaging.BitmapSource.
-        /// </summary>
-        /// <param name="frame">The specified color frame.</param>
-        /// <returns>The specified frame in a System.Media.Imaging.BitmapSource representation of the color frame.</returns>
         public static BitmapSource ToBitmap(this ColorFrame frame)
         {
-            if (_bitmap == null)
-            {
-                _width = frame.FrameDescription.Width;
-                _height = frame.FrameDescription.Height;
-                _pixels = new byte[_width * _height * BYTES_PER_PIXEL];
-                _bitmap = new WriteableBitmap(_width, _height, DPI, DPI, FORMAT, null);
-            }
+            int width = frame.FrameDescription.Width;
+            int height = frame.FrameDescription.Height;
+            PixelFormat format = PixelFormats.Bgr32;
+
+            byte[] pixels = new byte[width * height * ((format.BitsPerPixel + 7) / 8)];
 
             if (frame.RawColorImageFormat == ColorImageFormat.Bgra)
             {
-                frame.CopyRawFrameDataToArray(_pixels);
+                frame.CopyRawFrameDataToArray(pixels);
             }
             else
             {
-                frame.CopyConvertedFrameDataToArray(_pixels, ColorImageFormat.Bgra);
+                frame.CopyConvertedFrameDataToArray(pixels, ColorImageFormat.Bgra);
             }
 
-            _bitmap.Lock();
+            int stride = width * format.BitsPerPixel / 8;
 
-            Marshal.Copy(_pixels, 0, _bitmap.BackBuffer, _pixels.Length);
-            _bitmap.AddDirtyRect(new Int32Rect(0, 0, _width, _height));
-
-            _bitmap.Unlock();
-
-            return _bitmap;
+            return BitmapSource.Create(width, height, 96, 96, format, null, pixels, stride);
         }
-
-        #endregion
     }
 }
