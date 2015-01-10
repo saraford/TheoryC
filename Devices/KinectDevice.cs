@@ -33,6 +33,9 @@ namespace TheoryC.Devices
         private readonly Brush inferredBoneBrush = Brushes.Gray;
         private readonly Brush windowShowingBrush = Brushes.LightBlue; //(SolidColorBrush)(new BrushConverter().ConvertFrom("#FF3843C4")); // (SolidColorBrush)(new BrushConverter().ConvertFrom("#FFD0D8E0"));
         private readonly Brush windowDefaultBrush = (SolidColorBrush)(new BrushConverter().ConvertFrom("#FFDDDDDD"));
+        private readonly Brush moveHipCloserBrush = Brushes.LightPink;
+        private readonly Brush moveHipAwayBrush = Brushes.DarkRed;
+        private readonly Brush hipsAlignedBrush = Brushes.Green;
         Canvas bodyCanvas;
         Image kinectVideoImage;
         ViewModels.MainViewModel ViewModel;
@@ -116,6 +119,8 @@ namespace TheoryC.Devices
 
         }
 
+        double hipsAlignmentDelta = 0;
+
         private void TrackSkeleton(IList<Body> bodies)
         {
             foreach (Body body in bodies)
@@ -144,6 +149,12 @@ namespace TheoryC.Devices
                         // this converts the 3D camera space point in meters to a 2D pixel on the RGB camera/video
                         ColorSpacePoint colorSpacePoint = this.cm.MapCameraPointToColorSpace(position);
                         jointPoints[jointType] = new Point(colorSpacePoint.X, colorSpacePoint.Y);
+
+                        // if aligning hips as part of setup
+                        if (this.ViewModel.AlignHips)
+                        {
+                            AlignHips(joints, jointPoints, jointType, position);
+                        }
 
                         // track lean
                         if (body.LeanTrackingState == TrackingState.Tracked)
@@ -222,6 +233,76 @@ namespace TheoryC.Devices
                 }
             }
 
+        }
+
+        private void AlignHips(IReadOnlyDictionary<JointType, Joint> joints, Dictionary<JointType, Point> jointPoints, JointType jointType, CameraSpacePoint position)
+        {
+            if (jointType == JointType.HipLeft)
+            {
+                CameraSpacePoint positionHipRight = joints[JointType.HipRight].Position;
+
+                hipsAlignmentDelta = position.Z - positionHipRight.Z;
+
+                // are Hips aligned within 1 centimeter of each other
+                if (Math.Abs(hipsAlignmentDelta) < 0.01)
+                {
+                    // left hip
+                    DrawHip(joints, jointPoints, JointType.HipLeft, hipsAlignedBrush);
+                }
+                // if Left Hip is farther away than Right Hip (e.g. 20 - 5 = +15)
+                else if (hipsAlignmentDelta > 0)
+                {
+                    // left hip
+                    DrawHip(joints, jointPoints, JointType.HipLeft, moveHipCloserBrush);
+                }
+                else // negative number means left hips is closer
+                {
+                    // left hip
+                    DrawHip(joints, jointPoints, JointType.HipLeft, moveHipAwayBrush);
+                }
+            }
+            if (jointType == JointType.HipRight)
+            {
+                CameraSpacePoint positionHipLeft = joints[JointType.HipLeft].Position;
+
+                hipsAlignmentDelta = position.Z - positionHipLeft.Z;
+
+                // are Hips aligned within a 5 centimeter delta
+                if (Math.Abs(hipsAlignmentDelta) < 0.01)
+                {
+                    // right hip
+                    DrawHip(joints, jointPoints, JointType.HipRight, hipsAlignedBrush);
+                }
+                // if Left Hip is farther away than Right Hip (e.g. 20 - 5 = +15)
+                else if (hipsAlignmentDelta < 0)
+                {
+                    // right hip
+                    DrawHip(joints, jointPoints, JointType.HipRight, moveHipAwayBrush);
+                }
+                else // negative number means left hips is closer
+                {
+                    // right hip
+                    DrawHip(joints, jointPoints, JointType.HipRight, moveHipCloserBrush);
+                }
+            }
+        }
+
+        private void DrawHip(IReadOnlyDictionary<JointType, Joint> joints, Dictionary<JointType, Point> jointPoints, JointType jointType, Brush color)
+        {
+            Brush drawBrush = null;
+
+            TrackingState trackingState = joints[jointType].TrackingState;
+
+            if (trackingState == TrackingState.Tracked ||
+                trackingState == TrackingState.Inferred)
+            {
+                drawBrush = color;
+            }
+
+            if (drawBrush != null)
+            {
+                this.DrawEllipse(drawBrush, jointPoints[jointType], JointThickness);
+            }
         }
 
         private void DrawCircleAtFingerTip(IReadOnlyDictionary<JointType, Joint> joints, Dictionary<JointType, Point> jointPoints, JointType jointType)

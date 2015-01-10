@@ -125,6 +125,9 @@ namespace TheoryC.ViewModels
         private Side _Handedness;
         public Side Handedness { get { return _Handedness; } set { base.SetProperty(ref _Handedness, value); } }
 
+        private bool _AlignHips;
+        public bool AlignHips { get { return _AlignHips; } set { base.SetProperty(ref _AlignHips, value); } }
+
         #endregion
 
         public MainViewModel()
@@ -1364,7 +1367,31 @@ namespace TheoryC.ViewModels
             IsSetupWindowOpen = false;
         }
 
-        #endregion
+        DelegateCommand _HideShowHipMarkersCommand = null;
+        public DelegateCommand HideShowHipMarkersCommand
+        {
+            get
+            {
+                if (_HideShowHipMarkersCommand != null)
+                    return _HideShowHipMarkersCommand;
 
+                _HideShowHipMarkersCommand = new DelegateCommand(new Action(
+                    () =>
+                    {
+                        AlignHips = !AlignHips;
+                    }),
+
+                    new Func<bool>(
+                        () =>
+                        {
+                            return IsSetupWindowOpen; // only if setup window is showing
+                        }));
+                this.PropertyChanged += (s, e) => _HideShowHipMarkersCommand.RaiseCanExecuteChanged();
+                return _HideShowHipMarkersCommand;
+            }
+        }
+
+
+        #endregion
     }
 }
