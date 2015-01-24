@@ -719,7 +719,7 @@ namespace TheoryC.ViewModels
            
             if (IsUsingKinect)
             {
-                breakTime = CountdownInSeconds;
+                breakTime = Properties.Settings.Default.CountdownTimeInSeconds;
             }
 
             foreach (var trial in Trials)
@@ -777,13 +777,12 @@ namespace TheoryC.ViewModels
         }
 
         // probably should have created it into its own class
-        const int CountdownInSeconds = 10;
         private DispatcherTimer countdownWindowTimer;
 
         private void ShowCountdownWindowUI()
         {
             ShowCountdownWindow = true;
-            CountdownCount = CountdownInSeconds;
+            CountdownCount = Properties.Settings.Default.CountdownTimeInSeconds;
 
             countdownWindowTimer = new DispatcherTimer();
             countdownWindowTimer.Interval = TimeSpan.FromSeconds(1);
@@ -795,8 +794,6 @@ namespace TheoryC.ViewModels
         {
 
             CountdownCount--;
-
-            Debug.Print(CountdownCount.ToString());
 
             // hide when we hit 0
             if (CountdownCount <= 0)

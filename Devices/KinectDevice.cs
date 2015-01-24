@@ -9,6 +9,7 @@ using System.Windows.Media;
 using System.Windows.Shapes;
 using System.Windows.Controls;
 using System.Threading;
+using System.Windows.Media.Imaging;
 
 namespace TheoryC.Devices
 {
@@ -39,6 +40,7 @@ namespace TheoryC.Devices
         Canvas bodyCanvas;
         Image kinectVideoImage;
         ViewModels.MainViewModel ViewModel;
+        private WriteableBitmap colorBitmap = null;
 
         public KinectDevice()
         {
@@ -68,6 +70,12 @@ namespace TheoryC.Devices
 
             // get the coordinate mapper
             this.cm = this.kinectSensor.CoordinateMapper;
+
+            // create the colorFrameDescription from the ColorFrameSource using Bgra format
+            FrameDescription colorFrameDescription = this.kinectSensor.ColorFrameSource.CreateFrameDescription(ColorImageFormat.Bgra);
+
+            // create the bitmap to display
+            this.colorBitmap = new WriteableBitmap(colorFrameDescription.Width, colorFrameDescription.Height, 96.0, 96.0, PixelFormats.Bgr32, null);
 
             // in case we want to show the skeleton later
             CreateBonesList();
@@ -109,14 +117,31 @@ namespace TheoryC.Devices
             }
 
             // Color - get this last for performance issues
-            using (var frame = reference.ColorFrameReference.AcquireFrame())
-            {
-                if (frame != null)
+            using (var colorFrame = reference.ColorFrameReference.AcquireFrame())
+                if (colorFrame != null)
                 {
-                    kinectVideoImage.Source = frame.ToBitmap();
-                }
-            }
+                    FrameDescription colorFrameDescription = colorFrame.FrameDescription;
 
+                    using (KinectBuffer colorBuffer = colorFrame.LockRawImageBuffer())
+                    {
+                        this.colorBitmap.Lock();
+
+                        // verify data and write the new color frame data to the display bitmap
+                        if ((colorFrameDescription.Width == this.colorBitmap.PixelWidth) && (colorFrameDescription.Height == this.colorBitmap.PixelHeight))
+                        {
+                            colorFrame.CopyConvertedFrameDataToIntPtr(
+                                this.colorBitmap.BackBuffer,
+                                (uint)(colorFrameDescription.Width * colorFrameDescription.Height * 4),
+                                ColorImageFormat.Bgra);
+
+                            this.colorBitmap.AddDirtyRect(new Int32Rect(0, 0, this.colorBitmap.PixelWidth, this.colorBitmap.PixelHeight));
+                        }
+
+                        this.colorBitmap.Unlock();
+
+                        kinectVideoImage.Source = this.colorBitmap;
+                    }
+                }
         }
 
         double hipsAlignmentDelta = 0;
@@ -137,7 +162,7 @@ namespace TheoryC.Devices
                     {
                         // this gets the position of the joints in meters
                         CameraSpacePoint position = joints[jointType].Position;
-                        
+
                         // sometimes the depth(Z) of an inferred joint may show as negative
                         // clamp down to 0.1f to prevent coordinatemapper from returning (-Infinity, -Infinity)
                         // this is *only* needed for showing the skeleton in case the user gets too close to screen
@@ -150,11 +175,11 @@ namespace TheoryC.Devices
                         ColorSpacePoint colorSpacePoint = this.cm.MapCameraPointToColorSpace(position);
                         jointPoints[jointType] = new Point(colorSpacePoint.X, colorSpacePoint.Y);
 
-                        // if aligning hips as part of setup
-                        if (this.ViewModel.AlignHips)
-                        {
-                            AlignHips(joints, jointPoints, jointType, position);
-                        }
+                        //// if aligning hips as part of setup
+                        //if (this.ViewModel.AlignHips)
+                        //{
+                        //    AlignHips(joints, jointPoints, jointType, position);
+                        //}
 
                         // track lean
                         if (body.LeanTrackingState == TrackingState.Tracked)
@@ -192,7 +217,7 @@ namespace TheoryC.Devices
                         }
 
                         // If tracking left hand
-                        else 
+                        else
                         {
                             if (jointType == JointType.HandTipLeft)
                             {
@@ -222,7 +247,7 @@ namespace TheoryC.Devices
                     if (rightHandTip.X > 0 || leftHandTip.X > 0)
                     {
                         // once this is tracked, we assume tracked from here on out for the experiment
-                        this.ViewModel.IsKinectTracking = true;                        
+                        this.ViewModel.IsKinectTracking = true;
                     }
 
                     // if we want to show the skeleton, but note there are some performance issues

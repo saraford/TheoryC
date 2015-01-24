@@ -30,7 +30,7 @@ namespace TheoryC
             }
             else
             {
-                frame.CopyConvertedFrameDataToArray(pixels, ColorImageFormat.Bgra);
+           //     frame.CopyConvertedFrameDataToArray(pixels, ColorImageFormat.Bgra);
             }
 
             int stride = width * format.BitsPerPixel / 8;
