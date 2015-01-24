@@ -38,20 +38,20 @@
                 <!--This must come first before any windows; don't want anything pushing this down or it screws up mouse x,y-->
                 <Canvas x:Name="SceneCanvas" Width="960" Height="540" >
                     <Ellipse 
-                    Width="{Binding TrackRadius, Converter={StaticResource RadiusToDiameter}}"
-			         Height="{Binding TrackRadius, Converter={StaticResource RadiusToDiameter}}"
-		                    
-                    Stroke="AliceBlue"
-			StrokeThickness="10"
-            Canvas.Left="{Binding Source={x:Static Properties:Settings.Default}, Path=TrackLeftX, Mode=OneWay}"
-            Canvas.Top="{Binding Source={x:Static Properties:Settings.Default}, Path=TrackTopY, Mode=OneWay}"/>
+                        Width="{Binding TrackRadius, Converter={StaticResource RadiusToDiameter}}"
+			            Height="{Binding TrackRadius, Converter={StaticResource RadiusToDiameter}}"
+		                Visibility="{Binding ShowTrack, Converter={StaticResource BoolToVisibilityConverter}}"
+                        Stroke="AliceBlue"
+			            StrokeThickness="10"
+                        Canvas.Left="{Binding Source={x:Static Properties:Settings.Default}, Path=TrackLeftX, Mode=OneWay}"
+                        Canvas.Top="{Binding Source={x:Static Properties:Settings.Default}, Path=TrackTopY, Mode=OneWay}"/>
 
                     <Controls:Target x:Name="Target" 
-	            Width="{Binding CurrentTrial.ShapeSizeDiameter}"
-				Height="{Binding CurrentTrial.ShapeSizeDiameter}"
-                Canvas.Left="{Binding TargetPositionLeft, Mode=OneWay}"
-                Canvas.Top="{Binding TargetPositionTop, Mode=OneWay}"
-                FillColor="{Binding IsOnTarget, Converter={StaticResource BlueWhenTrue}, Mode=OneWay}">
+	                    Width="{Binding CurrentTrial.ShapeSizeDiameter}"
+				        Height="{Binding CurrentTrial.ShapeSizeDiameter}"
+                        Canvas.Left="{Binding TargetPositionLeft, Mode=OneWay}"
+                        Canvas.Top="{Binding TargetPositionTop, Mode=OneWay}"
+                        FillColor="{Binding IsOnTarget, Converter={StaticResource BlueWhenTrue}, Mode=OneWay}">
 
                         <i:Interaction.Triggers>
                             <i:EventTrigger EventName="MouseLeftButtonUp">

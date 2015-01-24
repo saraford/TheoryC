@@ -93,6 +93,12 @@ namespace TheoryC.ViewModels
         bool _ShowSkeleton = default(bool);
         public bool ShowSkeleton { get { return _ShowSkeleton; } set { base.SetProperty(ref _ShowSkeleton, value); } }
 
+        bool _ShowTrack = default(bool);
+        public bool ShowTrack { get { return _ShowTrack; } set { base.SetProperty(ref _ShowTrack, value); } }
+
+        int _CountdownTimeInSeconds = default(int);
+        public int CountdownTimeInSeconds { get { return _CountdownTimeInSeconds; } set { base.SetProperty(ref _CountdownTimeInSeconds, value); } }
+
         bool _ShowFingerTip = default(bool);
         public bool ShowFingerTip { get { return _ShowFingerTip; } set { base.SetProperty(ref _ShowFingerTip, value); } }
 
@@ -159,6 +165,9 @@ namespace TheoryC.ViewModels
 
                 // some designer info                
                 StatusText = "D: Status";
+
+                // show track in designer
+                ShowTrack = true;
             }
         }
 
@@ -185,8 +194,10 @@ namespace TheoryC.ViewModels
             // setup the target
             this.UpdateTargetSizeAndPlaceInStartingPosition();
 
-            // use as default
+            // other defaults to use
             Handedness = Side.Right;
+            ShowTrack = true;
+            CountdownTimeInSeconds = 10;
         }
 
         public void ShowSettingsOnLaunch()
@@ -719,7 +730,7 @@ namespace TheoryC.ViewModels
            
             if (IsUsingKinect)
             {
-                breakTime = Properties.Settings.Default.CountdownTimeInSeconds;
+                breakTime = CountdownTimeInSeconds;
             }
 
             foreach (var trial in Trials)
@@ -782,7 +793,7 @@ namespace TheoryC.ViewModels
         private void ShowCountdownWindowUI()
         {
             ShowCountdownWindow = true;
-            CountdownCount = Properties.Settings.Default.CountdownTimeInSeconds;
+            CountdownCount = CountdownTimeInSeconds;
 
             countdownWindowTimer = new DispatcherTimer();
             countdownWindowTimer.Interval = TimeSpan.FromSeconds(1);

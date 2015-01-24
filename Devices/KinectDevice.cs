@@ -175,11 +175,11 @@ namespace TheoryC.Devices
                         ColorSpacePoint colorSpacePoint = this.cm.MapCameraPointToColorSpace(position);
                         jointPoints[jointType] = new Point(colorSpacePoint.X, colorSpacePoint.Y);
 
-                        //// if aligning hips as part of setup
-                        //if (this.ViewModel.AlignHips)
-                        //{
-                        //    AlignHips(joints, jointPoints, jointType, position);
-                        //}
+                        // if aligning hips as part of setup
+                        if (this.ViewModel.AlignHips)
+                        {
+                            AlignHipsToKinectFrontalPlane(joints, jointPoints, jointType, position);
+                        }
 
                         // track lean
                         if (body.LeanTrackingState == TrackingState.Tracked)
@@ -260,7 +260,7 @@ namespace TheoryC.Devices
 
         }
 
-        private void AlignHips(IReadOnlyDictionary<JointType, Joint> joints, Dictionary<JointType, Point> jointPoints, JointType jointType, CameraSpacePoint position)
+        private void AlignHipsToKinectFrontalPlane(IReadOnlyDictionary<JointType, Joint> joints, Dictionary<JointType, Point> jointPoints, JointType jointType, CameraSpacePoint position)
         {
             if (jointType == JointType.HipLeft)
             {

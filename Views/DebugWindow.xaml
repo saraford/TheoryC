@@ -60,17 +60,26 @@
                 <StackPanel Margin="10,10,0,0">
                     <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Kinect Debug:" VerticalAlignment="Top"/>
                     <TextBlock Visibility="{Binding IsKinectTracking, Converter={StaticResource BoolToVisibility}}">Is Tracking</TextBlock>
-            </StackPanel>
+                </StackPanel>
                 <StackPanel Margin="10,0,0,0">
                     <TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="Show Finger Tip" VerticalAlignment="Top"/>
                     <CheckBox Margin="10,0,0,0" IsChecked="{Binding ShowFingerTip}" />
                 </StackPanel>
+                
+                <StackPanel Margin="10,0,0,0">
+                    <TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="Track Skeleton" VerticalAlignment="Top"/>
+                    <CheckBox Margin="10,0,0,0" IsChecked="{Binding ShowSkeleton}" />
+                </StackPanel>
 
                 <StackPanel Margin="10,0,0,0">
-                <TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="Track Skeleton" VerticalAlignment="Top"/>
-                <CheckBox Margin="10,0,0,0" IsChecked="{Binding ShowSkeleton}" />
-            </StackPanel>
+                    <TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="Show Track" VerticalAlignment="Top"/>
+                    <CheckBox Margin="10,0,0,0" IsChecked="{Binding ShowTrack}" />
+                </StackPanel>
 
+                <StackPanel Margin="10,0,0,0">
+                    <TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="Countdown" VerticalAlignment="Top"/>
+                    <TextBox Margin="10,0,0,0" Text="{Binding CountdownTimeInSeconds}" />
+                </StackPanel>
 
             </StackPanel>
 

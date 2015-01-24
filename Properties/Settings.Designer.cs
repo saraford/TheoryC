@@ -82,17 +82,5 @@ namespace TheoryC.Properties {
                 this["CSVextension"] = value;
             }
         }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("3")]
-        public int CountdownTimeInSeconds {
-            get {
-                return ((int)(this["CountdownTimeInSeconds"]));
-            }
-            set {
-                this["CountdownTimeInSeconds"] = value;
-            }
-        }
     }
 }
