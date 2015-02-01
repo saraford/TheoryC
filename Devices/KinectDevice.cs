@@ -145,14 +145,28 @@ namespace TheoryC.Devices
         }
 
         double hipsAlignmentDelta = 0;
+        private ulong participantTrackingID = 0;
 
         private void TrackSkeleton(IList<Body> bodies)
         {
             foreach (Body body in bodies)
             {
-                // find the first tracked body - if there are more than one, this will fail miserably
+                // a body that is tracked has a ID
                 if (body.IsTracked)
                 {
+                    // if first time finding body, get the ID
+                    if (participantTrackingID == 0)
+                    {
+                        participantTrackingID = body.TrackingId;
+                        // ParticipantID.Text = participantTrackingID.ToString();
+                    }
+
+                    // if the tracking IDs don't match, keep looping through bodies
+                    if (participantTrackingID != body.TrackingId)
+                    {
+                        return;
+                    }
+
                     IReadOnlyDictionary<JointType, Joint> joints = body.Joints;
 
                     // convert the joint points to depth (display) space

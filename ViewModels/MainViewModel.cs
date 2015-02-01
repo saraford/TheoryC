@@ -312,8 +312,8 @@ namespace TheoryC.ViewModels
             if (aborted)
             {
                 // researcher stops the experiment before it is finished
-                TextForMessageBoxWindow = 
-                    "Experiment aborted.\n" + 
+                TextForMessageBoxWindow =
+                    "Experiment aborted.\n" +
                     "\n" +
                     "All data collected (including in-progress trials) have been recorded and saved.";
             }
@@ -377,8 +377,8 @@ namespace TheoryC.ViewModels
             //Debug.Print("Trial time took " + totalTrialTime.Elapsed.ToString());
 
             // save results 
-            double percentageOnTarget = (double) ticksOnTarget / (double) CurrentTrial.Results.TickCount;
-            CurrentTrial.Results.TimeOnTarget = Math.Round(percentageOnTarget * CurrentTrial.DurationSeconds, 3);  
+            double percentageOnTarget = (double)ticksOnTarget / (double)CurrentTrial.Results.TickCount;
+            CurrentTrial.Results.TimeOnTarget = Math.Round(percentageOnTarget * CurrentTrial.DurationSeconds, 3);
 
             CurrentTrial.Results.AbsoluteError = Statistics.Mean(CurrentTrial.Results.AbsoluteErrorForEachTickList);
             CurrentTrial.Results.ConstantError = Statistics.ConstantError(CurrentTrial.Results.AbsoluteErrorForEachTickList, CurrentTrial.Results.IsInsideTrackForEachTickList);
@@ -403,8 +403,8 @@ namespace TheoryC.ViewModels
             // first 1/3rd            
             int countOnTarget1 = OnTarget1.Where(c => c).Count(); // gets the count of true bools
             double percentageOnTarget1 = (double)countOnTarget1 / OnTarget1.Count; // this count is the List<> size, not the sum
-            CurrentTrial.Results.TimeOnTarget1 = Math.Round(percentageOnTarget1 * CurrentTrial.DurationSeconds / 3.0, 3);  
-            
+            CurrentTrial.Results.TimeOnTarget1 = Math.Round(percentageOnTarget1 * CurrentTrial.DurationSeconds / 3.0, 3);
+
             CurrentTrial.Results.AbsoluteError1 = Statistics.Mean(ABE1);
             CurrentTrial.Results.ConstantError1 = Statistics.ConstantError(ABE1, IsInside1);
             CurrentTrial.Results.VariableError1 = Statistics.VariableError(ABE1, IsInside1);
@@ -414,7 +414,7 @@ namespace TheoryC.ViewModels
             int countOnTarget2 = OnTarget2.Where(c => c).Count(); // gets the count of true bools
             double percentageOnTarget2 = (double)countOnTarget2 / OnTarget2.Count; // this count is the List<> size, not the sum
             CurrentTrial.Results.TimeOnTarget2 = Math.Round(percentageOnTarget2 * CurrentTrial.DurationSeconds / 3.0, 3);
-            
+
             CurrentTrial.Results.AbsoluteError2 = Statistics.Mean(ABE2);
             CurrentTrial.Results.ConstantError2 = Statistics.ConstantError(ABE2, IsInside2);
             CurrentTrial.Results.VariableError2 = Statistics.VariableError(ABE2, IsInside2);
@@ -424,7 +424,7 @@ namespace TheoryC.ViewModels
             int countOnTarget3 = OnTarget3.Where(c => c).Count(); // gets the count of true bools
             double percentageOnTarget3 = (double)countOnTarget3 / OnTarget3.Count; // this count is the List<> size, not the sum
             CurrentTrial.Results.TimeOnTarget3 = Math.Round(percentageOnTarget3 * CurrentTrial.DurationSeconds / 3.0, 3);
-            
+
             CurrentTrial.Results.AbsoluteError3 = Statistics.Mean(ABE3);
             CurrentTrial.Results.ConstantError3 = Statistics.ConstantError(ABE3, IsInside3);
             CurrentTrial.Results.VariableError3 = Statistics.VariableError(ABE3, IsInside3);
@@ -478,9 +478,10 @@ namespace TheoryC.ViewModels
 
         private void WaitForUserToStartNextTrial()
         {
+            // In kinect mode
             if (IsUsingKinect)
             {
-                // In kinect mode, Show Countdown Window
+                // show if not the first trial
                 ShowCountdownWindowUI();
             }
             else
@@ -759,7 +760,7 @@ namespace TheoryC.ViewModels
             ShowParticipantInstructions = true;
 
             string experimentRunTimeInMinutes = CalculateExperimentRunTimeInMinutes();
-          
+
             if (IsUsingKinect)
             {
                 ShowParticipantInstructionsText =
@@ -798,7 +799,7 @@ namespace TheoryC.ViewModels
         {
             double time = 0;
             double breakTime = 0;
-           
+
             if (IsUsingKinect)
             {
                 breakTime = CountdownTimeInSeconds;
@@ -810,10 +811,11 @@ namespace TheoryC.ViewModels
             }
 
             // convert into minutes
-            int seconds = (int) time % 60;
-            int minutes = (int) time / 60;
+            int seconds = (int)time % 60;
+            int minutes = (int)time / 60;
 
-            if (seconds == 0){
+            if (seconds == 0)
+            {
                 return minutes + " minutes ";
             }
             else
@@ -840,10 +842,19 @@ namespace TheoryC.ViewModels
 
                         if (IsUsingKinect)
                         {
-                            ShowCountdownWindowUI();
+                            // don't show countdown window. it is just confusing.
+                            if (this.CurrentTrial.Number == 0)
+                            {
+                                ShowInstructionsToPutHandInTargetAndWait();
+                            }
+                            else
+                            {
+                                ShowCountdownWindowUI();
+                            }                         
                         }
                         else
                         {
+                            // mouse mode
                             WaitForUserToClickTarget();
                         }
 
@@ -887,12 +898,17 @@ namespace TheoryC.ViewModels
                 ShowCountdownWindow = false;
 
                 // show instructions to user to put their hand in target and wait for the event
-                ShowInstructionsToStartTrial = true;
-                ShowInstructionsToStartTrialText = "Put your hand in the target to start next trial";
-
-                // wait for user to put their hand inside the target
-                WaitForUserToPutHandInsideTarget();
+                ShowInstructionsToPutHandInTargetAndWait();
             }
+        }
+
+        private void ShowInstructionsToPutHandInTargetAndWait()
+        {
+            ShowInstructionsToStartTrial = true;
+            ShowInstructionsToStartTrialText = "Put your hand in the target to start next trial";
+
+            // wait for user to put their hand inside the target
+            WaitForUserToPutHandInsideTarget();
         }
 
         private void AbortCountdownTimer()

@@ -68,14 +68,14 @@
         <Grid Visibility="{Binding ShowParticipantInstructions, Converter={StaticResource BoolToVisibilityConverter}}" >
             <Border BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Center" VerticalAlignment="Center">
                 <Border.Background>
-                    <SolidColorBrush Opacity="0.5" Color="LightGray"/>
+                    <SolidColorBrush Opacity="0.75" Color="LightGray"/>
                 </Border.Background>
                 <Border Margin="5,10,5,5" BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Center" VerticalAlignment="Center">
                     <Border.Background>
                         <SolidColorBrush Opacity="0.5" Color="White"/>
                     </Border.Background>
                     <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                        <TextBlock Margin="5" FontSize="14" FontWeight="SemiBold" Text="{Binding ShowParticipantInstructionsText}"/>
+                        <TextBlock Margin="5" FontSize="20" FontWeight="SemiBold" Text="{Binding ShowParticipantInstructionsText}"/>
                         <Button Margin="0,30,0,10" Content="Start Experiment" MaxWidth="100" Command="{Binding StartExperimentCommand, Mode=OneWay}" ></Button>
                     </StackPanel>
                 </Border>
@@ -83,11 +83,11 @@
         </Grid>
 
         <!--The Start Next Trial Instructions Window-->
-        <Grid Margin="280,370,355,63.5" Visibility="{Binding ShowInstructionsToStartTrial, Converter={StaticResource BoolToVisibilityConverter}}" >
-            <Border Background="LightGray" BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="-10,-90,-162,-91" >
+        <Grid Margin="200,370,355,63.5" Visibility="{Binding ShowInstructionsToStartTrial, Converter={StaticResource BoolToVisibilityConverter}}" >            
+                <Border Background="LightGray" BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="-10,-90,-300,-91" >
                 <Border Margin="5,15,5,5" Background="White" BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Center" VerticalAlignment="Center">
                     <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                        <TextBlock Margin="10" FontSize="14" Text="{Binding ShowInstructionsToStartTrialText}"></TextBlock>
+                        <TextBlock Margin="10" FontSize="28" Text="{Binding ShowInstructionsToStartTrialText}"></TextBlock>
                     </StackPanel>
                 </Border>
             </Border>
@@ -109,12 +109,14 @@
         <Grid Visibility="{Binding ShowCountdownWindow, Converter={StaticResource BoolToVisibilityConverter}}" >
             <Border MinWidth="250" MinHeight="250" BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Center" VerticalAlignment="Center">
                 <Border.Background>
-                    <SolidColorBrush Opacity="0.5" Color="White"/>
+                    <SolidColorBrush Opacity="0.75" Color="White"/>
                 </Border.Background>
 
                 <StackPanel HorizontalAlignment="Center">
-                    <TextBlock Text="Lower your arm to your side" FontSize="36"/>
-                    <TextBlock Foreground="Black" FontSize="36" Text="Starting Trial in" HorizontalAlignment="Center"/>
+                    <TextBlock Text="Keep your arm at your side" FontSize="36"/>
+                    <TextBlock Text="Please wait for instructions" FontSize="36"/>
+                    <TextBlock Text="" FontSize="36"/>
+                    <TextBlock Foreground="Black" FontSize="36" Text="Break time remaining" HorizontalAlignment="Center"/>
                     <TextBlock FontSize="36" Text="{Binding CountdownCount}" HorizontalAlignment="Center"/>
                 </StackPanel>
             </Border>
