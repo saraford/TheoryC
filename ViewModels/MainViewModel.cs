@@ -220,7 +220,8 @@ namespace TheoryC.ViewModels
                     AbsoluteErrorForEachTickList = new List<double>(),
                     IsInsideTrackForEachTickList = new List<bool>(),
                     HandDepthForEachTickList = new List<double>(),
-                    LeanAmountForEachTickList = new List<PointF>()
+                    LeanAmountForEachTickList = new List<PointF>(),
+                    OnTargetList = new List<bool>()
                 }
             });
 
@@ -245,7 +246,8 @@ namespace TheoryC.ViewModels
                     AbsoluteErrorForEachTickList = new List<double>(),
                     IsInsideTrackForEachTickList = new List<bool>(),
                     HandDepthForEachTickList = new List<double>(),
-                    LeanAmountForEachTickList = new List<PointF>()
+                    LeanAmountForEachTickList = new List<PointF>(),
+                    OnTargetList = new List<bool>()
                 }
             });
 
@@ -374,16 +376,83 @@ namespace TheoryC.ViewModels
             //Debug.Print("Trial #" + CurrentTrial.Number.ToString() + " stopped at " + DateTime.Now.ToString("hh.mm.ss.ffffff"));
             //Debug.Print("Trial time took " + totalTrialTime.Elapsed.ToString());
 
-            // save results
-            double percentageOnTarget = (double)ticksOnTarget / (double)CurrentTrial.Results.TickCount;
+            // save results 
+            double percentageOnTarget = (double) ticksOnTarget / (double) CurrentTrial.Results.TickCount;
+            CurrentTrial.Results.TimeOnTarget = Math.Round(percentageOnTarget * CurrentTrial.DurationSeconds, 3);  
 
-            CurrentTrial.Results.TimeOnTarget = percentageOnTarget * CurrentTrial.DurationSeconds;  //timeOnTarget.ElapsedMilliseconds;
             CurrentTrial.Results.AbsoluteError = Statistics.Mean(CurrentTrial.Results.AbsoluteErrorForEachTickList);
             CurrentTrial.Results.ConstantError = Statistics.ConstantError(CurrentTrial.Results.AbsoluteErrorForEachTickList, CurrentTrial.Results.IsInsideTrackForEachTickList);
             CurrentTrial.Results.VariableError = Statistics.VariableError(CurrentTrial.Results.AbsoluteErrorForEachTickList, CurrentTrial.Results.IsInsideTrackForEachTickList);
             CurrentTrial.Results.HandDepthStdDev = Statistics.PopulationStandardDeviation(CurrentTrial.Results.HandDepthForEachTickList);
             CurrentTrial.Results.LeanLeftRightX = Statistics.PopulationStandardDeviation(CurrentTrial.Results.LeanAmountForEachTickList, DesiredCoord.X);
             CurrentTrial.Results.LeanForwardBackY = Statistics.PopulationStandardDeviation(CurrentTrial.Results.LeanAmountForEachTickList, DesiredCoord.Y);
+
+            // figure out the indexes for the 1/3
+            int indexMarker = CurrentTrial.Results.TickCount / 3;
+
+            // break up the results into thirds
+            List<double> ABE1, ABE2, ABE3;
+            Tools.BreakListIntoThirds(CurrentTrial.Results.AbsoluteErrorForEachTickList, indexMarker, out ABE1, out ABE2, out ABE3);
+
+            List<bool> IsInside1, IsInside2, IsInside3;
+            Tools.BreakListIntoThirds(CurrentTrial.Results.IsInsideTrackForEachTickList, indexMarker, out IsInside1, out IsInside2, out IsInside3);
+
+            List<bool> OnTarget1, OnTarget2, OnTarget3;
+            Tools.BreakListIntoThirds(CurrentTrial.Results.OnTargetList, indexMarker, out OnTarget1, out OnTarget2, out OnTarget3);
+
+            // first 1/3rd            
+            int countOnTarget1 = OnTarget1.Where(c => c).Count(); // gets the count of true bools
+            double percentageOnTarget1 = (double)countOnTarget1 / OnTarget1.Count; // this count is the List<> size, not the sum
+            CurrentTrial.Results.TimeOnTarget1 = Math.Round(percentageOnTarget1 * CurrentTrial.DurationSeconds / 3.0, 3);  
+            
+            CurrentTrial.Results.AbsoluteError1 = Statistics.Mean(ABE1);
+            CurrentTrial.Results.ConstantError1 = Statistics.ConstantError(ABE1, IsInside1);
+            CurrentTrial.Results.VariableError1 = Statistics.VariableError(ABE1, IsInside1);
+            CurrentTrial.Results.TickCount1 = ABE1.Count; // size of list, not the sum
+
+            // second 1/3rd            
+            int countOnTarget2 = OnTarget2.Where(c => c).Count(); // gets the count of true bools
+            double percentageOnTarget2 = (double)countOnTarget2 / OnTarget2.Count; // this count is the List<> size, not the sum
+            CurrentTrial.Results.TimeOnTarget2 = Math.Round(percentageOnTarget2 * CurrentTrial.DurationSeconds / 3.0, 3);
+            
+            CurrentTrial.Results.AbsoluteError2 = Statistics.Mean(ABE2);
+            CurrentTrial.Results.ConstantError2 = Statistics.ConstantError(ABE2, IsInside2);
+            CurrentTrial.Results.VariableError2 = Statistics.VariableError(ABE2, IsInside2);
+            CurrentTrial.Results.TickCount2 = ABE2.Count;
+
+            // third 1/3rd
+            int countOnTarget3 = OnTarget3.Where(c => c).Count(); // gets the count of true bools
+            double percentageOnTarget3 = (double)countOnTarget3 / OnTarget3.Count; // this count is the List<> size, not the sum
+            CurrentTrial.Results.TimeOnTarget3 = Math.Round(percentageOnTarget3 * CurrentTrial.DurationSeconds / 3.0, 3);
+            
+            CurrentTrial.Results.AbsoluteError3 = Statistics.Mean(ABE3);
+            CurrentTrial.Results.ConstantError3 = Statistics.ConstantError(ABE3, IsInside3);
+            CurrentTrial.Results.VariableError3 = Statistics.VariableError(ABE3, IsInside3);
+            CurrentTrial.Results.TickCount3 = ABE3.Count;
+
+            if (IsUsingKinect)
+            {
+                List<double> HandDepth1, HandDepth2, HandDepth3;
+                Tools.BreakListIntoThirds(CurrentTrial.Results.HandDepthForEachTickList, indexMarker, out HandDepth1, out HandDepth2, out HandDepth3);
+
+                List<PointF> LeanAmount1, LeanAmount2, LeanAmount3;
+                Tools.BreakListIntoThirds(CurrentTrial.Results.LeanAmountForEachTickList, indexMarker, out LeanAmount1, out LeanAmount2, out LeanAmount3);
+
+                // first 1/3rd
+                CurrentTrial.Results.HandDepthStdDev1 = Statistics.PopulationStandardDeviation(HandDepth1);
+                CurrentTrial.Results.LeanLeftRightX1 = Statistics.PopulationStandardDeviation(LeanAmount1, DesiredCoord.X);
+                CurrentTrial.Results.LeanForwardBackY1 = Statistics.PopulationStandardDeviation(LeanAmount1, DesiredCoord.Y);
+
+                // first 1/3rd
+                CurrentTrial.Results.HandDepthStdDev2 = Statistics.PopulationStandardDeviation(HandDepth2);
+                CurrentTrial.Results.LeanLeftRightX2 = Statistics.PopulationStandardDeviation(LeanAmount2, DesiredCoord.X);
+                CurrentTrial.Results.LeanForwardBackY2 = Statistics.PopulationStandardDeviation(LeanAmount2, DesiredCoord.Y);
+
+                // first 1/3rd
+                CurrentTrial.Results.HandDepthStdDev3 = Statistics.PopulationStandardDeviation(HandDepth3);
+                CurrentTrial.Results.LeanLeftRightX3 = Statistics.PopulationStandardDeviation(LeanAmount3, DesiredCoord.X);
+                CurrentTrial.Results.LeanForwardBackY3 = Statistics.PopulationStandardDeviation(LeanAmount3, DesiredCoord.Y);
+            }
         }
 
         private void SetupNextTrial()
@@ -601,6 +670,8 @@ namespace TheoryC.ViewModels
         {
             // calculate whether inside the circle
             IsOnTarget = Tools.IsInsideCircle(this.InputPosition, this.TargetPositionCenter, TargetSizeRadius);
+
+            CurrentTrial.Results.OnTargetList.Add(IsOnTarget);
 
             if (IsOnTarget)
             {

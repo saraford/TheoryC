@@ -5,11 +5,12 @@
         xmlns:Converters="clr-namespace:TheoryC.Converters"      
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
         x:Class="TheoryC.Views.SettingsWindow"
-        Title="SettingsWindow" Height="600" Width="500">
+        Title="SettingsWindow" Height="580" Width="720">
     <Window.DataContext>
         <ViewModels:MainViewModel/>
     </Window.DataContext>
     <Window.Resources>
+        <Converters:RoundValueConverter x:Key="RoundValueConverter"/>
         <Converters:AddOneConverter x:Key="AddOneToTrial"/>
     </Window.Resources>
     <DockPanel>
@@ -32,7 +33,7 @@
 
             <StackPanel Margin="5,10,0.4,0.4" Orientation="Vertical"  Grid.Row="0" Grid.ColumnSpan="2">
                 <TextBlock Text="Participant Info" FontSize="14" FontWeight="SemiBold"></TextBlock>
-                
+
                 <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
                     <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Participant ID" VerticalAlignment="Top"/>
                     <TextBox Margin="10,0,0,0" HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" VerticalAlignment="Top" Width="160" Text="{Binding ParticipantID}"/>
@@ -45,7 +46,8 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="50" />
                     <ColumnDefinition Width="20" />
-                    <ColumnDefinition />
+                    <ColumnDefinition Width="150"/>
+                    <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
                 <ListBox Grid.Column="0"
@@ -62,14 +64,13 @@
                 </ListBox>
 
                 <StackPanel Grid.Column="2" >
-
                     <StackPanel Orientation="Horizontal">
                         <TextBlock FontWeight="SemiBold" FontSize="13" Text="Trial #" />
                         <TextBlock FontWeight="SemiBold" FontSize="13"  Text="{Binding CurrentTrial.Number, Converter={StaticResource AddOneToTrial}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                     </StackPanel>
 
                     <StackPanel Margin="0,10,0,0" Orientation="Vertical">
-                                                
+
                         <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Target Diameter in pixels" VerticalAlignment="Top"/>
                         <TextBox Margin="0,5,0,0" HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" VerticalAlignment="Top" Width="85" Text="{Binding CurrentTrial.ShapeSizeDiameter, UpdateSourceTrigger=PropertyChanged}">
                             <i:Interaction.Triggers>
@@ -79,61 +80,330 @@
                             </i:Interaction.Triggers>
                         </TextBox>
                     </StackPanel>
-                    
+
                     <StackPanel Margin="0,5,0,0" Orientation="Vertical">
                         <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Duration in seconds" VerticalAlignment="Top"/>
                         <TextBox Margin="0,5,0,0" HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" Text="{Binding CurrentTrial.DurationSeconds}" VerticalAlignment="Top" Width="86"/>
                     </StackPanel>
-                    
+
                     <StackPanel Margin="0,5,0,0" Orientation="Vertical">
                         <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="RPMs" VerticalAlignment="Top"/>
-                        <TextBox Margin="0,5,0,0" HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" Text="{Binding CurrentTrial.RPMs}" VerticalAlignment="Top" Width="86"/>                   
+                        <TextBox Margin="0,5,0,0" HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" Text="{Binding CurrentTrial.RPMs}" VerticalAlignment="Top" Width="86"/>
+                    </StackPanel>
+                </StackPanel>
+
+                <StackPanel Grid.Column="3">
+
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock FontSize="13" Text="Results" FontWeight="SemiBold"/>
+                        <TextBlock Margin="10,2,0,0" FontSize="10"><Hyperlink Command="{Binding OpenResultsFolderCommand, Mode=OneWay}">(View Results Folder)</Hyperlink></TextBlock>
                     </StackPanel>
 
-                    <TextBlock Margin="0,10,0,0" FontSize="13" Text="Results" FontWeight="SemiBold"/>
+                    <!--Attempt to do a proper table-->
+                    <StackPanel MaxHeight="350">
+                        <FlowDocumentReader Margin="-15,-10,0,0" Height="477" >
+                            <FlowDocument FontFamily="Segoe UI" FontSize="12" >
+                                <Table CellSpacing="5">
+                                    <TableRowGroup>
 
-                    <TextBlock Margin="0,5,0,0" ><Hyperlink Command="{Binding OpenResultsFolderCommand, Mode=OneWay}">View Results Folder</Hyperlink></TextBlock>
+                                        <!-- Header row for the table. -->
+                                        <TableRow Background="LightSteelBlue">
+                                            <TableCell>
+                                            </TableCell>
 
-                    <Grid Margin="0,10,0,0">
+                                            <TableCell >
+                                                <Paragraph>Total Trial</Paragraph>
+                                            </TableCell>
+
+                                            <!--<TableCell RowSpan="9" Background="DimGray" />-->
+                                            <!--<TableCell RowSpan="9" />-->
+
+                                            <TableCell>
+                                                <Paragraph>First 3rd</Paragraph>
+                                            </TableCell>
+
+                                            <TableCell>
+                                                <Paragraph>Middle 3rd</Paragraph>
+                                            </TableCell>
+
+                                            <TableCell>
+                                                <Paragraph>Last 3rd</Paragraph>
+                                            </TableCell>
+
+                                        </TableRow>
+
+                                        <!-- Data rows for the results. -->
+                                        <TableRow>
+                                            <TableCell TextAlignment="Left">
+                                                <Paragraph >Time On Target (seconds)</Paragraph>
+                                            </TableCell>
+                                            <TableCell>
+                                                <Paragraph>
+                                                    <Run Text="{Binding CurrentTrial.Results.TimeOnTarget}"/>
+                                                </Paragraph>
+                                            </TableCell>                                            
+                                            <TableCell>
+                                                <Paragraph>
+                                                    <Run Text="{Binding CurrentTrial.Results.TimeOnTarget1}"/>
+                                                </Paragraph>
+                                            </TableCell>
+                                            <TableCell>
+                                                <Paragraph>
+                                                    <Run Text="{Binding CurrentTrial.Results.TimeOnTarget2}"/>
+                                                </Paragraph>
+                                            </TableCell>
+                                            <TableCell>
+                                                <Paragraph>
+                                                    <Run Text="{Binding CurrentTrial.Results.TimeOnTarget3}"/>
+                                                </Paragraph>
+                                            </TableCell>
+                                        </TableRow>
+
+                                        <TableRow Background="LightSteelBlue">
+                                            <TableCell TextAlignment="Left">
+                                                <Paragraph>Absolute Error (pixels)</Paragraph>
+                                            </TableCell>
+                                            <TableCell>
+                                                <Paragraph>
+                                                    <Run Text="{Binding CurrentTrial.Results.AbsoluteError, Converter={StaticResource RoundValueConverter}}"/>
+                                                </Paragraph>
+                                            </TableCell>
+                                            <TableCell>
+                                                <Paragraph>
+                                                    <Run Text="{Binding CurrentTrial.Results.AbsoluteError1, Converter={StaticResource RoundValueConverter}}"/>
+                                                </Paragraph>
+                                            </TableCell>
+                                            <TableCell>
+                                                <Paragraph>
+                                                    <Run Text="{Binding CurrentTrial.Results.AbsoluteError2, Converter={StaticResource RoundValueConverter}}"/>
+                                                </Paragraph>
+                                            </TableCell>
+                                            <TableCell>
+                                                <Paragraph>
+                                                    <Run Text="{Binding CurrentTrial.Results.AbsoluteError3, Converter={StaticResource RoundValueConverter}}"/>
+                                                </Paragraph>
+                                            </TableCell>
+                                        </TableRow>
+
+                                        <TableRow>
+                                            <TableCell TextAlignment="Left">
+                                                <Paragraph>Constant Error (pixels)</Paragraph>
+                                            </TableCell>
+                                            <TableCell>
+                                                <Paragraph>
+                                                    <Run Text="{Binding CurrentTrial.Results.ConstantError, Converter={StaticResource RoundValueConverter}}"/>
+                                                </Paragraph>
+                                            </TableCell>
+                                            <TableCell>
+                                                <Paragraph>
+                                                    <Run Text="{Binding CurrentTrial.Results.ConstantError1, Converter={StaticResource RoundValueConverter}}"/>
+                                                </Paragraph>
+                                            </TableCell>
+                                            <TableCell>
+                                                <Paragraph>
+                                                    <Run Text="{Binding CurrentTrial.Results.ConstantError2, Converter={StaticResource RoundValueConverter}}"/>
+                                                </Paragraph>
+                                            </TableCell>
+                                            <TableCell>
+                                                <Paragraph>
+                                                    <Run Text="{Binding CurrentTrial.Results.ConstantError3, Converter={StaticResource RoundValueConverter}}"/>
+                                                </Paragraph>
+                                            </TableCell>
+                                        </TableRow>
+
+                                        <TableRow Background="LightSteelBlue">
+                                            <TableCell TextAlignment="Left">
+                                                <Paragraph>Variable Error (pixels)</Paragraph>
+                                            </TableCell>
+                                            <TableCell>
+                                                <Paragraph>
+                                                    <Run Text="{Binding CurrentTrial.Results.VariableError, Converter={StaticResource RoundValueConverter}}"/>
+                                                </Paragraph>
+                                            </TableCell>
+                                            <TableCell>
+                                                <Paragraph>
+                                                    <Run Text="{Binding CurrentTrial.Results.VariableError1, Converter={StaticResource RoundValueConverter}}"/>
+                                                </Paragraph>
+                                            </TableCell>
+                                            <TableCell>
+                                                <Paragraph>
+                                                    <Run Text="{Binding CurrentTrial.Results.VariableError2, Converter={StaticResource RoundValueConverter}}"/>
+                                                </Paragraph>
+                                            </TableCell>
+                                            <TableCell>
+                                                <Paragraph>
+                                                    <Run Text="{Binding CurrentTrial.Results.VariableError3, Converter={StaticResource RoundValueConverter}}"/>
+                                                </Paragraph>
+                                            </TableCell>
+                                        </TableRow>
+
+                                        <TableRow>
+                                            <TableCell TextAlignment="Left">
+                                                <Paragraph>Depth StdDev (meters)</Paragraph>
+                                            </TableCell>
+                                            <TableCell>
+                                                <Paragraph>
+                                                    <Run Text="{Binding CurrentTrial.Results.HandDepthStdDev, Converter={StaticResource RoundValueConverter}}"/>
+                                                </Paragraph>
+                                            </TableCell>
+                                            <TableCell>
+                                                <Paragraph>
+                                                    <Run Text="{Binding CurrentTrial.Results.HandDepthStdDev1, Converter={StaticResource RoundValueConverter}}"/>
+                                                </Paragraph>
+                                            </TableCell>
+                                            <TableCell>
+                                                <Paragraph>
+                                                    <Run Text="{Binding CurrentTrial.Results.HandDepthStdDev2, Converter={StaticResource RoundValueConverter}}"/>
+                                                </Paragraph>
+                                            </TableCell>
+                                            <TableCell>
+                                                <Paragraph>
+                                                    <Run Text="{Binding CurrentTrial.Results.HandDepthStdDev3, Converter={StaticResource RoundValueConverter}}"/>
+                                                </Paragraph>
+                                            </TableCell>
+                                        </TableRow>
+
+                                        <TableRow Background="LightSteelBlue">
+                                            <TableCell TextAlignment="Left">
+                                                <Paragraph>Lean Left/Right StdDev (meters)</Paragraph>
+                                            </TableCell>
+                                            <TableCell>
+                                                <Paragraph>
+                                                    <Run Text="{Binding CurrentTrial.Results.LeanLeftRightX, Converter={StaticResource RoundValueConverter}}"/>
+                                                </Paragraph>
+                                            </TableCell>
+                                            <TableCell>
+                                                <Paragraph>
+                                                    <Run Text="{Binding CurrentTrial.Results.LeanLeftRightX1, Converter={StaticResource RoundValueConverter}}"/>
+                                                </Paragraph>
+                                            </TableCell>
+                                            <TableCell>
+                                                <Paragraph>
+                                                    <Run Text="{Binding CurrentTrial.Results.LeanLeftRightX2, Converter={StaticResource RoundValueConverter}}"/>
+                                                </Paragraph>
+                                            </TableCell>
+                                            <TableCell>
+                                                <Paragraph>
+                                                    <Run Text="{Binding CurrentTrial.Results.LeanLeftRightX3, Converter={StaticResource RoundValueConverter}}"/>
+                                                </Paragraph>
+                                            </TableCell>
+                                        </TableRow>
+
+                                        <TableRow>
+                                            <TableCell TextAlignment="Left">
+                                                <Paragraph>Lean Front/Back SD (meters)</Paragraph>
+                                            </TableCell>
+                                            <TableCell>
+                                                <Paragraph>
+                                                    <Run Text="{Binding CurrentTrial.Results.LeanForwardBackY, Converter={StaticResource RoundValueConverter}}"/>
+                                                </Paragraph>
+                                            </TableCell>
+                                            <TableCell>
+                                                <Paragraph>
+                                                    <Run Text="{Binding CurrentTrial.Results.LeanForwardBackY1, Converter={StaticResource RoundValueConverter}}"/>
+                                                </Paragraph>
+                                            </TableCell>
+                                            <TableCell>
+                                                <Paragraph>
+                                                    <Run Text="{Binding CurrentTrial.Results.LeanForwardBackY2, Converter={StaticResource RoundValueConverter}}"/>
+                                                </Paragraph>
+                                            </TableCell>
+                                            <TableCell>
+                                                <Paragraph>
+                                                    <Run Text="{Binding CurrentTrial.Results.LeanForwardBackY3, Converter={StaticResource RoundValueConverter}}"/>
+                                                </Paragraph>
+                                            </TableCell>
+                                        </TableRow>
+
+                                        <TableRow Background="LightSteelBlue">
+                                            <TableCell TextAlignment="Left">
+                                                <Paragraph>Tick Count</Paragraph>
+                                            </TableCell>
+                                            <TableCell>
+                                                <Paragraph>
+                                                    <Run Text="{Binding CurrentTrial.Results.TickCount}"/>
+                                                </Paragraph>
+                                            </TableCell>
+                                            <TableCell>
+                                                <Paragraph>
+                                                    <Run Text="{Binding CurrentTrial.Results.TickCount1}"/>
+                                                </Paragraph>
+                                            </TableCell>
+                                            <TableCell>
+                                                <Paragraph>
+                                                    <Run Text="{Binding CurrentTrial.Results.TickCount2}"/>
+                                                </Paragraph>
+                                            </TableCell>
+                                            <TableCell>
+                                                <Paragraph>
+                                                    <Run Text="{Binding CurrentTrial.Results.TickCount3}"/>
+                                                </Paragraph>
+                                            </TableCell>
+                                        </TableRow>
+
+                                    </TableRowGroup>
+
+                                    <Table.Columns>
+                                        <TableColumn/>
+                                        <TableColumn />
+                                        <!--<TableColumn Width="1"/>-->
+                                        <!--<TableColumn Width="5"/>-->
+                                        <TableColumn/>
+                                        <TableColumn/>
+                                        <TableColumn/>
+                                    </Table.Columns>
+
+                                </Table>
+                            </FlowDocument>
+                        </FlowDocumentReader>
+                    </StackPanel>
+
+
+                    <!--The Results table grid-->
+                    <!--<Grid Margin="0,10,0,0">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="10" />
-                            <ColumnDefinition />
+                            <ColumnDefinition Width="150" />
+                            <ColumnDefinition Width="15" />
+                            <ColumnDefinition Width="150" />
                         </Grid.ColumnDefinitions>
 
                         <StackPanel Grid.Column="0" >
-
-                            <TextBlock Margin="0,0,0,0" Text="Time On Target in seconds"/>
+                            <TextBlock Margin="0,0,0,0" Text="Time On Target (seconds)"/>
                             <TextBox Margin="0,5,0,0" Text="{Binding CurrentTrial.Results.TimeOnTarget}"  />
-                            <TextBlock Margin="0,5,0,0" Text="Absolute Error in pixels"/>
+                            <TextBlock Margin="0,5,0,0" Text="Absolute Error (pixels)"/>
                             <TextBox Margin="0,5,0,0" Text="{Binding CurrentTrial.Results.AbsoluteError}"  />
-                            <TextBlock Margin="0,5,0,0" Text="Constant Error in pixels"/>
+                            <TextBlock Margin="0,5,0,0" Text="Constant Error (pixels)"/>
                             <TextBox Margin="0,5,0,0" Text="{Binding CurrentTrial.Results.ConstantError}"  />
-                            <TextBlock Margin="0,5,0,0" Text="Variable Error in pixels"/>
+                            <TextBlock Margin="0,5,0,0" Text="Variable Error (pixels)"/>
                             <TextBox Margin="0,5,0,0" Text="{Binding CurrentTrial.Results.VariableError}"  />
 
-                        </StackPanel>
-
-                        <StackPanel Grid.Column="2">
-                            <TextBlock Margin="0,0,0,0" Text="Depth StdDev in meters"/>
+                            <TextBlock Margin="0,0,0,0" Text="Depth SD (meters)"/>
                             <TextBox Margin="0,5,0,0" Text="{Binding CurrentTrial.Results.HandDepthStdDev}"  />
 
-                            <TextBlock Margin="0,5,0,0" Text="Lean Left Right StdDev in meters"/>
+                            <TextBlock Margin="0,5,0,0" Text="Lean Left/Right SD (meters)"/>
                             <TextBox Margin="0,5,0,0" Text="{Binding CurrentTrial.Results.LeanLeftRightX}"  />
 
-                            <TextBlock Margin="0,5,0,0" Text="Lean Forward/Back StdDev in meters"/>
+                            <TextBlock Margin="0,5,0,0" Text="Lean Front/Back SD (meters)"/>
                             <TextBox Margin="0,5,0,0" Text="{Binding CurrentTrial.Results.LeanForwardBackY}"  />
 
                             <TextBlock Margin="0,5,0,0" Text="Tick Count"/>
                             <TextBox Margin="0,5,0,0" Text="{Binding CurrentTrial.Results.TickCount}"  />
 
-                        </StackPanel>                       
-                    </Grid>
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="2">
+                            <TextBlock Text="1/3 time"/>
+                            <TextBox Margin="0,5,0,0" Text="TBC"  />
+
+                        </StackPanel>
+                    </Grid>-->
 
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                    <Button Margin="10" Content="OK" Width="80" Command="{Binding CloseSettingsWindowCommand, Mode=OneWay}" ></Button>
+                        <Button Margin="10" Content="OK" Width="80" Command="{Binding CloseSettingsWindowCommand, Mode=OneWay}" ></Button>
                     </StackPanel>
+
                 </StackPanel>
+
             </Grid>
         </Grid>
     </DockPanel>

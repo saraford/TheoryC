@@ -48,6 +48,23 @@ namespace TheoryC.Models
             Results.LeanForwardBackY = 0;
             Results.LeanLeftRightX = 0;
             Results.LeanAmountForEachTickList.Clear();
+            Results.OnTargetList.Clear();
+
+            Results.AbsoluteError1 = 0;
+            Results.AbsoluteError2 = 0;
+            Results.AbsoluteError3 = 0;
+            Results.ConstantError1 = 0;
+            Results.ConstantError2 = 0;
+            Results.ConstantError3 = 0;
+            Results.TimeOnTarget1 = 0;
+            Results.TimeOnTarget2 = 0;
+            Results.TimeOnTarget3 = 0;
+            Results.VariableError1 = 0;
+            Results.VariableError2 = 0;
+            Results.VariableError3 = 0;
+            Results.TickCount1 = 0;
+            Results.TickCount2 = 0;
+            Results.TickCount3 = 0;
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Kinect;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -57,5 +58,25 @@ namespace TheoryC.Common
             return Math.Sqrt(Math.Pow(pt2.X - pt1.X, 2) + Math.Pow(pt2.Y - pt1.Y, 2));
         }
 
+        public static void BreakListIntoThirds(List<double> originalList, int indexMarker, out List<double> list1, out List<double> list2, out List<double> list3 )
+        {
+            list1 = originalList.GetRange(0, indexMarker);
+            list2 = originalList.GetRange(indexMarker, indexMarker);
+            list3 = originalList.GetRange(indexMarker * 2, originalList.Count - indexMarker * 2);
+        }
+
+        public static void BreakListIntoThirds(List<bool> originalList, int indexMarker, out List<bool> list1, out List<bool> list2, out List<bool> list3)
+        {
+            list1 = originalList.GetRange(0, indexMarker);
+            list2 = originalList.GetRange(indexMarker, indexMarker);
+            list3 = originalList.GetRange(indexMarker * 2, originalList.Count - indexMarker * 2);
+        }
+
+        public static void BreakListIntoThirds(List<PointF> originalList, int indexMarker, out List<PointF> list1, out List<PointF> list2, out List<PointF> list3)
+        {
+            list1 = originalList.GetRange(0, indexMarker);
+            list2 = originalList.GetRange(indexMarker, indexMarker);
+            list3 = originalList.GetRange(indexMarker * 2, originalList.Count - indexMarker * 2);
+        }
     }
 }

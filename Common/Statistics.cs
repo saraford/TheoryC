@@ -84,7 +84,7 @@ namespace TheoryC.Common
             }
             return answer;
         }
-
+       
         public static double PopulationStandardDeviation(List<PointF> pointfs, DesiredCoord desiredCoord)
         {
             if (desiredCoord == DesiredCoord.X)
