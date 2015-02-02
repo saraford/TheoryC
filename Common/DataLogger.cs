@@ -35,7 +35,32 @@ namespace TheoryC.Common
                                  " Hand Depth StdDev , " + 
                                  " Lean Right Left X , " + 
                                  " Lean Forward Backward Y , " + 
-                                 " Tick Count");
+                                 " Tick Count , " + 
+                                 "  , " + 
+                                 " ToT1 , " +
+                                 " ToT2 , " +
+                                 " ToT3 , " + 
+                                 " ABE1 , " +
+                                 " ABE2 , " +
+                                 " ABE3 , " +
+                                 " CE1  , " +
+                                 " CE2  , " + 
+                                 " CE3  , " +
+                                 " VE1  , " +
+                                 " VE2  , " +
+                                 " VE3  , " +
+                                 " HandDepth1 , " + 
+                                 " HandDepth2 , " + 
+                                 " HandDepth3 , " + 
+                                 " LeanLR1 , " + 
+                                 " LeanLR2 , " + 
+                                 " LeanLR3 , " +
+                                 " LeanFB1 , " + 
+                                 " LeanFB2 , " + 
+                                 " LeanFB3 , " + 
+                                 " Tick1 , " +
+                                 " Tick2 , " +
+                                 " Tick3 ");
 
                 foreach (var trial in Trials)
                 {
@@ -67,6 +92,31 @@ namespace TheoryC.Common
             str += Result.LeanLeftRightX.ToString() + ",";
             str += Result.LeanForwardBackY.ToString() + ",";
             str += Result.TickCount.ToString() + ",";
+            str += "  ,";
+            str += Result.TimeOnTarget1.ToString() + ",";
+            str += Result.TimeOnTarget2.ToString() + ",";
+            str += Result.TimeOnTarget3.ToString() + ",";
+            str += Result.AbsoluteError1.ToString() + ",";
+            str += Result.AbsoluteError2.ToString() + ",";
+            str += Result.AbsoluteError3.ToString() + ",";
+            str += Result.ConstantError1.ToString() + ",";
+            str += Result.ConstantError2.ToString() + ",";
+            str += Result.ConstantError3.ToString() + ",";
+            str += Result.VariableError1.ToString() + ",";
+            str += Result.VariableError2.ToString() + ",";
+            str += Result.VariableError3.ToString() + ",";
+            str += Result.HandDepthStdDev1.ToString() + ",";
+            str += Result.HandDepthStdDev2.ToString() + ",";
+            str += Result.HandDepthStdDev3.ToString() + ",";
+            str += Result.LeanLeftRightX1.ToString() + ",";
+            str += Result.LeanLeftRightX2.ToString() + ",";
+            str += Result.LeanLeftRightX3.ToString() + ",";
+            str += Result.LeanForwardBackY1.ToString() + ",";
+            str += Result.LeanForwardBackY2.ToString() + ",";
+            str += Result.LeanForwardBackY3.ToString() + ",";
+            str += Result.TickCount1.ToString() + ",";
+            str += Result.TickCount2.ToString() + ",";
+            str += Result.TickCount3.ToString() + ",";
 
             return str;   
         }
