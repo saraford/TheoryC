@@ -27,7 +27,15 @@ namespace TheoryC.Common
                 writer.WriteLine(participantID);
 
                 // Establish column headings
-                writer.WriteLine("Trial # , Time on Target , Absolute Error , Constant Error , Variable Error , Hand Depth StdDev , Lean Right Left X , Lean Forward Backward Y , Tick Count");
+                writer.WriteLine("Trial # , " + 
+                                 " Time on Target , " + 
+                                 " Absolute Error , " + 
+                                 " Constant Error , " + 
+                                 " Variable Error , " + 
+                                 " Hand Depth StdDev , " + 
+                                 " Lean Right Left X , " + 
+                                 " Lean Forward Backward Y , " + 
+                                 " Tick Count");
 
                 foreach (var trial in Trials)
                 {

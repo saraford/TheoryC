@@ -32,39 +32,56 @@ namespace TheoryC.Models
         {
             _shapeSizeDiameter = 50;
             _durationSeconds = 1;
-            _rpm = 30; 
+            _rpm = 1; 
         }
 
         internal void ClearResults()
         {
-            Results.AbsoluteError = 0;
             Results.AbsoluteErrorForEachTickList.Clear();
-            Results.TimeOnTarget = 0;
             Results.IsInsideTrackForEachTickList.Clear();
-            Results.ConstantError = 0;
-            Results.TickCount = 0;
-            Results.VariableError = 0;
             Results.HandDepthForEachTickList.Clear();
-            Results.LeanForwardBackY = 0;
-            Results.LeanLeftRightX = 0;
             Results.LeanAmountForEachTickList.Clear();
             Results.OnTargetList.Clear();
 
+            Results.AbsoluteError = 0;
             Results.AbsoluteError1 = 0;
             Results.AbsoluteError2 = 0;
             Results.AbsoluteError3 = 0;
+
+            Results.ConstantError = 0;
             Results.ConstantError1 = 0;
             Results.ConstantError2 = 0;
             Results.ConstantError3 = 0;
+
+            Results.TimeOnTarget = 0;
             Results.TimeOnTarget1 = 0;
             Results.TimeOnTarget2 = 0;
             Results.TimeOnTarget3 = 0;
+
+            Results.VariableError = 0;
             Results.VariableError1 = 0;
             Results.VariableError2 = 0;
             Results.VariableError3 = 0;
+
+            Results.TickCount = 0;
             Results.TickCount1 = 0;
             Results.TickCount2 = 0;
             Results.TickCount3 = 0;
+
+            Results.LeanForwardBackY = 0;
+            Results.LeanLeftRightX = 0;
+            Results.LeanForwardBackY1 = 0;
+            Results.LeanLeftRightX1 = 0;
+            Results.LeanForwardBackY2 = 0;
+            Results.LeanLeftRightX2 = 0;
+            Results.LeanForwardBackY3 = 0;
+            Results.LeanLeftRightX3 = 0;
+
+            Results.HandDepthStdDev = 0;
+            Results.HandDepthStdDev1 = 0;
+            Results.HandDepthStdDev2 = 0;
+            Results.HandDepthStdDev3 = 0;
+
         }
     }
 }

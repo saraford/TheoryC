@@ -7,7 +7,8 @@
         xmlns:Properties="clr-namespace:TheoryC.Properties"     
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"    
         x:Class="TheoryC.Views.MainWindow"
-        Title="MainWindow" Width="960" Height="600" Background="#FF656565">
+        Title="MainWindow" Width="960" Height="600" Background="#FF656565"
+        Closing="Window_Closing">
     <Window.DataContext>
         <ViewModels:MainViewModel/>
     </Window.DataContext>
@@ -68,7 +69,7 @@
         <Grid Visibility="{Binding ShowParticipantInstructions, Converter={StaticResource BoolToVisibilityConverter}}" >
             <Border BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Center" VerticalAlignment="Center">
                 <Border.Background>
-                    <SolidColorBrush Opacity="0.75" Color="LightGray"/>
+                    <SolidColorBrush Opacity="0.90" Color="LightGray"/>
                 </Border.Background>
                 <Border Margin="5,10,5,5" BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Center" VerticalAlignment="Center">
                     <Border.Background>
@@ -109,7 +110,7 @@
         <Grid Visibility="{Binding ShowCountdownWindow, Converter={StaticResource BoolToVisibilityConverter}}" >
             <Border MinWidth="250" MinHeight="250" BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Center" VerticalAlignment="Center">
                 <Border.Background>
-                    <SolidColorBrush Opacity="0.75" Color="White"/>
+                    <SolidColorBrush Opacity="0.90" Color="White"/>
                 </Border.Background>
 
                 <StackPanel HorizontalAlignment="Center">

@@ -101,5 +101,13 @@ namespace TheoryC.Views
             this.Left = desktop.Left;
             this.Top = desktop.Top;
         }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            if (myKinect != null)
+            {
+                myKinect.Shutdown();
+            }
+        }
     }
 }

@@ -14,7 +14,7 @@ namespace TheoryC.Converters
         {
             if (System.Convert.ToBoolean(value))
                 return Brushes.White;
-            return Brushes.Red;
+            return Brushes.Yellow;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)

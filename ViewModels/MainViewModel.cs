@@ -197,7 +197,7 @@ namespace TheoryC.ViewModels
             // other defaults to use
             Handedness = Side.Right;
             ShowTrack = true;
-            CountdownTimeInSeconds = 10;
+            CountdownTimeInSeconds = 3;
         }
 
         public void ShowSettingsOnLaunch()
@@ -495,7 +495,7 @@ namespace TheoryC.ViewModels
         private void WaitForUserToClickTarget()
         {
             ShowInstructionsToStartTrial = true;
-            ShowInstructionsToStartTrialText = "Click the red ball to start the trial";
+            ShowInstructionsToStartTrialText = "Click the yellow ball to start the trial";
             MouseUserReadyForNextTrialCanExecute = true;
         }
 
@@ -512,7 +512,8 @@ namespace TheoryC.ViewModels
         private void CheckForHandInsideTargetTick(object sender, EventArgs e)
         {
             // check whether inside target
-            bool result = Tools.IsInsideCircle(this.InputPosition, this.TargetPositionCenter, TargetSizeRadius);
+            // looking for the inner 1/3 of the circle to start
+            bool result = Tools.IsInsideCircle(this.InputPosition, this.TargetPositionCenter, TargetSizeRadius / 3.0);
 
             if (result)
             {
@@ -850,7 +851,7 @@ namespace TheoryC.ViewModels
                             else
                             {
                                 ShowCountdownWindowUI();
-                            }                         
+                            }
                         }
                         else
                         {

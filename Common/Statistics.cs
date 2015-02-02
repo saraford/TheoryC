@@ -54,16 +54,23 @@ namespace TheoryC.Common
 
         private static List<double> ConvertAbsoluteErrorToAlgebraicError(List<double> absoluteErrors, List<bool> isInsideCircle)
         {
+            List<double> algebraicErrors = new List<double>();
+
             for (int i = 0; i < absoluteErrors.Count; i++)
             {
                 if (isInsideCircle[i])
                 {
-                    // inside the track, so add a negative value
-                    absoluteErrors[i] *= -1;
+                    // inside the track, so negate value
+                    algebraicErrors.Add(absoluteErrors[i] * -1);
+                }
+                else
+                {
+                    // outside the track, so just add value
+                    algebraicErrors.Add(absoluteErrors[i]);
                 }
             }
 
-            return absoluteErrors;
+            return algebraicErrors;
         }
 
         // http://stackoverflow.com/questions/2253874/linq-equivalent-for-standard-deviation
