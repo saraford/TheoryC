@@ -115,19 +115,16 @@
                                                 <Paragraph>Total Trial</Paragraph>
                                             </TableCell>
 
-                                            <!--<TableCell RowSpan="9" Background="DimGray" />-->
-                                            <!--<TableCell RowSpan="9" />-->
-
                                             <TableCell>
-                                                <Paragraph>First 3rd</Paragraph>
+                                                <Paragraph>First 1/3rd</Paragraph>
                                             </TableCell>
 
                                             <TableCell>
-                                                <Paragraph>Middle 3rd</Paragraph>
+                                                <Paragraph>Middle 1/3rd</Paragraph>
                                             </TableCell>
 
                                             <TableCell>
-                                                <Paragraph>Last 3rd</Paragraph>
+                                                <Paragraph>Last 1/3rd</Paragraph>
                                             </TableCell>
 
                                         </TableRow>
@@ -358,48 +355,8 @@
                         </FlowDocumentReader>
                     </StackPanel>
 
-
-                    <!--The Results table grid-->
-                    <!--<Grid Margin="0,10,0,0">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="150" />
-                            <ColumnDefinition Width="15" />
-                            <ColumnDefinition Width="150" />
-                        </Grid.ColumnDefinitions>
-
-                        <StackPanel Grid.Column="0" >
-                            <TextBlock Margin="0,0,0,0" Text="Time On Target (seconds)"/>
-                            <TextBox Margin="0,5,0,0" Text="{Binding CurrentTrial.Results.TimeOnTarget}"  />
-                            <TextBlock Margin="0,5,0,0" Text="Absolute Error (pixels)"/>
-                            <TextBox Margin="0,5,0,0" Text="{Binding CurrentTrial.Results.AbsoluteError}"  />
-                            <TextBlock Margin="0,5,0,0" Text="Constant Error (pixels)"/>
-                            <TextBox Margin="0,5,0,0" Text="{Binding CurrentTrial.Results.ConstantError}"  />
-                            <TextBlock Margin="0,5,0,0" Text="Variable Error (pixels)"/>
-                            <TextBox Margin="0,5,0,0" Text="{Binding CurrentTrial.Results.VariableError}"  />
-
-                            <TextBlock Margin="0,0,0,0" Text="Depth SD (meters)"/>
-                            <TextBox Margin="0,5,0,0" Text="{Binding CurrentTrial.Results.HandDepthStdDev}"  />
-
-                            <TextBlock Margin="0,5,0,0" Text="Lean Left/Right SD (meters)"/>
-                            <TextBox Margin="0,5,0,0" Text="{Binding CurrentTrial.Results.LeanLeftRightX}"  />
-
-                            <TextBlock Margin="0,5,0,0" Text="Lean Front/Back SD (meters)"/>
-                            <TextBox Margin="0,5,0,0" Text="{Binding CurrentTrial.Results.LeanForwardBackY}"  />
-
-                            <TextBlock Margin="0,5,0,0" Text="Tick Count"/>
-                            <TextBox Margin="0,5,0,0" Text="{Binding CurrentTrial.Results.TickCount}"  />
-
-                        </StackPanel>
-
-                        <StackPanel Grid.Column="2">
-                            <TextBlock Text="1/3 time"/>
-                            <TextBox Margin="0,5,0,0" Text="TBC"  />
-
-                        </StackPanel>
-                    </Grid>-->
-
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                        <Button Margin="10" Content="OK" Width="80" Command="{Binding CloseSettingsWindowCommand, Mode=OneWay}" ></Button>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">                        
+                        <Button Margin="10" Content="OK" Width="80" IsDefault="True" Command="{Binding CloseSettingsWindowCommand, Mode=OneWay}" ></Button>
                     </StackPanel>
 
                 </StackPanel>

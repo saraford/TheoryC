@@ -31,8 +31,8 @@ namespace TheoryC.Models
         public Trial()
         {
             _shapeSizeDiameter = 50;
-            _durationSeconds = 5;
-            _rpm = 15; 
+            _durationSeconds = 1;
+            _rpm = 1; 
         }
 
         internal void ClearResults()

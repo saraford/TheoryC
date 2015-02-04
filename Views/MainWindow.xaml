@@ -13,8 +13,8 @@
         <ViewModels:MainViewModel/>
     </Window.DataContext>
     <Window.InputBindings>
-        <KeyBinding Command="{Binding StartExpCommand, Mode=OneWay}"  Key="S"/>
-        <KeyBinding Command="{Binding StartTrialCommand, Mode=OneWay}"  Key="T"/>
+        <!--<KeyBinding Command="{Binding StartExpCommand, Mode=OneWay}"  Key="S"/>
+        <KeyBinding Command="{Binding StartTrialCommand, Mode=OneWay}"  Key="T"/>-->
     </Window.InputBindings>
     <Window.Resources>
         <Converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
@@ -77,7 +77,7 @@
                     </Border.Background>
                     <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
                         <TextBlock Margin="5" FontSize="20" FontWeight="SemiBold" Text="{Binding ShowParticipantInstructionsText}"/>
-                        <Button Margin="0,30,0,10" Content="Start Experiment" MaxWidth="100" Command="{Binding StartExperimentCommand, Mode=OneWay}" ></Button>
+                        <Button Margin="0,30,0,10" Content="Start Experiment" MaxWidth="100" IsDefault="True"  Command="{Binding StartExperimentCommand, Mode=OneWay}" ></Button>
                     </StackPanel>
                 </Border>
             </Border>
@@ -100,7 +100,7 @@
                 <Border Margin="5,15,5,5" Background="White" BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Center" VerticalAlignment="Center">
                     <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
                         <TextBlock Margin="10" Text="{Binding TextForMessageBoxWindow}"></TextBlock>
-                        <Button Margin="0,30,0,20" Content="OK" MaxWidth="100" Command="{Binding CloseMessageBoxWindowCommand, Mode=OneWay}" ></Button>
+                        <Button Margin="0,30,0,20" Content="OK" IsDefault="True" MaxWidth="100" Command="{Binding CloseMessageBoxWindowCommand, Mode=OneWay}" ></Button>
                     </StackPanel>
                 </Border>
             </Border>

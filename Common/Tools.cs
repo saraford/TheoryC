@@ -58,25 +58,100 @@ namespace TheoryC.Common
             return Math.Sqrt(Math.Pow(pt2.X - pt1.X, 2) + Math.Pow(pt2.Y - pt1.Y, 2));
         }
 
-        public static void BreakListIntoThirds(List<double> originalList, int indexMarker, out List<double> list1, out List<double> list2, out List<double> list3 )
+        public static void BreakListIntoThirds(List<double> originalList, out List<double> list1, out List<double> list2, out List<double> list3 )
         {
-            list1 = originalList.GetRange(0, indexMarker);
-            list2 = originalList.GetRange(indexMarker, indexMarker);
-            list3 = originalList.GetRange(indexMarker * 2, originalList.Count - indexMarker * 2);
+            int indexMarker = originalList.Count / 3;
+            int remainder = originalList.Count % 3;
+
+            // if there's 1 extra, throw into list3
+            if (remainder == 0 || remainder == 1)
+            {
+                list1 = originalList.GetRange(0, indexMarker);
+                list2 = originalList.GetRange(indexMarker, indexMarker);
+                list3 = originalList.GetRange(indexMarker * 2, originalList.Count - indexMarker * 2);
+            }
+            else // need to put the 2 extras into list2 and list3
+            {
+                list1 = originalList.GetRange(0, indexMarker);
+                list2 = originalList.GetRange(indexMarker, indexMarker + 1);
+                list3 = originalList.GetRange((indexMarker * 2) + 1, originalList.Count - (indexMarker * 2) - 1);
+            }
         }
 
-        public static void BreakListIntoThirds(List<bool> originalList, int indexMarker, out List<bool> list1, out List<bool> list2, out List<bool> list3)
+        public static void BreakListIntoThirds(List<bool> originalList, out List<bool> list1, out List<bool> list2, out List<bool> list3)
         {
-            list1 = originalList.GetRange(0, indexMarker);
-            list2 = originalList.GetRange(indexMarker, indexMarker);
-            list3 = originalList.GetRange(indexMarker * 2, originalList.Count - indexMarker * 2);
+            int indexMarker = originalList.Count / 3;
+            int remainder = originalList.Count % 3;
+
+            // if there's 1 extra, throw into list3
+            if (remainder == 0 || remainder == 1)
+            {
+                list1 = originalList.GetRange(0, indexMarker);
+                list2 = originalList.GetRange(indexMarker, indexMarker);
+                list3 = originalList.GetRange(indexMarker * 2, originalList.Count - indexMarker * 2);
+            }
+            else // need to put the 2 extras into list2 and list3
+            {
+                list1 = originalList.GetRange(0, indexMarker);
+                list2 = originalList.GetRange(indexMarker, indexMarker + 1);
+                list3 = originalList.GetRange((indexMarker * 2) + 1, originalList.Count - (indexMarker * 2) - 1);
+            }
         }
 
-        public static void BreakListIntoThirds(List<PointF> originalList, int indexMarker, out List<PointF> list1, out List<PointF> list2, out List<PointF> list3)
+        public static void BreakListIntoThirds(List<PointF> originalList, out List<PointF> list1, out List<PointF> list2, out List<PointF> list3)
         {
-            list1 = originalList.GetRange(0, indexMarker);
-            list2 = originalList.GetRange(indexMarker, indexMarker);
-            list3 = originalList.GetRange(indexMarker * 2, originalList.Count - indexMarker * 2);
+            int indexMarker = originalList.Count / 3;
+            int remainder = originalList.Count % 3;
+
+            // if there's 1 extra, throw into list3
+            if (remainder == 0 || remainder == 1)
+            {
+                list1 = originalList.GetRange(0, indexMarker);
+                list2 = originalList.GetRange(indexMarker, indexMarker);
+                list3 = originalList.GetRange(indexMarker * 2, originalList.Count - indexMarker * 2);
+            }
+            else // need to put the 2 extras into list2 and list3
+            {
+                list1 = originalList.GetRange(0, indexMarker);
+                list2 = originalList.GetRange(indexMarker, indexMarker + 1);
+                list3 = originalList.GetRange((indexMarker * 2) + 1, originalList.Count - (indexMarker * 2) - 1);
+            }
+        }
+
+        public static void GetTimeThirdPercentages(int tickCount, out double firstTimePercentage, out double secondTimePercentage, out double thirdTimePercentage)
+        {
+            int remainder = tickCount % 3;
+            int sizeOfList = tickCount / 3;
+
+            // equal tick times
+            if (remainder == 0)
+            {
+                firstTimePercentage = (double)sizeOfList / tickCount;
+                secondTimePercentage = (double)sizeOfList / tickCount;
+                thirdTimePercentage = (double)sizeOfList / tickCount;
+            }
+            // list3 has an extra tick, so compensate times
+            else if (remainder == 1)
+            {
+                firstTimePercentage = (double)sizeOfList / tickCount;
+                secondTimePercentage = (double)sizeOfList / tickCount;
+                thirdTimePercentage = (double)(sizeOfList + 1) / tickCount;                
+            }
+            else // if remainder == 2, second and third lists will have extra ticks 
+            {
+                firstTimePercentage = (double)sizeOfList / tickCount;
+                secondTimePercentage = (double)(sizeOfList + 1) / tickCount;
+                thirdTimePercentage = (double)(sizeOfList + 1) / tickCount;                
+            }
+        }
+
+        public static double CalculateTimeThirds(List<bool> OnTarget, double trialDurationSeconds, double timePercentage)
+        {
+            int countOnTarget = OnTarget.Where(c => c).Count(); // gets the count of true bools
+            double percentageOnTarget = (double)countOnTarget / OnTarget.Count; // this count is the List<> size, not the sum
+            double timeOnTargetForThird = percentageOnTarget * trialDurationSeconds * timePercentage;
+
+            return Math.Round(timeOnTargetForThird, 3);
         }
     }
 }
