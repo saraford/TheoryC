@@ -5,7 +5,7 @@
         xmlns:Converters="clr-namespace:TheoryC.Converters"      
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
         x:Class="TheoryC.Views.SettingsWindow"
-        Title="SettingsWindow" Height="580" Width="720">
+        Title="SettingsWindow" Height="580" Width="750">
     <Window.DataContext>
         <ViewModels:MainViewModel/>
     </Window.DataContext>
@@ -100,8 +100,8 @@
                     </StackPanel>
 
                     <!--Attempt to do a proper table-->
-                    <StackPanel MaxHeight="350">
-                        <FlowDocumentReader Margin="-15,-10,0,0" Height="477" >
+                    <StackPanel MaxHeight="360">
+                        <FlowDocumentReader Margin="-15,-10,0,0" Height="485" Width="520">
                             <FlowDocument FontFamily="Segoe UI" FontSize="12" >
                                 <Table CellSpacing="5">
                                     <TableRowGroup>
@@ -111,20 +111,24 @@
                                             <TableCell>
                                             </TableCell>
 
-                                            <TableCell >
-                                                <Paragraph>Total Trial</Paragraph>
-                                            </TableCell>
+                                            <TableCell>
+                                                <Paragraph Margin="10,0,0,0" >Total Trial</Paragraph>
+                                                <Paragraph Margin="10,0,0,0" >resutls</Paragraph>
+                                           </TableCell>
 
                                             <TableCell>
                                                 <Paragraph>First 1/3rd</Paragraph>
+                                                <Paragraph>of total trial</Paragraph>
                                             </TableCell>
 
                                             <TableCell>
                                                 <Paragraph>Middle 1/3rd</Paragraph>
+                                                <Paragraph>of total trial</Paragraph>
                                             </TableCell>
 
                                             <TableCell>
                                                 <Paragraph>Last 1/3rd</Paragraph>
+                                                <Paragraph>of total trial</Paragraph>
                                             </TableCell>
 
                                         </TableRow>
@@ -135,7 +139,7 @@
                                                 <Paragraph >Time On Target (seconds)</Paragraph>
                                             </TableCell>
                                             <TableCell>
-                                                <Paragraph>
+                                                <Paragraph Margin="10,0,0,0">
                                                     <Run Text="{Binding CurrentTrial.Results.TimeOnTarget}"/>
                                                 </Paragraph>
                                             </TableCell>                                            
@@ -161,7 +165,7 @@
                                                 <Paragraph>Absolute Error (pixels)</Paragraph>
                                             </TableCell>
                                             <TableCell>
-                                                <Paragraph>
+                                                <Paragraph Margin="10,0,0,0">
                                                     <Run Text="{Binding CurrentTrial.Results.AbsoluteError, Converter={StaticResource RoundValueConverter}}"/>
                                                 </Paragraph>
                                             </TableCell>
@@ -187,7 +191,7 @@
                                                 <Paragraph>Constant Error (pixels)</Paragraph>
                                             </TableCell>
                                             <TableCell>
-                                                <Paragraph>
+                                                <Paragraph Margin="10,0,0,0">
                                                     <Run Text="{Binding CurrentTrial.Results.ConstantError, Converter={StaticResource RoundValueConverter}}"/>
                                                 </Paragraph>
                                             </TableCell>
@@ -213,12 +217,12 @@
                                                 <Paragraph>Variable Error (pixels)</Paragraph>
                                             </TableCell>
                                             <TableCell>
-                                                <Paragraph>
+                                                <Paragraph Margin="10,0,0,0">
                                                     <Run Text="{Binding CurrentTrial.Results.VariableError, Converter={StaticResource RoundValueConverter}}"/>
                                                 </Paragraph>
                                             </TableCell>
                                             <TableCell>
-                                                <Paragraph>
+                                                <Paragraph >
                                                     <Run Text="{Binding CurrentTrial.Results.VariableError1, Converter={StaticResource RoundValueConverter}}"/>
                                                 </Paragraph>
                                             </TableCell>
@@ -239,7 +243,7 @@
                                                 <Paragraph>Depth StdDev (meters)</Paragraph>
                                             </TableCell>
                                             <TableCell>
-                                                <Paragraph>
+                                                <Paragraph Margin="10,0,0,0">
                                                     <Run Text="{Binding CurrentTrial.Results.HandDepthStdDev, Converter={StaticResource RoundValueConverter}}"/>
                                                 </Paragraph>
                                             </TableCell>
@@ -265,7 +269,7 @@
                                                 <Paragraph>Lean Left/Right StdDev (meters)</Paragraph>
                                             </TableCell>
                                             <TableCell>
-                                                <Paragraph>
+                                                <Paragraph Margin="10,0,0,0">
                                                     <Run Text="{Binding CurrentTrial.Results.LeanLeftRightX, Converter={StaticResource RoundValueConverter}}"/>
                                                 </Paragraph>
                                             </TableCell>
@@ -291,7 +295,7 @@
                                                 <Paragraph>Lean Front/Back SD (meters)</Paragraph>
                                             </TableCell>
                                             <TableCell>
-                                                <Paragraph>
+                                                <Paragraph Margin="10,0,0,0">
                                                     <Run Text="{Binding CurrentTrial.Results.LeanForwardBackY, Converter={StaticResource RoundValueConverter}}"/>
                                                 </Paragraph>
                                             </TableCell>
@@ -317,7 +321,7 @@
                                                 <Paragraph>Tick Count</Paragraph>
                                             </TableCell>
                                             <TableCell>
-                                                <Paragraph>
+                                                <Paragraph Margin="10,0,0,0">
                                                     <Run Text="{Binding CurrentTrial.Results.TickCount}"/>
                                                 </Paragraph>
                                             </TableCell>
@@ -341,8 +345,8 @@
                                     </TableRowGroup>
 
                                     <Table.Columns>
-                                        <TableColumn/>
                                         <TableColumn />
+                                        <TableColumn Width="125"/>
                                         <!--<TableColumn Width="1"/>-->
                                         <!--<TableColumn Width="5"/>-->
                                         <TableColumn/>

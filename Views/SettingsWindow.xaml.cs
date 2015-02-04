@@ -29,6 +29,8 @@ namespace TheoryC.Views
         {
             InitializeComponent();
 
+            this.ResizeMode = System.Windows.ResizeMode.NoResize;
+
             Closing += Setup_Closing;
             _closing = closing;
         }
