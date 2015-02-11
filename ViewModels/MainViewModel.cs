@@ -18,6 +18,7 @@ using TheoryC.Properties;
 namespace TheoryC.ViewModels
 {
     public enum Side { Right, Left }
+    public enum Reality { Virtual, Augmented}
 
     public class MainViewModel : Common.BindableBase
     {
@@ -93,6 +94,9 @@ namespace TheoryC.ViewModels
         bool _ShowSkeleton = default(bool);
         public bool ShowSkeleton { get { return _ShowSkeleton; } set { base.SetProperty(ref _ShowSkeleton, value); } }
 
+        Reality _CurrentReality = default(Reality);
+        public Reality CurrentReality { get { return _CurrentReality; } set { base.SetProperty(ref _CurrentReality, value); } }
+        
         bool _ShowTrack = default(bool);
         public bool ShowTrack { get { return _ShowTrack; } set { base.SetProperty(ref _ShowTrack, value); } }
 
@@ -198,6 +202,10 @@ namespace TheoryC.ViewModels
             Handedness = Side.Right;
             ShowTrack = true;
             CountdownTimeInSeconds = 3;
+            
+            // reality modes
+            CurrentReality = Reality.Virtual;
+            this.ShowSkeleton = true;
         }
 
         public void ShowSettingsOnLaunch()
@@ -539,7 +547,7 @@ namespace TheoryC.ViewModels
         {
             // check whether inside target
             // looking for the inner 1/3 of the circle to start
-            bool result = Tools.IsInsideCircle(this.InputPosition, this.TargetPositionCenter, TargetSizeRadius / 3.0);
+            bool result = Tools.IsInsideCircle(this.InputPosition, this.TargetPositionCenter, TargetSizeRadius);
 
             if (result)
             {
@@ -1008,8 +1016,8 @@ namespace TheoryC.ViewModels
 
 
 
-        bool _DebugWindowOpen = default(bool);
-        public bool DebugWindowOpen { get { return _DebugWindowOpen; } set { base.SetProperty(ref _DebugWindowOpen, value); } }
+        bool _IsDebugWindowOpen = default(bool);
+        public bool IsDebugWindowOpen { get { return _IsDebugWindowOpen; } set { base.SetProperty(ref _IsDebugWindowOpen, value); } }
 
         DelegateCommand _ShowDebugCommand = null;
         public DelegateCommand ShowDebugCommand
@@ -1023,7 +1031,7 @@ namespace TheoryC.ViewModels
                 (
                     () =>
                     {
-                        if (!DebugWindowOpen)
+                        if (!IsDebugWindowOpen)
                         {
                             ShowDebugWindow();
                         }
@@ -1044,14 +1052,14 @@ namespace TheoryC.ViewModels
 
         private void HideDebugWindow()
         {
-            DebugWindowOpen = false;
+            IsDebugWindowOpen = false;
             var debugWin = Application.Current.Windows.OfType<Views.DebugWindow>().First();
             debugWin.Close();
         }
 
         internal void ShowDebugWindow()
         {
-            DebugWindowOpen = true;
+            IsDebugWindowOpen = true;
             var debugWin = new Views.DebugWindow();
             debugWin.DataContext = this; // to share same model data
             var main = Application.Current.MainWindow;
@@ -1521,7 +1529,38 @@ namespace TheoryC.ViewModels
             }
         }
 
+        DelegateCommand _ToggleCurrentReality = null;
+        public DelegateCommand ToggleCurrentReality
+        {
+            get
+            {
+                if (_ToggleCurrentReality != null)
+                    return _ToggleCurrentReality;
 
+                _ToggleCurrentReality = new DelegateCommand(new Action(
+                    () =>
+                    {
+                        // hide/show skeleton depending on reality type
+                        if (CurrentReality == Reality.Augmented)
+                        {
+                            ShowSkeleton = false;
+                        }
+                        else if (CurrentReality == Reality.Virtual)
+                        {
+                            ShowSkeleton = true;
+                        }
+
+                    }),
+
+                    new Func<bool>(
+                        () =>
+                        {
+                            return IsDebugWindowOpen; // only if debug window is showing
+                        }));
+                this.PropertyChanged += (s, e) => _ToggleCurrentReality.RaiseCanExecuteChanged();
+                return _ToggleCurrentReality;
+            }
+        }
         #endregion
     }
 }

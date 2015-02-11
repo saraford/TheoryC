@@ -17,6 +17,7 @@
         <KeyBinding Command="{Binding StartTrialCommand, Mode=OneWay}"  Key="T"/>-->
     </Window.InputBindings>
     <Window.Resources>
+        <Converters:RealityToVisibilityConverter x:Key="RealityToVisibilityConverter"/>
         <Converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
         <Converters:BlueWhenTrue x:Key="BlueWhenTrue" />
         <Converters:InvertBooleanConverter x:Key="InvertBoolean"/>
@@ -29,11 +30,11 @@
                 <MenuItem Command="{Binding StartExpCommand, Mode=OneWay}" Header="{Binding IsExperimentRunning, Converter={StaticResource StartButtonText}, Mode=OneWay}"  />
                 <MenuItem Margin="15,0,0,0" Command="{Binding ShowSettingsCommand, Mode=OneWay}" Header="Trials / Results" />
                 <MenuItem Margin="15,0,0,0" Command="{Binding ShowSetupCommand, Mode=OneWay}" Header="Participant Setup" />
-                <MenuItem Margin="15,0,0,0" Command="{Binding ShowDebugCommand, Mode=OneWay}" Header="Debug" />
+                <MenuItem Margin="15,0,0,0" Command="{Binding ShowDebugCommand, Mode=OneWay}" Header="Other Settings" />
             </Menu>
 
             <Grid x:Name="MainWindowGrid" Height="540" HorizontalAlignment="Left" VerticalAlignment="Top" Width="960" >
-                <Image x:Name="kinectVideoImage" Width="960" Height="540" />
+                <Image x:Name="kinectVideoImage" Width="960" Height="540" Visibility="{Binding CurrentReality, Converter={StaticResource RealityToVisibilityConverter}}" />
                 <Canvas x:Name="bodyCanvas" Width="960" Height="540" HorizontalAlignment="Left" VerticalAlignment="Top" />
 
                 <!--This must come first before any windows; don't want anything pushing this down or it screws up mouse x,y-->

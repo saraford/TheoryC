@@ -26,6 +26,7 @@ namespace TheoryC.Devices
         public double leftHandTipDepth;
         private List<Tuple<JointType, JointType>> bones;
         private const double JointThickness = 5;
+        private const double BoneThickness = 10;
         public bool useRightShoulder = true;
         public Point leftElbowCenter; // by default use the center of the screen
         public Point rightElbowCenter; // by default use the center of the screen
@@ -117,31 +118,35 @@ namespace TheoryC.Devices
             }
 
             // Color - get this last for performance issues
-            using (var colorFrame = reference.ColorFrameReference.AcquireFrame())
-                if (colorFrame != null)
-                {
-                    FrameDescription colorFrameDescription = colorFrame.FrameDescription;
-
-                    using (KinectBuffer colorBuffer = colorFrame.LockRawImageBuffer())
+            // Use the color camera for augmented reality mode
+            if (this.ViewModel.CurrentReality == ViewModels.Reality.Augmented)
+            {
+                using (var colorFrame = reference.ColorFrameReference.AcquireFrame())
+                    if (colorFrame != null)
                     {
-                        this.colorBitmap.Lock();
+                        FrameDescription colorFrameDescription = colorFrame.FrameDescription;
 
-                        // verify data and write the new color frame data to the display bitmap
-                        if ((colorFrameDescription.Width == this.colorBitmap.PixelWidth) && (colorFrameDescription.Height == this.colorBitmap.PixelHeight))
+                        using (KinectBuffer colorBuffer = colorFrame.LockRawImageBuffer())
                         {
-                            colorFrame.CopyConvertedFrameDataToIntPtr(
-                                this.colorBitmap.BackBuffer,
-                                (uint)(colorFrameDescription.Width * colorFrameDescription.Height * 4),
-                                ColorImageFormat.Bgra);
+                            this.colorBitmap.Lock();
 
-                            this.colorBitmap.AddDirtyRect(new Int32Rect(0, 0, this.colorBitmap.PixelWidth, this.colorBitmap.PixelHeight));
+                            // verify data and write the new color frame data to the display bitmap
+                            if ((colorFrameDescription.Width == this.colorBitmap.PixelWidth) && (colorFrameDescription.Height == this.colorBitmap.PixelHeight))
+                            {
+                                colorFrame.CopyConvertedFrameDataToIntPtr(
+                                    this.colorBitmap.BackBuffer,
+                                    (uint)(colorFrameDescription.Width * colorFrameDescription.Height * 4),
+                                    ColorImageFormat.Bgra);
+
+                                this.colorBitmap.AddDirtyRect(new Int32Rect(0, 0, this.colorBitmap.PixelWidth, this.colorBitmap.PixelHeight));
+                            }
+
+                            this.colorBitmap.Unlock();
+
+                            kinectVideoImage.Source = this.colorBitmap;
                         }
-
-                        this.colorBitmap.Unlock();
-
-                        kinectVideoImage.Source = this.colorBitmap;
                     }
-                }
+            }
         }
 
         double hipsAlignmentDelta = 0;
@@ -264,7 +269,7 @@ namespace TheoryC.Devices
                         this.ViewModel.IsKinectTracking = true;
                     }
 
-                    // if we want to show the skeleton, but note there are some performance issues
+                    // for VR mode, drawing skeleton is enabled by default
                     if (this.ViewModel.ShowSkeleton)
                     {
                         this.DrawBody(joints, jointPoints);
@@ -411,13 +416,12 @@ namespace TheoryC.Devices
             pt.X = (double)(point.X / 1920.0 * bodyCanvas.ActualWidth);
             pt.Y = (double)(point.Y / 1080.0 * bodyCanvas.ActualHeight);
 
-            //BUGBUG
+            // if off screen, return 0
             if (pt.X < 0 || pt.Y < 0)
             {
-                pt.X = InferredZPositionClamp;
-                pt.Y = InferredZPositionClamp;
+                pt.X = 0;
+                pt.Y = 0;
             }
-
 
             return pt;
         }
@@ -463,12 +467,14 @@ namespace TheoryC.Devices
                 return;
             }
 
-            // We assume all drawn bones are inferred unless BOTH joints are tracked
-            Brush drawBrush = this.inferredBoneBrush;
-            if ((joint0.TrackingState == TrackingState.Tracked) && (joint1.TrackingState == TrackingState.Tracked))
-            {
-                drawBrush = trackedJointBrush; // same tracked color
-            }
+            // Inferred will be drawn the same as tracked as to not confused participant
+            Brush drawBrush = Brushes.Green; 
+            
+            //Brush drawBrush = this.inferredBoneBrush;
+            //if ((joint0.TrackingState == TrackingState.Tracked) && (joint1.TrackingState == TrackingState.Tracked))
+            //{
+            //    drawBrush = Brushes.Green; 
+            //}
 
             this.DrawLine(drawBrush, jointPoints[jointType0], jointPoints[jointType1]);
         }
@@ -477,10 +483,16 @@ namespace TheoryC.Devices
         {
             Line boneLine = new Line();
             boneLine.Stroke = drawBrush;
-            boneLine.StrokeThickness = 2;
+            boneLine.StrokeThickness = BoneThickness;
 
             Point pt1 = ConvertToCanvas(point1);
             Point pt2 = ConvertToCanvas(point2);
+
+            // if off screen, don't draw
+            if (pt1.X == 0 || pt1.Y == 0 || pt2.X == 0 || pt2.Y == 0)
+            {
+                return;
+            }
 
             boneLine.X1 = pt1.X;
             boneLine.Y1 = pt1.Y;

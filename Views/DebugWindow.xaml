@@ -4,13 +4,14 @@
         xmlns:ViewModels="clr-namespace:TheoryC.ViewModels"   
         xmlns:Converters="clr-namespace:TheoryC.Converters"       
         WindowStyle="None" AllowsTransparency="true" Background="Transparent"
-        Height="50" Width="960">
+        Height="70" Width="960">
     <Window.DataContext>
         <ViewModels:MainViewModel/>
     </Window.DataContext>
     <Window.Resources>
         <Converters:AddOneConverter x:Key="AddOneToTrial"/>
         <Converters:BoolToVisibilityConverter x:Key="BoolToVisibility"/>
+        <Converters:RealityEnumConverter x:Key="RealityEnumConverter"/>
     </Window.Resources>
     <Border Width="Auto" Height="Auto"     
           BorderBrush="#395984"
@@ -22,10 +23,10 @@
 
         <Grid>
             <StackPanel Orientation="Horizontal">
-                <StackPanel>
+                <!--<StackPanel>
                     <TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="Trial Number" VerticalAlignment="Top"/>
                     <TextBox Margin="10,0,0,0"  Text="{Binding CurrentTrial.Number, Converter={StaticResource AddOneToTrial}, Mode=OneWay}" />
-                </StackPanel>
+                </StackPanel>-->
 
                 <!--<StackPanel>
                     <TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="Time On Target MS" VerticalAlignment="Top"/>
@@ -68,7 +69,13 @@
                 
                 <StackPanel Margin="10,0,0,0">
                     <TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="Track Skeleton" VerticalAlignment="Top"/>
-                    <CheckBox Margin="10,0,0,0" IsChecked="{Binding ShowSkeleton}" />
+                    <CheckBox Margin="10,0,0,0" IsChecked="{Binding ShowSkeleton, Mode=TwoWay}" />
+                </StackPanel>
+
+                <StackPanel Margin="10,0,0,0">
+                    <TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="Reality Type:" VerticalAlignment="Top"/>
+                    <RadioButton  Margin="10,2,0,0" IsChecked="{Binding Path=CurrentReality, Converter={StaticResource RealityEnumConverter}, ConverterParameter={x:Static ViewModels:Reality.Virtual}}" Command="{Binding ToggleCurrentReality, Mode=OneWay}" >Virtual</RadioButton>
+                    <RadioButton  Margin="10,2,0,0" IsChecked="{Binding Path=CurrentReality, Converter={StaticResource RealityEnumConverter}, ConverterParameter={x:Static ViewModels:Reality.Augmented}}" Command="{Binding ToggleCurrentReality, Mode=OneWay}" >Augmented</RadioButton>
                 </StackPanel>
 
                 <StackPanel Margin="10,0,0,0">
