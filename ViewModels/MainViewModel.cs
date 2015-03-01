@@ -204,8 +204,8 @@ namespace TheoryC.ViewModels
             CountdownTimeInSeconds = 3;
             
             // reality modes
-            CurrentReality = Reality.Virtual;
-            this.ShowSkeleton = true;
+            CurrentReality = Reality.Augmented;
+            this.ShowSkeleton = false;
         }
 
         public void ShowSettingsOnLaunch()
@@ -1378,7 +1378,7 @@ namespace TheoryC.ViewModels
                     new Func<bool>(
                         () =>
                         {
-                            return !IsExperimentRunning; // only if experiment is not running
+                            return !IsExperimentRunning; 
                         }));
                 this.PropertyChanged += (s, e) => _CenterTargetOnParticipantElbow.RaiseCanExecuteChanged();
                 return _CenterTargetOnParticipantElbow;
@@ -1409,7 +1409,7 @@ namespace TheoryC.ViewModels
                     new Func<bool>(
                         () =>
                         {
-                            return IsSettingsWindowOpen; // only if settings window is showing
+                            return !IsExperimentRunning; // only if settings window is showing
                         }));
                 this.PropertyChanged += (s, e) => _ClearResultsCommand.RaiseCanExecuteChanged();
                 return _ClearResultsCommand;
@@ -1457,7 +1457,7 @@ namespace TheoryC.ViewModels
                     new Func<bool>(
                         () =>
                         {
-                            return !IsExperimentRunning; // only if settings window is showing
+                            return !IsExperimentRunning; 
                         }));
                 this.PropertyChanged += (s, e) => _SetRightHandedness.RaiseCanExecuteChanged();
                 return _SetRightHandedness;
@@ -1492,7 +1492,9 @@ namespace TheoryC.ViewModels
                     },
                     () =>
                     {
-                        return (!IsSetupWindowOpen) && (!IsExperimentRunning) && (IsKinectTracking);
+                        // only available if not already opened and experiment isn't running
+                        return (!IsSetupWindowOpen) && (!IsExperimentRunning);
+                        //                        return (!IsSetupWindowOpen) && (!IsExperimentRunning) && (IsKinectTracking);
                     }
                 );
                 this.PropertyChanged += (s, e) => _ShowSetupCommand.RaiseCanExecuteChanged();
@@ -1522,7 +1524,7 @@ namespace TheoryC.ViewModels
                     new Func<bool>(
                         () =>
                         {
-                            return IsSetupWindowOpen; // only if setup window is showing
+                            return !IsExperimentRunning; // only if setup window is showing
                         }));
                 this.PropertyChanged += (s, e) => _HideShowHipMarkersCommand.RaiseCanExecuteChanged();
                 return _HideShowHipMarkersCommand;
@@ -1561,6 +1563,33 @@ namespace TheoryC.ViewModels
                 return _ToggleCurrentReality;
             }
         }
+
+        public ulong ParticipantTrackingID = 0;
+        DelegateCommand _SearchForParticipant = null;
+        public DelegateCommand SearchForParticipant
+        {
+            get
+            {
+                if (_SearchForParticipant != null)
+                    return _SearchForParticipant;
+
+                _SearchForParticipant = new DelegateCommand(new Action(
+                    () =>
+                    {
+                        // just set the tracking ID back to 0 and KinectSensor will look again
+                        this.ParticipantTrackingID = 0;
+                    }),
+
+                    new Func<bool>(
+                        () =>
+                        {
+                            return !IsExperimentRunning; 
+                        }));
+                this.PropertyChanged += (s, e) => _SearchForParticipant.RaiseCanExecuteChanged();
+                return _SearchForParticipant;
+            }
+        }
+
         #endregion
     }
 }

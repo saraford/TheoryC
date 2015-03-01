@@ -68,7 +68,7 @@
                 </StackPanel>
                 
                 <StackPanel Margin="10,0,0,0">
-                    <TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="Track Skeleton" VerticalAlignment="Top"/>
+                    <TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="Show Skeleton" VerticalAlignment="Top"/>
                     <CheckBox Margin="10,0,0,0" IsChecked="{Binding ShowSkeleton, Mode=TwoWay}" />
                 </StackPanel>
 

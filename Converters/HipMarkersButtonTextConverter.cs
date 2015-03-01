@@ -15,11 +15,11 @@ namespace TheoryC.Converters
             bool original = (bool)value;
             if (original)
             {
-                return "Hide Markers";
+                return "Hide Hip Markers";
             }
             else
             {
-                return "Show Markers";
+                return "Show Hip Markers";
             }
         }
 

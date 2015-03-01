@@ -150,7 +150,7 @@ namespace TheoryC.Devices
         }
 
         double hipsAlignmentDelta = 0;
-        private ulong participantTrackingID = 0;
+        
 
         private void TrackSkeleton(IList<Body> bodies)
         {
@@ -159,15 +159,16 @@ namespace TheoryC.Devices
                 // a body that is tracked has a ID
                 if (body.IsTracked)
                 {
-                    // if first time finding body, get the ID
-                    if (participantTrackingID == 0)
+                    // if first time finding body or the body has been reset via UI, get the ID 
+                    // the ID will be of the closest participant
+                    if (this.ViewModel.ParticipantTrackingID == 0)
                     {
-                        participantTrackingID = body.TrackingId;
+                        this.ViewModel.ParticipantTrackingID = body.TrackingId;
                         // ParticipantID.Text = participantTrackingID.ToString();
                     }
 
                     // if the tracking IDs don't match, keep looping through bodies
-                    if (participantTrackingID != body.TrackingId)
+                    if (this.ViewModel.ParticipantTrackingID != body.TrackingId)
                     {
                         return;
                     }
@@ -436,7 +437,6 @@ namespace TheoryC.Devices
         {
             return (double)(y / 1080.0 * bodyCanvas.ActualHeight);
         }
-
 
         private void DrawEllipse(Brush drawBrush, Point point, double JointThickness)
         {
