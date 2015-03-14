@@ -51,6 +51,7 @@
                     <Controls:Target x:Name="Target" 
 	                    Width="{Binding CurrentTrial.ShapeSizeDiameter}"
 				        Height="{Binding CurrentTrial.ShapeSizeDiameter}"
+		                Visibility="{Binding ShowTarget, Converter={StaticResource BoolToVisibilityConverter}}"                                     
                         Canvas.Left="{Binding TargetPositionLeft, Mode=OneWay}"
                         Canvas.Top="{Binding TargetPositionTop, Mode=OneWay}"
                         FillColor="{Binding IsOnTarget, Converter={StaticResource BlueWhenTrue}, Mode=OneWay}">

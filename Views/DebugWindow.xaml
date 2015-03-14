@@ -84,10 +84,15 @@
                 </StackPanel>
 
                 <StackPanel Margin="10,0,0,0">
+                    <TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="Show Traget" VerticalAlignment="Top"/>
+                    <CheckBox Margin="10,0,0,0" IsChecked="{Binding ShowTarget}" />
+                </StackPanel>
+
+                <StackPanel Margin="10,0,0,0">
                     <TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="Countdown" VerticalAlignment="Top"/>
                     <TextBox Margin="10,0,0,0" Text="{Binding CountdownTimeInSeconds}" />
                 </StackPanel>
-
+                               
             </StackPanel>
 
         </Grid>

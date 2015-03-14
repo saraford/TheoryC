@@ -100,6 +100,9 @@ namespace TheoryC.ViewModels
         bool _ShowTrack = default(bool);
         public bool ShowTrack { get { return _ShowTrack; } set { base.SetProperty(ref _ShowTrack, value); } }
 
+        bool _ShowTarget = default(bool);
+        public bool ShowTarget { get { return _ShowTarget; } set { base.SetProperty(ref _ShowTarget, value); } }
+
         int _CountdownTimeInSeconds = default(int);
         public int CountdownTimeInSeconds { get { return _CountdownTimeInSeconds; } set { base.SetProperty(ref _CountdownTimeInSeconds, value); } }
 
@@ -170,8 +173,9 @@ namespace TheoryC.ViewModels
                 // some designer info                
                 StatusText = "D: Status";
 
-                // show track in designer
+                // show track and target in designer
                 ShowTrack = true;
+                ShowTarget = true;
             }
         }
 
@@ -206,6 +210,10 @@ namespace TheoryC.ViewModels
             // reality modes
             CurrentReality = Reality.Augmented;
             this.ShowSkeleton = false;
+
+            // show track and target at launch
+            ShowTrack = true;
+            ShowTarget = true;            
         }
 
         public void ShowSettingsOnLaunch()
