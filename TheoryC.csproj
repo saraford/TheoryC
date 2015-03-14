@@ -78,7 +78,6 @@
     <Compile Include="Converters\RoundValueConverter.cs" />
     <Compile Include="Converters\StartButtonTextConverter.cs" />
     <Compile Include="Devices\KinectDevice.cs" />
-    <Compile Include="Converters\HipMarkersButtonTextConverter.cs" />
     <Compile Include="Models\Results.cs" />
     <Compile Include="Models\Trial.cs" />
     <Compile Include="Properties\Settings.Designer.cs">

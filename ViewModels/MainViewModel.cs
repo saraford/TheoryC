@@ -135,8 +135,8 @@ namespace TheoryC.ViewModels
         private Side _Handedness;
         public Side Handedness { get { return _Handedness; } set { base.SetProperty(ref _Handedness, value); } }
 
-        private bool _AlignHips;
-        public bool AlignHips { get { return _AlignHips; } set { base.SetProperty(ref _AlignHips, value); } }
+        private bool _AlignAnkles;
+        public bool AlignAnkles { get { return _AlignAnkles; } set { base.SetProperty(ref _AlignAnkles, value); } }
 
         #endregion
 
@@ -1507,18 +1507,18 @@ namespace TheoryC.ViewModels
             IsSetupWindowOpen = false;
         }
 
-        DelegateCommand _HideShowHipMarkersCommand = null;
-        public DelegateCommand HideShowHipMarkersCommand
+        DelegateCommand _HideShowAnkleMarkersCommand = null;
+        public DelegateCommand HideShowAnkleMarkersCommand
         {
             get
             {
-                if (_HideShowHipMarkersCommand != null)
-                    return _HideShowHipMarkersCommand;
+                if (_HideShowAnkleMarkersCommand != null)
+                    return _HideShowAnkleMarkersCommand;
 
-                _HideShowHipMarkersCommand = new DelegateCommand(new Action(
+                _HideShowAnkleMarkersCommand = new DelegateCommand(new Action(
                     () =>
                     {
-                        AlignHips = !AlignHips;
+                        AlignAnkles = !AlignAnkles;
                     }),
 
                     new Func<bool>(
@@ -1526,8 +1526,8 @@ namespace TheoryC.ViewModels
                         {
                             return !IsExperimentRunning; // only if setup window is showing
                         }));
-                this.PropertyChanged += (s, e) => _HideShowHipMarkersCommand.RaiseCanExecuteChanged();
-                return _HideShowHipMarkersCommand;
+                this.PropertyChanged += (s, e) => _HideShowAnkleMarkersCommand.RaiseCanExecuteChanged();
+                return _HideShowAnkleMarkersCommand;
             }
         }
 

@@ -35,9 +35,9 @@ namespace TheoryC.Devices
         private readonly Brush inferredBoneBrush = Brushes.Gray;
         private readonly Brush windowShowingBrush = Brushes.LightBlue; //(SolidColorBrush)(new BrushConverter().ConvertFrom("#FF3843C4")); // (SolidColorBrush)(new BrushConverter().ConvertFrom("#FFD0D8E0"));
         private readonly Brush windowDefaultBrush = (SolidColorBrush)(new BrushConverter().ConvertFrom("#FFDDDDDD"));
-        private readonly Brush moveHipCloserBrush = Brushes.LightPink;
-        private readonly Brush moveHipAwayBrush = Brushes.DarkRed;
-        private readonly Brush hipsAlignedBrush = Brushes.Green;
+        private readonly Brush moveAnkleCloserBrush = Brushes.LightPink;
+        private readonly Brush moveAnkleAwayBrush = Brushes.DarkRed;
+        private readonly Brush ankleAlignedBrush = Brushes.Green;
         Canvas bodyCanvas;
         Image kinectVideoImage;
         ViewModels.MainViewModel ViewModel;
@@ -147,10 +147,7 @@ namespace TheoryC.Devices
                         }
                     }
             }
-        }
-
-        double hipsAlignmentDelta = 0;
-        
+        }      
 
         private void TrackSkeleton(IList<Body> bodies)
         {
@@ -195,10 +192,11 @@ namespace TheoryC.Devices
                         ColorSpacePoint colorSpacePoint = this.cm.MapCameraPointToColorSpace(position);
                         jointPoints[jointType] = new Point(colorSpacePoint.X, colorSpacePoint.Y);
 
-                        // if aligning hips as part of setup
-                        if (this.ViewModel.AlignHips)
+                        // if aligning ankles 
+                        if (jointType == JointType.AnkleLeft || jointType == JointType.AnkleRight)
+                        if (this.ViewModel.AlignAnkles)
                         {
-                            AlignHipsToKinectFrontalPlane(joints, jointPoints, jointType, position);
+                            AlignAnklesToKinectFrontalPlane(joints, jointPoints, jointType, position);
                         }
 
                         // track lean
@@ -280,59 +278,62 @@ namespace TheoryC.Devices
 
         }
 
-        private void AlignHipsToKinectFrontalPlane(IReadOnlyDictionary<JointType, Joint> joints, Dictionary<JointType, Point> jointPoints, JointType jointType, CameraSpacePoint position)
+        double ankleAlignmentDelta = 0;
+
+        private void AlignAnklesToKinectFrontalPlane(IReadOnlyDictionary<JointType, Joint> joints, Dictionary<JointType, Point> jointPoints, JointType jointType, CameraSpacePoint position)
         {
-            if (jointType == JointType.HipLeft)
+            if (jointType == JointType.AnkleLeft)
             {
-                CameraSpacePoint positionHipRight = joints[JointType.HipRight].Position;
+                // get right ankle position
+                CameraSpacePoint positionAnkleRight = joints[JointType.AnkleRight].Position;
 
-                hipsAlignmentDelta = position.Z - positionHipRight.Z;
+                ankleAlignmentDelta = position.Z - positionAnkleRight.Z;
 
-                // are Hips aligned within 1 centimeter of each other
-                if (Math.Abs(hipsAlignmentDelta) < 0.01)
+                // are ankles aligned within 1 centimeter of each other
+                if (Math.Abs(ankleAlignmentDelta) < 0.01)
                 {
-                    // left hip
-                    DrawHip(joints, jointPoints, JointType.HipLeft, hipsAlignedBrush);
+                    // left ankle
+                    DrawAnkleMarker(joints, jointPoints, JointType.AnkleLeft, ankleAlignedBrush);
                 }
-                // if Left Hip is farther away than Right Hip (e.g. 20 - 5 = +15)
-                else if (hipsAlignmentDelta > 0)
+                // if Left ankle is farther away than Right Ankle (e.g. 20 - 5 = +15)
+                else if (ankleAlignmentDelta > 0)
                 {
-                    // left hip
-                    DrawHip(joints, jointPoints, JointType.HipLeft, moveHipCloserBrush);
+                    // left ankle
+                    DrawAnkleMarker(joints, jointPoints, JointType.AnkleLeft, moveAnkleCloserBrush);
                 }
-                else // negative number means left hips is closer
+                else // negative number means left ankle is closer
                 {
-                    // left hip
-                    DrawHip(joints, jointPoints, JointType.HipLeft, moveHipAwayBrush);
+                    // left ankle
+                    DrawAnkleMarker(joints, jointPoints, JointType.AnkleLeft, moveAnkleAwayBrush);
                 }
             }
-            if (jointType == JointType.HipRight)
+            if (jointType == JointType.AnkleRight)
             {
-                CameraSpacePoint positionHipLeft = joints[JointType.HipLeft].Position;
+                CameraSpacePoint positionAnkleLeft = joints[JointType.AnkleLeft].Position;
 
-                hipsAlignmentDelta = position.Z - positionHipLeft.Z;
+                ankleAlignmentDelta = position.Z - positionAnkleLeft.Z;
 
-                // are Hips aligned within a 5 centimeter delta
-                if (Math.Abs(hipsAlignmentDelta) < 0.01)
+                // are ankles aligned within a 5 centimeter delta
+                if (Math.Abs(ankleAlignmentDelta) < 0.01)
                 {
-                    // right hip
-                    DrawHip(joints, jointPoints, JointType.HipRight, hipsAlignedBrush);
+                    // right ankle
+                    DrawAnkleMarker(joints, jointPoints, JointType.AnkleRight, ankleAlignedBrush);
                 }
-                // if Left Hip is farther away than Right Hip (e.g. 20 - 5 = +15)
-                else if (hipsAlignmentDelta < 0)
+                // if Left Ankle is farther away than Right ankle (e.g. 20 - 5 = +15)
+                else if (ankleAlignmentDelta < 0)
                 {
-                    // right hip
-                    DrawHip(joints, jointPoints, JointType.HipRight, moveHipAwayBrush);
+                    // right ankle
+                    DrawAnkleMarker(joints, jointPoints, JointType.AnkleRight, moveAnkleAwayBrush);
                 }
-                else // negative number means left hips is closer
+                else // negative number means left ankle is closer
                 {
-                    // right hip
-                    DrawHip(joints, jointPoints, JointType.HipRight, moveHipCloserBrush);
+                    // right ankle
+                    DrawAnkleMarker(joints, jointPoints, JointType.AnkleRight, moveAnkleCloserBrush);
                 }
             }
         }
 
-        private void DrawHip(IReadOnlyDictionary<JointType, Joint> joints, Dictionary<JointType, Point> jointPoints, JointType jointType, Brush color)
+        private void DrawAnkleMarker(IReadOnlyDictionary<JointType, Joint> joints, Dictionary<JointType, Point> jointPoints, JointType jointType, Brush color)
         {
             Brush drawBrush = null;
 
