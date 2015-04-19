@@ -1,4 +1,7 @@
-﻿// hello github world
+﻿/*  Copyright (c)2015 San Jose State University - All Rights Reserved
+    Licensed under the Microsoft Public License (Ms-Pl)
+    Created by Sara Ford and Dr. Emily Wughalter, Dept of Kinesiology, San Jose State University */
+
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
