@@ -100,7 +100,10 @@ namespace TheoryC.ViewModels
 
         Reality _CurrentReality = default(Reality);
         public Reality CurrentReality { get { return _CurrentReality; } set { base.SetProperty(ref _CurrentReality, value); } }
-        
+
+        double _TargetRotationDirection = default(double);
+        public double TargetRotationDirection { get { return _TargetRotationDirection; } set { base.SetProperty(ref _TargetRotationDirection, value); } }
+
         bool _ShowTrack = default(bool);
         public bool ShowTrack { get { return _ShowTrack; } set { base.SetProperty(ref _ShowTrack, value); } }
 
@@ -145,8 +148,12 @@ namespace TheoryC.ViewModels
         private bool _AlignAnkles;
         public bool AlignAnkles { get { return _AlignAnkles; } set { base.SetProperty(ref _AlignAnkles, value); } }
 
+        const double TargetRotationClockwise = 1.0;
+        const double TargetRotationCounterClockwise = -1.0;
+
         #endregion
 
+        //this is just for the Designer!!!!
         public MainViewModel()
         {
             if (System.ComponentModel.DesignerProperties.GetIsInDesignMode(new System.Windows.DependencyObject()))
@@ -218,6 +225,9 @@ namespace TheoryC.ViewModels
             // show track and target at launch
             ShowTrack = true;
             ShowTarget = true;            
+
+            // clockwise start
+            TargetRotationDirection = TargetRotationClockwise;
         }
 
         public void ShowSettingsOnLaunch()
@@ -683,7 +693,7 @@ namespace TheoryC.ViewModels
         private void CalculateAngleBasedOnTimeSampling()
         {
             double wp = totalTrialTime.ElapsedMilliseconds / (secondsToDoOneRotation * 1000);
-            AngleInDegrees = 360.0 * wp;
+            AngleInDegrees = 360.0 * wp * TargetRotationDirection;
         }
 
         double distanceFromCenterOnTick;
@@ -1601,6 +1611,31 @@ namespace TheoryC.ViewModels
                 return _SearchForParticipant;
             }
         }
+
+        DelegateCommand _SetTargetRotationCounterClockwise = null;
+        public DelegateCommand SetTargetRotationCounterClockwise
+        {
+            get
+            {
+                if (_SetTargetRotationCounterClockwise != null)
+                    return _SetTargetRotationCounterClockwise;
+
+                _SetTargetRotationCounterClockwise = new DelegateCommand(new Action(
+                    () =>
+                    {
+                        TargetRotationDirection = TargetRotationCounterClockwise;
+                    }),
+
+                    new Func<bool>(
+                        () =>
+                        {
+                            return !IsExperimentRunning;
+                        }));
+                this.PropertyChanged += (s, e) => _SetTargetRotationCounterClockwise.RaiseCanExecuteChanged();
+                return _SetTargetRotationCounterClockwise;
+            }
+        }
+
 
         #endregion
     }

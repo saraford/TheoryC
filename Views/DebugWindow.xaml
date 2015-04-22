@@ -92,7 +92,13 @@
                     <TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="Countdown" VerticalAlignment="Top"/>
                     <TextBox Margin="10,0,0,0" Text="{Binding CountdownTimeInSeconds}" />
                 </StackPanel>
-                               
+
+                <StackPanel Margin="10,0,0,0">
+                    <TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="Target Rotation:" VerticalAlignment="Top"/>
+                    <RadioButton  Margin="10,2,0,0" IsChecked="True">Clockwise</RadioButton>
+                    <RadioButton  Margin="10,2,0,0" Command="{Binding SetTargetRotationCounterClockwise, Mode=OneWay}" >Counterclockwise</RadioButton>
+                </StackPanel>
+
             </StackPanel>
 
         </Grid>
