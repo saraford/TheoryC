@@ -451,6 +451,11 @@ namespace TheoryC.ViewModels
 
         private void CalculateTotalTrialResults()
         {
+            // gameSamplingRatePerMillisecond = 1 / 30 Millisecond Delay = 0.033
+            // gameSampleRatePerSecond = 0.033 * 1000 milliseconds = 33
+            // totalNumberOfPossibleSamples = 33.33 * TotalSeconds e.g. 5 = 165
+            CurrentTrial.Results.TotalPossibleTicks = Convert.ToInt32(1.0 / Settings.Default.MillisecondDelay * 1000) * Convert.ToInt32(CurrentTrial.DurationSeconds);
+
             double percentageOnTarget = (double)ticksOnTarget / (double)CurrentTrial.Results.TickCount;
             CurrentTrial.Results.TimeOnTarget = Math.Round(percentageOnTarget * CurrentTrial.DurationSeconds, 3);
 

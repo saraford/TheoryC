@@ -323,6 +323,8 @@
                                             <TableCell>
                                                 <Paragraph Margin="10,0,0,0">
                                                     <Run Text="{Binding CurrentTrial.Results.TickCount}"/>
+                                                    <Run Text="of "/>
+                                                    <Run Text="{Binding CurrentTrial.Results.TotalPossibleTicks}"/>
                                                 </Paragraph>
                                             </TableCell>
                                             <TableCell>

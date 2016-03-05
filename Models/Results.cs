@@ -73,6 +73,9 @@ namespace TheoryC.Models
         int _TickCount3 = default(int);
         public int TickCount3 { get { return _TickCount3; } set { base.SetProperty(ref _TickCount3, value); } }
 
+        int _TotalPossibleTicks = default(int);
+        public int TotalPossibleTicks { get { return _TotalPossibleTicks; } set { base.SetProperty(ref _TotalPossibleTicks, value); } }
+
         double _HandDepthStdDev = default(double);
         public double HandDepthStdDev { get { return _HandDepthStdDev; } set { base.SetProperty(ref _HandDepthStdDev, value); } }
 

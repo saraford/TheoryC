@@ -68,6 +68,7 @@ namespace TheoryC.Models
             Results.VariableError2 = 0;
             Results.VariableError3 = 0;
 
+            Results.TotalPossibleTicks = 0;
             Results.TickCount = 0;
             Results.TickCount1 = 0;
             Results.TickCount2 = 0;
