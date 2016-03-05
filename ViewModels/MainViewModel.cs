@@ -183,6 +183,7 @@ namespace TheoryC.ViewModels
 
                 // some designer info                
                 StatusText = "D: Status";
+                
 
                 // show track and target in designer
                 ShowTrack = true;

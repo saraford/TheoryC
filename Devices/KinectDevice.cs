@@ -30,6 +30,7 @@ namespace TheoryC.Devices
         public double leftHandTipDepth;
         private List<Tuple<JointType, JointType>> bones;
         private const double JointThickness = 5;
+        private const double AnkleThickness = 25;
         private const double BoneThickness = 10;
         public bool useRightShoulder = true;
         public Point leftElbowCenter; // by default use the center of the screen
@@ -351,7 +352,7 @@ namespace TheoryC.Devices
 
             if (drawBrush != null)
             {
-                this.DrawEllipse(drawBrush, jointPoints[jointType], JointThickness);
+                this.DrawEllipse(drawBrush, jointPoints[jointType], AnkleThickness);
             }
         }
 

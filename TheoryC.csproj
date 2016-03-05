@@ -69,6 +69,7 @@
       <DependentUpon>Target.xaml</DependentUpon>
     </Compile>
     <Compile Include="Converters\AddOneConverter.cs" />
+    <Compile Include="Converters\KinectTrackingBodyStatusToText.cs" />
     <Compile Include="Converters\RealityToVisibilityConverter.cs" />
     <Compile Include="Converters\RealityEnumConverter.cs" />
     <Compile Include="Converters\BlueWhenTrue.cs" />
