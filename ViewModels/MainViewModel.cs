@@ -148,6 +148,9 @@ namespace TheoryC.ViewModels
         private bool _AlignAnkles;
         public bool AlignAnkles { get { return _AlignAnkles; } set { base.SetProperty(ref _AlignAnkles, value); } }
 
+        private double _KinectFPS;
+        public double KinectFPS { get { return _KinectFPS; } set { base.SetProperty(ref _KinectFPS, value); } }
+
         const double TargetRotationClockwise = 1.0;
         const double TargetRotationCounterClockwise = -1.0;
 
@@ -252,6 +255,7 @@ namespace TheoryC.ViewModels
                     IsInsideTrackForEachTickList = new List<bool>(),
                     HandDepthForEachTickList = new List<double>(),
                     LeanAmountForEachTickList = new List<PointF>(),
+                    KinectFPSForEachTickList = new List<double>(),
                     OnTargetList = new List<bool>()
                 }
             });
@@ -278,6 +282,7 @@ namespace TheoryC.ViewModels
                     IsInsideTrackForEachTickList = new List<bool>(),
                     HandDepthForEachTickList = new List<double>(),
                     LeanAmountForEachTickList = new List<PointF>(),
+                    KinectFPSForEachTickList = new List<double>(),
                     OnTargetList = new List<bool>()
                 }
             });
@@ -455,6 +460,7 @@ namespace TheoryC.ViewModels
             CurrentTrial.Results.HandDepthStdDev = Statistics.PopulationStandardDeviation(CurrentTrial.Results.HandDepthForEachTickList);
             CurrentTrial.Results.LeanLeftRightX = Statistics.PopulationStandardDeviation(CurrentTrial.Results.LeanAmountForEachTickList, DesiredCoord.X);
             CurrentTrial.Results.LeanForwardBackY = Statistics.PopulationStandardDeviation(CurrentTrial.Results.LeanAmountForEachTickList, DesiredCoord.Y);
+            CurrentTrial.Results.KinectFPSTrial = Statistics.Mean(CurrentTrial.Results.KinectFPSForEachTickList);
         }
 
         private void CalculateFirstThirdResults(List<double> ABE1, List<bool> IsInside1, List<bool> OnTarget1, double firstTimePercentage)
@@ -496,20 +502,26 @@ namespace TheoryC.ViewModels
             List<PointF> LeanAmount1, LeanAmount2, LeanAmount3;
             Tools.BreakListIntoThirds(CurrentTrial.Results.LeanAmountForEachTickList, out LeanAmount1, out LeanAmount2, out LeanAmount3);
 
+            List<double> KinectFPS1, KinectFPS2, KinectFPS3;
+            Tools.BreakListIntoThirds(CurrentTrial.Results.KinectFPSForEachTickList, out KinectFPS1, out KinectFPS2, out KinectFPS3);
+
             // first 1/3rd
             CurrentTrial.Results.HandDepthStdDev1 = Statistics.PopulationStandardDeviation(HandDepth1);
             CurrentTrial.Results.LeanLeftRightX1 = Statistics.PopulationStandardDeviation(LeanAmount1, DesiredCoord.X);
             CurrentTrial.Results.LeanForwardBackY1 = Statistics.PopulationStandardDeviation(LeanAmount1, DesiredCoord.Y);
+            CurrentTrial.Results.KinectFPS1 = Statistics.Mean(KinectFPS1);
 
             // second 1/3rd
             CurrentTrial.Results.HandDepthStdDev2 = Statistics.PopulationStandardDeviation(HandDepth2);
             CurrentTrial.Results.LeanLeftRightX2 = Statistics.PopulationStandardDeviation(LeanAmount2, DesiredCoord.X);
             CurrentTrial.Results.LeanForwardBackY2 = Statistics.PopulationStandardDeviation(LeanAmount2, DesiredCoord.Y);
+            CurrentTrial.Results.KinectFPS2 = Statistics.Mean(KinectFPS2);
 
             // third 1/3rd
             CurrentTrial.Results.HandDepthStdDev3 = Statistics.PopulationStandardDeviation(HandDepth3);
             CurrentTrial.Results.LeanLeftRightX3 = Statistics.PopulationStandardDeviation(LeanAmount3, DesiredCoord.X);
             CurrentTrial.Results.LeanForwardBackY3 = Statistics.PopulationStandardDeviation(LeanAmount3, DesiredCoord.Y);
+            CurrentTrial.Results.KinectFPS3 = Statistics.Mean(KinectFPS3);
         }
 
         private void SetupNextTrial()
@@ -682,6 +694,7 @@ namespace TheoryC.ViewModels
             {
                 CurrentTrial.Results.LeanAmountForEachTickList.Add(TickLeanAmount);
                 CurrentTrial.Results.HandDepthForEachTickList.Add(TickHandDepth);
+                CurrentTrial.Results.KinectFPSForEachTickList.Add(KinectFPS);
             }
 
             if (HasTrialTimeExpired())

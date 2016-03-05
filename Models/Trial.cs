@@ -45,6 +45,7 @@ namespace TheoryC.Models
             Results.IsInsideTrackForEachTickList.Clear();
             Results.HandDepthForEachTickList.Clear();
             Results.LeanAmountForEachTickList.Clear();
+            Results.KinectFPSForEachTickList.Clear();
             Results.OnTargetList.Clear();
 
             Results.AbsoluteError = 0;

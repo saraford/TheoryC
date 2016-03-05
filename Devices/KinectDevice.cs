@@ -149,6 +149,10 @@ namespace TheoryC.Devices
                             this.colorBitmap.Unlock();
 
                             kinectVideoImage.Source = this.colorBitmap;
+
+                            // TotalSeconds is either 33.33ms or 66.66ms (for low lighting conditions)
+                            // hence FPS = 1.0 / TotalSeconds(ms)
+                            this.ViewModel.KinectFPS = Math.Round(1.0 / colorFrame.ColorCameraSettings.FrameInterval.TotalSeconds, 2);
                         }
                     }
             }

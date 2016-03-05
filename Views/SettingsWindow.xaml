@@ -5,7 +5,7 @@
         xmlns:Converters="clr-namespace:TheoryC.Converters"      
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
         x:Class="TheoryC.Views.SettingsWindow"
-        Title="SettingsWindow" Height="580" Width="750">
+        Title="SettingsWindow" Height="600" Width="750">
     <Window.DataContext>
         <ViewModels:MainViewModel/>
     </Window.DataContext>
@@ -100,8 +100,8 @@
                     </StackPanel>
 
                     <!--Attempt to do a proper table-->
-                    <StackPanel MaxHeight="360">
-                        <FlowDocumentReader Margin="-15,-10,0,0" Height="485" Width="520">
+                    <StackPanel MaxHeight="390">
+                        <FlowDocumentReader Margin="-9,-10,6,0" Height="500" Width="520" HorizontalAlignment="Right">
                             <FlowDocument FontFamily="Segoe UI" FontSize="12" >
                                 <Table CellSpacing="5">
                                     <TableRowGroup>
@@ -114,7 +114,7 @@
                                             <TableCell>
                                                 <Paragraph Margin="10,0,0,0" >Total Trial</Paragraph>
                                                 <Paragraph Margin="10,0,0,0" >resutls</Paragraph>
-                                           </TableCell>
+                                            </TableCell>
 
                                             <TableCell>
                                                 <Paragraph>First 1/3rd</Paragraph>
@@ -142,7 +142,7 @@
                                                 <Paragraph Margin="10,0,0,0">
                                                     <Run Text="{Binding CurrentTrial.Results.TimeOnTarget}"/>
                                                 </Paragraph>
-                                            </TableCell>                                            
+                                            </TableCell>
                                             <TableCell>
                                                 <Paragraph>
                                                     <Run Text="{Binding CurrentTrial.Results.TimeOnTarget1}"/>
@@ -318,7 +318,7 @@
 
                                         <TableRow Background="LightSteelBlue">
                                             <TableCell TextAlignment="Left">
-                                                <Paragraph>Tick Count</Paragraph>
+                                                <Paragraph>GameEngine Ticks</Paragraph>
                                             </TableCell>
                                             <TableCell>
                                                 <Paragraph Margin="10,0,0,0">
@@ -342,8 +342,37 @@
                                             </TableCell>
                                         </TableRow>
 
-                                    </TableRowGroup>
+                                        <TableRow>
+                                            <TableCell TextAlignment="Left">
+                                                <Paragraph Margin="0,0,0,5">Kinect FPS</Paragraph>
+                                            </TableCell>
+                                            <TableCell>
+                                                <Paragraph Margin="10,0,0,0">
+                                                    <Run Text="{Binding CurrentTrial.Results.KinectFPSTrial}"/>
+                                                </Paragraph>
+                                            </TableCell>
+                                            <TableCell>
+                                                <Paragraph>
+                                                    <Run Text="{Binding CurrentTrial.Results.KinectFPS1}"/>
+                                                </Paragraph>
+                                            </TableCell>
+                                            <TableCell>
+                                                <Paragraph>
+                                                    <Run Text="{Binding CurrentTrial.Results.KinectFPS2}"/>
+                                                </Paragraph>
+                                            </TableCell>
+                                            <TableCell>
+                                                <Paragraph>
+                                                    <Run Text="{Binding CurrentTrial.Results.KinectFPS3}"/>
+                                                </Paragraph>
+                                            </TableCell>
+                                        </TableRow>
 
+                                        <TableRow Background="LightSteelBlue">
+                                        </TableRow>
+
+                                    </TableRowGroup>
+                                                                       
                                     <Table.Columns>
                                         <TableColumn />
                                         <TableColumn Width="125"/>
@@ -359,7 +388,7 @@
                         </FlowDocumentReader>
                     </StackPanel>
 
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">                        
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                         <Button Margin="10" Content="OK" Width="80" IsDefault="True" Command="{Binding CloseSettingsWindowCommand, Mode=OneWay}" ></Button>
                     </StackPanel>
 

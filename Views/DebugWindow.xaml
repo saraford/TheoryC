@@ -85,6 +85,11 @@
                     <CheckBox Content="Show Skeleton" Margin="0,10,0,0" IsChecked="{Binding ShowSkeleton, Mode=TwoWay}" />
                 </StackPanel>
 
+                <StackPanel Margin="10,-2,0,0">
+                    <TextBlock HorizontalAlignment="Left" Margin="10,0,0,0" TextWrapping="Wrap" Text="Kinect FPS" VerticalAlignment="Top"/>
+                    <TextBlock Margin="10,0,0,0" Text="{Binding KinectFPS, Mode=OneWay}" />
+                </StackPanel>
+
                 <!--<StackPanel Margin="10,0,0,0">
                     <TextBlock Text="Kinect"></TextBlock>
                 <StackPanel Orientation="Horizontal" >

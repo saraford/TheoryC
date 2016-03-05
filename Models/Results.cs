@@ -123,5 +123,21 @@ namespace TheoryC.Models
 
         private List<PointF> _LeanAmountForEachTickList;
         public List<PointF> LeanAmountForEachTickList { get { return _LeanAmountForEachTickList; } set { _LeanAmountForEachTickList = value; } }
+
+        private List<double> _KinectFPSForEachTickList;
+        public List<double> KinectFPSForEachTickList { get { return _KinectFPSForEachTickList; } set { _KinectFPSForEachTickList = value; } }
+
+        private double _KinectFPSTrial;
+        public double KinectFPSTrial { get { return _KinectFPSTrial; } set { _KinectFPSTrial = value; } }
+
+        private double _KinectFPS1;
+        public double KinectFPS1 { get { return _KinectFPS1; } set { _KinectFPS1 = value; } }
+
+        private double _KinectFPS2;
+        public double KinectFPS2 { get { return _KinectFPS2; } set { _KinectFPS2 = value; } }
+
+        private double _KinectFPS3;
+        public double KinectFPS3 { get { return _KinectFPS3; } set { _KinectFPS3 = value; } }
+
     }
 }
