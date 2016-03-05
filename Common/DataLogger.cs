@@ -39,6 +39,7 @@ namespace TheoryC.Common
                                  " Hand Depth StdDev , " + 
                                  " Lean Right Left X , " + 
                                  " Lean Forward Backward Y , " + 
+                                 " Total Possible Ticks , " +
                                  " Tick Count , " + 
                                  "  , " + 
                                  " ToT1 , " +
@@ -64,7 +65,10 @@ namespace TheoryC.Common
                                  " LeanFB3 , " + 
                                  " Tick1 , " +
                                  " Tick2 , " +
-                                 " Tick3 ");
+                                 " Tick3 ," +
+                                 " KinectFPS1 , " +
+                                 " KinectFPS2 , " +
+                                 " KinectFPS3");
 
                 foreach (var trial in Trials)
                 {
@@ -95,6 +99,7 @@ namespace TheoryC.Common
             str += Result.HandDepthStdDev.ToString() + ",";
             str += Result.LeanLeftRightX.ToString() + ",";
             str += Result.LeanForwardBackY.ToString() + ",";
+            str += Result.TotalPossibleTicks.ToString() + ",";
             str += Result.TickCount.ToString() + ",";
             str += "  ,";
             str += Result.TimeOnTarget1.ToString() + ",";
@@ -121,6 +126,9 @@ namespace TheoryC.Common
             str += Result.TickCount1.ToString() + ",";
             str += Result.TickCount2.ToString() + ",";
             str += Result.TickCount3.ToString() + ",";
+            str += Result.KinectFPS1.ToString() + ",";
+            str += Result.KinectFPS2.ToString() + ",";
+            str += Result.KinectFPS3.ToString() + ",";
 
             return str;   
         }
