@@ -69,7 +69,8 @@ namespace TheoryC.Common
                                  " KinectFPS1 , " +
                                  " KinectFPS2 , " +
                                  " KinectFPS3 , " + 
-                                 " KinectBodyFramesCount ");
+                                 " Body Frames Counted , " +
+                                 " Total Possible Body Frames ");
 
                 foreach (var trial in Trials)
                 {
@@ -131,6 +132,7 @@ namespace TheoryC.Common
             str += Result.KinectFPS2.ToString() + ",";
             str += Result.KinectFPS3.ToString() + ",";
             str += Result.KinectBodyFramesTrial.ToString() + ",";
+            str += Result.KinectTotalPossibleBodyFrames.ToString();
 
             return str;   
         }
