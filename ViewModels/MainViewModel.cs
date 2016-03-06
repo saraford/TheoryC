@@ -473,7 +473,9 @@ namespace TheoryC.ViewModels
 
             // Total possible body frames depends on the Kinect FPS - it's either 15 or 30. Using same formula as above for total possible game ticks
             CurrentTrial.Results.KinectBodyFramesTrial = this.BodyFramesCount;
-            CurrentTrial.Results.KinectTotalPossibleBodyFrames = Convert.ToInt32(CurrentTrial.Results.KinectFPSTrial * CurrentTrial.DurationSeconds);
+            if (CurrentTrial.Results.KinectFPSTrial > 0) {
+                CurrentTrial.Results.KinectTotalPossibleBodyFrames = Convert.ToInt32(CurrentTrial.Results.KinectFPSTrial * CurrentTrial.DurationSeconds);
+            }
         }
 
         private void CalculateFirstThirdResults(List<double> ABE1, List<bool> IsInside1, List<bool> OnTarget1, double firstTimePercentage)
