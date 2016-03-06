@@ -154,6 +154,9 @@ namespace TheoryC.ViewModels
         const double TargetRotationClockwise = 1.0;
         const double TargetRotationCounterClockwise = -1.0;
 
+        private int _BodyFramesCount;
+        public int BodyFramesCount { get { return _BodyFramesCount; } set { base.SetProperty(ref _BodyFramesCount, value); } }
+
         #endregion
 
         //this is just for the Designer!!!!
@@ -388,6 +391,7 @@ namespace TheoryC.ViewModels
 
         private void StartNextTrial()
         {
+            this.BodyFramesCount = 0;
             stopTime = DateTime.Now.AddSeconds(CurrentTrial.DurationSeconds);
 
             //            timeOnTarget.Reset();
@@ -466,6 +470,10 @@ namespace TheoryC.ViewModels
             CurrentTrial.Results.LeanLeftRightX = Statistics.PopulationStandardDeviation(CurrentTrial.Results.LeanAmountForEachTickList, DesiredCoord.X);
             CurrentTrial.Results.LeanForwardBackY = Statistics.PopulationStandardDeviation(CurrentTrial.Results.LeanAmountForEachTickList, DesiredCoord.Y);
             CurrentTrial.Results.KinectFPSTrial = Statistics.Mean(CurrentTrial.Results.KinectFPSForEachTickList);
+
+            // Total possible body frames depends on the Kinect FPS - it's either 15 or 30. Using same formula as above for total possible game ticks
+            CurrentTrial.Results.KinectBodyFramesTrial = this.BodyFramesCount;
+            CurrentTrial.Results.KinectTotalPossibleBodyFrames = Convert.ToInt32(CurrentTrial.Results.KinectFPSTrial * CurrentTrial.DurationSeconds);
         }
 
         private void CalculateFirstThirdResults(List<double> ABE1, List<bool> IsInside1, List<bool> OnTarget1, double firstTimePercentage)

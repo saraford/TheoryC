@@ -5,7 +5,7 @@
         xmlns:Converters="clr-namespace:TheoryC.Converters"      
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
         x:Class="TheoryC.Views.SettingsWindow"
-        Title="SettingsWindow" Height="600" Width="750">
+        Title="SettingsWindow" Height="640" Width="750">
     <Window.DataContext>
         <ViewModels:MainViewModel/>
     </Window.DataContext>
@@ -100,7 +100,7 @@
                     </StackPanel>
 
                     <!--Attempt to do a proper table-->
-                    <StackPanel MaxHeight="390">
+                    <StackPanel MaxHeight="430">
                         <FlowDocumentReader Margin="-9,-10,6,0" Height="500" Width="520" HorizontalAlignment="Right">
                             <FlowDocument FontFamily="Segoe UI" FontSize="12" >
                                 <Table CellSpacing="5">
@@ -346,7 +346,7 @@
 
                                         <TableRow>
                                             <TableCell TextAlignment="Left">
-                                                <Paragraph Margin="0,0,0,5">Kinect FPS</Paragraph>
+                                                <Paragraph>Kinect color stream fps</Paragraph>
                                             </TableCell>
                                             <TableCell>
                                                 <Paragraph Margin="10,0,0,0">
@@ -371,6 +371,16 @@
                                         </TableRow>
 
                                         <TableRow Background="LightSteelBlue">
+                                            <TableCell TextAlignment="Left">
+                                                <Paragraph >Total Body Frames Taken</Paragraph>
+                                            </TableCell>
+                                            <TableCell>
+                                                <Paragraph Margin="10,0,0,0">
+                                                    <Run Text="{Binding CurrentTrial.Results.KinectBodyFramesTrial}"/>
+                                                    <Run Text="of "/>
+                                                    <Run Text="{Binding CurrentTrial.Results.KinectTotalPossibleBodyFrames}"/>
+                                                </Paragraph>
+                                            </TableCell>
                                         </TableRow>
 
                                     </TableRowGroup>

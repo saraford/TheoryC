@@ -88,6 +88,7 @@ namespace TheoryC.Models
             Results.HandDepthStdDev2 = 0;
             Results.HandDepthStdDev3 = 0;
 
+            Results.KinectBodyFramesTrial = 0;
         }
     }
 }

@@ -130,9 +130,6 @@ namespace TheoryC.Models
         private List<double> _KinectFPSForEachTickList;
         public List<double> KinectFPSForEachTickList { get { return _KinectFPSForEachTickList; } set { _KinectFPSForEachTickList = value; } }
 
-        private double _KinectFPSTrial;
-        public double KinectFPSTrial { get { return _KinectFPSTrial; } set { _KinectFPSTrial = value; } }
-
         private double _KinectFPS1;
         public double KinectFPS1 { get { return _KinectFPS1; } set { _KinectFPS1 = value; } }
 
@@ -142,5 +139,13 @@ namespace TheoryC.Models
         private double _KinectFPS3;
         public double KinectFPS3 { get { return _KinectFPS3; } set { _KinectFPS3 = value; } }
 
+        private double _KinectFPSTrial;
+        public double KinectFPSTrial { get { return _KinectFPSTrial; } set { _KinectFPSTrial = value; } }
+
+        private double _KinectBodyFramesTrial;
+        public double KinectBodyFramesTrial { get { return _KinectBodyFramesTrial; } set { _KinectBodyFramesTrial = value; } }
+
+        int _KinectTotalPossibleBodyFrames = default(int);
+        public int KinectTotalPossibleBodyFrames { get { return _KinectTotalPossibleBodyFrames; } set { base.SetProperty(ref _KinectTotalPossibleBodyFrames, value); } }
     }
 }

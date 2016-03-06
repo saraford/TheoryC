@@ -119,6 +119,8 @@ namespace TheoryC.Devices
                     frame.GetAndRefreshBodyData(bodies);
 
                     this.TrackSkeleton(bodies);
+
+                    this.ViewModel.BodyFramesCount++;
                 }
             }
 
