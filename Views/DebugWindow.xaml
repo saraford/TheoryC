@@ -1,0 +1,126 @@
+﻿<Window x:Class="TheoryC.Views.DebugWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:ViewModels="clr-namespace:TheoryC.ViewModels"   
+        xmlns:Converters="clr-namespace:TheoryC.Converters"       
+        WindowStyle="None" AllowsTransparency="true" Background="Transparent"
+        Height="80" Width="960">
+    <Window.DataContext>
+        <ViewModels:MainViewModel/>
+    </Window.DataContext>
+    <Window.Resources>
+        <Converters:KinectTrackingBodyStatusToTextConverter x:Key="KinectTrackingBodyStatusToTextConverter"/>
+        <Converters:AddOneConverter x:Key="AddOneToTrial"/>
+        <Converters:BoolToVisibilityConverter x:Key="BoolToVisibility"/>
+        <Converters:RealityEnumConverter x:Key="RealityEnumConverter"/>
+    </Window.Resources>
+    <Border Width="Auto" Height="Auto"     
+          BorderBrush="#395984"
+          BorderThickness="1"
+          CornerRadius="0,0,10,10" >
+        <Border.Background>
+            <SolidColorBrush Color="#FFD0D8E0" />
+        </Border.Background>
+
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="507*"/>
+                <ColumnDefinition Width="451*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="3*"/>
+                <RowDefinition Height="10*"/>
+            </Grid.RowDefinitions>
+
+            <!-- Labels -->
+            <TextBlock Text="Experiment-level settings" FontWeight="SemiBold" Margin="20,0,0,0"></TextBlock>
+            <TextBlock Grid.Row="0" Grid.Column="1" Text="Kinect debug info" FontWeight="SemiBold" Margin="30,0,0,0"></TextBlock>
+
+            <!-- Other Settings -->
+            <StackPanel Margin="10,5,0,0" Orientation="Horizontal" Grid.Row="1" Grid.Column="0">
+                <StackPanel >
+                    <TextBlock HorizontalAlignment="Left" Margin="10,0,0,0" TextWrapping="Wrap" Text="Reality Type:" VerticalAlignment="Top"/>
+                    <RadioButton  Margin="10,2,0,0" IsChecked="{Binding Path=CurrentReality, Converter={StaticResource RealityEnumConverter}, ConverterParameter={x:Static ViewModels:Reality.Virtual}}" Command="{Binding ToggleCurrentReality, Mode=OneWay}" >Virtual</RadioButton>
+                    <RadioButton  Margin="10,2,0,0" IsChecked="{Binding Path=CurrentReality, Converter={StaticResource RealityEnumConverter}, ConverterParameter={x:Static ViewModels:Reality.Augmented}}" Command="{Binding ToggleCurrentReality, Mode=OneWay}" >Augmented</RadioButton>
+                </StackPanel>
+
+                <StackPanel Margin="10,0,0,0">
+                    <TextBlock HorizontalAlignment="Left" Margin="10,0,0,0" TextWrapping="Wrap" Text="Show Track" VerticalAlignment="Top"/>
+                    <CheckBox Margin="10,0,0,0" IsChecked="{Binding ShowTrack}" />
+                </StackPanel>
+
+                <StackPanel Margin="10,0,0,0">
+                    <TextBlock HorizontalAlignment="Left" Margin="10,0,0,0" TextWrapping="Wrap" Text="Show Traget" VerticalAlignment="Top"/>
+                    <CheckBox Margin="10,0,0,0" IsChecked="{Binding ShowTarget}" />
+                </StackPanel>
+
+                <StackPanel Margin="10,0,0,0">
+                    <TextBlock HorizontalAlignment="Left" Margin="10,0,0,0" TextWrapping="Wrap" Text="Countdown" VerticalAlignment="Top"/>
+                    <TextBox Margin="10,0,0,0" Text="{Binding CountdownTimeInSeconds}" />
+                </StackPanel>
+
+                <StackPanel Margin="10,0,0,0">
+                    <TextBlock HorizontalAlignment="Left" Margin="10,0,0,0" TextWrapping="Wrap" Text="Target Rotation:" VerticalAlignment="Top"/>
+                    <RadioButton  Margin="10,2,0,0" IsChecked="True">Clockwise</RadioButton>
+                    <RadioButton  Margin="10,2,0,0" Command="{Binding SetTargetRotationCounterClockwise, Mode=OneWay}" >Counterclockwise</RadioButton>
+                </StackPanel>
+            </StackPanel>
+
+            <!-- Debug Settings -->
+            <StackPanel Margin="0,5,0,0" Orientation="Horizontal" Grid.Row="1" Grid.Column="1">
+                <StackPanel Margin="20,0,0,0">
+                    <StackPanel Orientation="Horizontal" Margin="10,0,0,0">
+                        <TextBlock Text="Kinect Status:  "/>
+                        <TextBlock Text="{Binding StatusText}"/>
+                    </StackPanel>
+                    <!-- Todo: Fix this embarrassment :) why is the converter not working #sadtrombone
+                        <StackPanel Orientation="Horizontal" Margin="10,10,0,0">
+                        <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Body:  " VerticalAlignment="Top"/>
+                        <TextBlock Visibility="{Binding IsKinectTracking, Converter={StaticResource KinectTrackingBodyStatusToTextConverter}}">Not Tracking</TextBlock>
+                    </StackPanel>-->
+                </StackPanel>
+
+                <StackPanel Margin="20,0,0,0">
+                    <CheckBox Content="Show Finger Tip" IsChecked="{Binding ShowFingerTip}" />
+                    <CheckBox Content="Show Skeleton" Margin="0,10,0,0" IsChecked="{Binding ShowSkeleton, Mode=TwoWay}" />
+                </StackPanel>
+
+                <StackPanel Margin="10,-2,0,0">
+                    <TextBlock HorizontalAlignment="Left" Margin="10,0,0,0" TextWrapping="Wrap" Text="Kinect FPS" VerticalAlignment="Top"/>
+                    <TextBlock Margin="10,0,0,0" Text="{Binding KinectFPS, Mode=OneWay}" />
+                </StackPanel>
+
+                <!--<StackPanel Margin="10,0,0,0">
+                    <TextBlock Text="Kinect"></TextBlock>
+                <StackPanel Orientation="Horizontal" >
+                    <TextBox MinWidth="50" MaxWidth="50" Text="{Binding InputPosition.X}" ></TextBox>
+                    <TextBox Margin="5,0,0,0" MinWidth="50" MaxWidth="50" Text="{Binding InputPosition.Y}" ></TextBox>
+                </StackPanel>
+                </StackPanel>-->
+
+                <!--<StackPanel Margin="10,0,0,0">
+                    <TextBlock Text="Mouse"></TextBlock>
+                    <StackPanel Orientation="Horizontal" >
+                        <TextBox MinWidth="50" MaxWidth="50" Text="{Binding MousePosition.X}" ></TextBox>
+                        <TextBox Margin="5,0,0,0" MinWidth="50" MaxWidth="50" Text="{Binding MousePosition.Y}" ></TextBox>
+                    </StackPanel>
+                </StackPanel>-->
+
+                <!--<StackPanel>
+                    <TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="Trial Number" VerticalAlignment="Top"/>
+                    <TextBox Margin="10,0,0,0"  Text="{Binding CurrentTrial.Number, Converter={StaticResource AddOneToTrial}, Mode=OneWay}" />
+                </StackPanel>-->
+
+                <!--<StackPanel>
+                    <TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="Time On Target MS" VerticalAlignment="Top"/>
+                    <TextBox Margin="10,0,0,0"  Text="{Binding CurrentTrial.Results.TimeOnTarget}" />
+                </StackPanel>
+
+                <StackPanel>
+                    <TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="Absolute Error" VerticalAlignment="Top"/>
+                    <TextBox Margin="10,0,0,0"  Text="{Binding CurrentTrial.Results.AbsoluteError}" />
+                </StackPanel>-->
+            </StackPanel>
+        </Grid>
+    </Border>
+</Window>
