@@ -1,0 +1,128 @@
+﻿<Window
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:Controls="clr-namespace:TheoryC.Controls"
+        xmlns:Converters="clr-namespace:TheoryC.Converters"
+        xmlns:ViewModels="clr-namespace:TheoryC.ViewModels" 
+        xmlns:Properties="clr-namespace:TheoryC.Properties"     
+        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"    
+        x:Class="TheoryC.Views.MainWindow"
+        Title="MainWindow" Width="960" Height="600" Background="#FF656565"
+        Closing="Window_Closing">
+    <Window.DataContext>
+        <ViewModels:MainViewModel/>
+    </Window.DataContext>
+    <Window.InputBindings>
+        <!--<KeyBinding Command="{Binding StartExpCommand, Mode=OneWay}"  Key="S"/>
+        <KeyBinding Command="{Binding StartTrialCommand, Mode=OneWay}"  Key="T"/>-->
+    </Window.InputBindings>
+    <Window.Resources>
+        <Converters:RealityToVisibilityConverter x:Key="RealityToVisibilityConverter"/>
+        <Converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+        <Converters:BlueWhenTrue x:Key="BlueWhenTrue" />
+        <Converters:InvertBooleanConverter x:Key="InvertBoolean"/>
+        <Converters:StartButtonTextConverter x:Key="StartButtonText"/>
+        <Converters:RadiusToDiameterConverter x:Key="RadiusToDiameter"/>
+    </Window.Resources>
+    <Grid>
+        <DockPanel>
+            <Menu DockPanel.Dock="Top" MinHeight="20" MaxHeight="20">
+                <MenuItem Command="{Binding StartExpCommand, Mode=OneWay}" Header="{Binding IsExperimentRunning, Converter={StaticResource StartButtonText}, Mode=OneWay}"  />
+                <MenuItem Margin="15,0,0,0" Command="{Binding ShowSettingsCommand, Mode=OneWay}" Header="Trials / Results" />
+                <MenuItem Margin="15,0,0,0" Command="{Binding ShowSetupCommand, Mode=OneWay}" Header="Participant Setup" />
+                <MenuItem Margin="15,0,0,0" Command="{Binding ShowDebugCommand, Mode=OneWay}" Header="Other Settings" />
+            </Menu>
+
+            <Grid x:Name="MainWindowGrid" Height="540" HorizontalAlignment="Left" VerticalAlignment="Top" Width="960" >
+                <Image x:Name="kinectVideoImage" Width="960" Height="540" Visibility="{Binding CurrentReality, Converter={StaticResource RealityToVisibilityConverter}}" />
+                <Canvas x:Name="bodyCanvas" Width="960" Height="540" HorizontalAlignment="Left" VerticalAlignment="Top" />
+
+                <!--This must come first before any windows; don't want anything pushing this down or it screws up mouse x,y-->
+                <Canvas x:Name="SceneCanvas" Width="960" Height="540" >
+                    <Ellipse 
+                        Width="{Binding TrackRadius, Converter={StaticResource RadiusToDiameter}}"
+			            Height="{Binding TrackRadius, Converter={StaticResource RadiusToDiameter}}"
+		                Visibility="{Binding ShowTrack, Converter={StaticResource BoolToVisibilityConverter}}"
+                        Stroke="AliceBlue"
+			            StrokeThickness="10"
+                        Canvas.Left="{Binding Source={x:Static Properties:Settings.Default}, Path=TrackLeftX, Mode=OneWay}"
+                        Canvas.Top="{Binding Source={x:Static Properties:Settings.Default}, Path=TrackTopY, Mode=OneWay}"/>
+
+                    <Controls:Target x:Name="Target" 
+	                    Width="{Binding CurrentTrial.ShapeSizeDiameter}"
+				        Height="{Binding CurrentTrial.ShapeSizeDiameter}"
+		                Visibility="{Binding ShowTarget, Converter={StaticResource BoolToVisibilityConverter}}"                                     
+                        Canvas.Left="{Binding TargetPositionLeft, Mode=OneWay}"
+                        Canvas.Top="{Binding TargetPositionTop, Mode=OneWay}"
+                        FillColor="{Binding IsOnTarget, Converter={StaticResource BlueWhenTrue}, Mode=OneWay}">
+
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="MouseLeftButtonUp">
+                                <i:InvokeCommandAction Command="{Binding UserClickedTargetToStartNextTrialCommand}" />
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </Controls:Target>
+                </Canvas>
+            </Grid>
+
+        </DockPanel>
+
+        <!--The Participant Instructions / Start Experiment Window-->
+        <Grid Visibility="{Binding ShowParticipantInstructions, Converter={StaticResource BoolToVisibilityConverter}}" >
+            <Border BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <Border.Background>
+                    <SolidColorBrush Opacity="0.90" Color="LightGray"/>
+                </Border.Background>
+                <Border Margin="5,10,5,5" BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <Border.Background>
+                        <SolidColorBrush Opacity="0.5" Color="White"/>
+                    </Border.Background>
+                    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <TextBlock Margin="5" FontSize="20" FontWeight="SemiBold" Text="{Binding ShowParticipantInstructionsText}"/>
+                        <Button Margin="0,30,0,10" Content="Start Experiment" MaxWidth="100" IsDefault="True"  Command="{Binding StartExperimentCommand, Mode=OneWay}" ></Button>
+                    </StackPanel>
+                </Border>
+            </Border>
+        </Grid>
+
+        <!--The Start Next Trial Instructions Window-->
+        <Grid Margin="200,370,355,63.5" Visibility="{Binding ShowInstructionsToStartTrial, Converter={StaticResource BoolToVisibilityConverter}}" >            
+                <Border Background="LightGray" BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="-10,-90,-300,-91" >
+                <Border Margin="5,15,5,5" Background="White" BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <TextBlock Margin="10" FontSize="28" Text="{Binding ShowInstructionsToStartTrialText}"></TextBlock>
+                    </StackPanel>
+                </Border>
+            </Border>
+        </Grid>
+
+        <!--My Message Box Window-->
+        <Grid Visibility="{Binding ShowMessageBoxWindow, Converter={StaticResource BoolToVisibilityConverter}}" >
+            <Border Background="LightGray" BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <Border Margin="5,15,5,5" Background="White" BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <TextBlock Margin="10" Text="{Binding TextForMessageBoxWindow}"></TextBlock>
+                        <Button Margin="0,30,0,20" Content="OK" IsDefault="True" MaxWidth="100" Command="{Binding CloseMessageBoxWindowCommand, Mode=OneWay}" ></Button>
+                    </StackPanel>
+                </Border>
+            </Border>
+        </Grid>
+
+        <!-- Countdown window-->
+        <Grid Visibility="{Binding ShowCountdownWindow, Converter={StaticResource BoolToVisibilityConverter}}" >
+            <Border MinWidth="250" MinHeight="250" BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <Border.Background>
+                    <SolidColorBrush Opacity="0.90" Color="White"/>
+                </Border.Background>
+
+                <StackPanel HorizontalAlignment="Center">
+                    <TextBlock Text="Keep your arm at your side" FontSize="36"/>
+                    <TextBlock Text="Please wait for instructions" FontSize="36"/>
+                    <TextBlock Text="" FontSize="36"/>
+                    <TextBlock Foreground="Black" FontSize="36" Text="Break time remaining" HorizontalAlignment="Center"/>
+                    <TextBlock FontSize="36" Text="{Binding CountdownCount}" HorizontalAlignment="Center"/>
+                </StackPanel>
+            </Border>
+        </Grid>
+    </Grid>
+</Window>
