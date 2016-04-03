@@ -864,7 +864,7 @@ namespace TheoryC.ViewModels
                     "Please keep your arm out as far away from your body as comfortable.\n" +
                     "\n" +
                     "There will be a total of " + Trials.Count + " trials. Between each trial,\n" +
-                    "you will have a 10 second break where you will rest your arm\n" +
+                    "you will have a " + CountdownTimeInSeconds + " second break where you will rest your arm\n" +
                     "at your side.\n" +
                     "\n" +
                     //"The experiment will last approximately " + experimentRunTimeInMinutes + "\n" +
