@@ -294,6 +294,12 @@ namespace TheoryC.ViewModels
             this.Trials[currentCount].PropertyChanged += CurrentTrial_PropertyChanged;
         }
 
+        private void RemoveLastTrial()
+        {
+            int lastTrialNumber = this.Trials.Count - 1;
+            this.Trials.RemoveAt(lastTrialNumber);           
+        }
+
         // if the user changes the target radius from Settings, we need code to place it at right location
         void CurrentTrial_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
@@ -1301,6 +1307,30 @@ namespace TheoryC.ViewModels
                         }));
                 this.PropertyChanged += (s, e) => _AddTrialCommand.RaiseCanExecuteChanged();
                 return _AddTrialCommand;
+            }
+        }
+
+        DelegateCommand _RemoveTrialCommand = null;
+        public DelegateCommand RemoveTrialCommand
+        {
+            get
+            {
+                if (_RemoveTrialCommand != null)
+                    return _RemoveTrialCommand;
+
+                _RemoveTrialCommand = new DelegateCommand(new Action(
+                    () =>
+                    {
+                        RemoveLastTrial();   
+                    }),
+
+                    new Func<bool>(
+                        () =>
+                        {
+                            return IsSettingsWindowOpen && this.Trials.Count > 0; 
+                        }));
+                this.PropertyChanged += (s, e) => _RemoveTrialCommand.RaiseCanExecuteChanged();
+                return _RemoveTrialCommand;
             }
         }
 

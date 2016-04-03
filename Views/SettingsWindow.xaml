@@ -15,9 +15,10 @@
     </Window.Resources>
     <DockPanel>
         <Menu DockPanel.Dock="Top" MinHeight="20" MaxHeight="20">
-            <MenuItem Command="{Binding AddTrialCommand, Mode=OneWay}" Header="Add Trial"/>
-            <MenuItem Command="{Binding ImportSettingsCommand, Mode=OneWay}" Header="Import" />
-            <MenuItem Command="{Binding ExportSettingsCommand, Mode=OneWay}" Header="Export" />
+            <MenuItem Command="{Binding ImportSettingsCommand, Mode=OneWay}" Header="Import Trials" />
+            <MenuItem Command="{Binding ExportSettingsCommand, Mode=OneWay}" Header="Export Trials" />
+            <MenuItem Command="{Binding AddTrialCommand, Mode=OneWay}" Header="Add New Trial"/>
+            <MenuItem Command="{Binding RemoveTrialCommand, Mode=OneWay}" Header="Remove Last Trial"/>
             <MenuItem Command="{Binding ClearResultsCommand, Mode=OneWay}" Header="Clear Results" />
         </Menu>
 
