@@ -7,7 +7,7 @@
         xmlns:Properties="clr-namespace:TheoryC.Properties"     
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"    
         x:Class="TheoryC.Views.MainWindow"
-        Title="MainWindow" Width="960" Height="600" Background="#FF656565"
+        Title="TheoryC" Width="960" Height="600" Background="#FF656565"
         Closing="Window_Closing">
     <Window.DataContext>
         <ViewModels:MainViewModel/>
