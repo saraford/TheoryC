@@ -850,9 +850,9 @@ namespace TheoryC.ViewModels
             if (IsUsingKinect)
             {
                 ShowParticipantInstructionsText =
-                    "In this experiment, you will track a red circle moving\n" +
+                    "In this experiment, you will track a yellow circle moving\n" +
                     "steadily around a circular path. Try to keep the tips of\n" +
-                    "your fingers of your dominant hand within the red circle\n" +
+                    "your fingers of your dominant hand within the yellow circle\n" +
                     "at all times.\n" +
                     "\n" +
                     "Please keep your arm out as far away from your body as comfortable.\n" +
@@ -868,9 +868,9 @@ namespace TheoryC.ViewModels
             else
             {
                 ShowParticipantInstructionsText =
-                    "In this experiment, you will track a red circle moving\n" +
+                    "In this experiment, you will track a yellow circle moving\n" +
                     "steadily around a circular path. Try to keep your mouse\n" +
-                    "pointer within the red circle at all times.\n" +
+                    "pointer within the yellow circle at all times.\n" +
                     "\n" +
                     "There will be a total of " + Trials.Count + " trials\n" +
                     "\n" +
