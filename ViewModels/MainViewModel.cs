@@ -861,8 +861,8 @@ namespace TheoryC.ViewModels
                     "you will have a 10 second break where you will rest your arm\n" +
                     "at your side.\n" +
                     "\n" +
-                    "The experiment will last approximately " + experimentRunTimeInMinutes + "\n" +
-                    "\n" +
+                    //"The experiment will last approximately " + experimentRunTimeInMinutes + "\n" +
+                    //"\n" +
                     "Say \"Ready\" to being the experiment.";
             }
             else
@@ -872,10 +872,10 @@ namespace TheoryC.ViewModels
                     "steadily around a circular path. Try to keep your mouse\n" +
                     "pointer within the yellow circle at all times.\n" +
                     "\n" +
-                    "There will be a total of " + Trials.Count + " trials\n" +
+                    "There will be a total of " + Trials.Count + " trials.\n" +
                     "\n" +
-                    "The experiment will last approximately " + experimentRunTimeInMinutes + "\n" +
-                    "\n" +
+                    //"The experiment will last approximately " + experimentRunTimeInMinutes + "\n" +
+                    //"\n" +
                     "Say \"Ready\" to being the experiment.";
             }
 
