@@ -5,7 +5,7 @@
         xmlns:Converters="clr-namespace:TheoryC.Converters"      
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
         x:Class="TheoryC.Views.SettingsWindow"
-        Title="SettingsWindow" Height="640" Width="750">
+        Title="Trials and Results" Height="680" Width="750">
     <Window.DataContext>
         <ViewModels:MainViewModel/>
     </Window.DataContext>
@@ -28,22 +28,26 @@
                 <ColumnDefinition Width="239*"/>
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
-                <RowDefinition Height="100" />
+                <RowDefinition Height="105" />
                 <RowDefinition />
             </Grid.RowDefinitions>
 
-            <StackPanel Margin="5,10,0.4,0.4" Orientation="Vertical"  Grid.Row="0" Grid.ColumnSpan="2">
-                <TextBlock Text="Participant Info" FontSize="14" FontWeight="SemiBold"></TextBlock>
-
+            <StackPanel Margin="5,10,0,0" Orientation="Vertical"  Grid.Row="0" Grid.ColumnSpan="2">
                 <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
                     <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Participant ID" VerticalAlignment="Top"/>
                     <TextBox Margin="10,0,0,0" HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" VerticalAlignment="Top" Width="160" Text="{Binding ParticipantID}"/>
                 </StackPanel>
 
-                <TextBlock Text="Trials and Results" Margin="0,10,0,0" FontSize="14" FontWeight="SemiBold"></TextBlock>
-            </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                    <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Break Time" VerticalAlignment="Top"/>
+                    <TextBox Margin="22,0,0,0" HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" VerticalAlignment="Top" Width="160" Text="{Binding CountdownTimeInSeconds}"/>
+                    <TextBlock Margin="5,0,0,0" HorizontalAlignment="Left" TextWrapping="Wrap" Text="(same break time in seconds for every trial)" VerticalAlignment="Top"/>
+                </StackPanel>
 
-            <Grid Grid.ColumnSpan="2" Grid.Row="1" Margin="5,0,0,0">
+                 <TextBlock Text="Trials and Results" Margin="0,10,0,0" FontSize="13" FontWeight="SemiBold"></TextBlock>
+            </StackPanel>
+            
+            <Grid Grid.ColumnSpan="2" Grid.Row="1" Margin="5,10,0,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="50" />
                     <ColumnDefinition Width="20" />
