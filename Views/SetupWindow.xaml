@@ -2,8 +2,9 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:ViewModels="clr-namespace:TheoryC.ViewModels"
-        xmlns:Converters="clr-namespace:TheoryC.Converters"      
-        Title="SetupWindow" Height="300" Width="300">
+        xmlns:Converters="clr-namespace:TheoryC.Converters"
+        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+        Title="SetupWindow" Height="400" Width="300">
     <Window.DataContext>
         <ViewModels:MainViewModel/>
     </Window.DataContext>
@@ -29,9 +30,23 @@
                 <RadioButton Margin="20,10,0,0" IsChecked="True" Content="Right Hand" HorizontalAlignment="Left" VerticalAlignment="Top" Command="{Binding SetRightHandedness, Mode=OneWay}"/>
             </StackPanel>
 
-            <TextBlock Margin="0,10,0,0" FontSize="12" FontWeight="SemiBold" Text="Center Pursuit Track on Elbow"/>
-            <TextBlock Margin="0,5,0,0" FontSize="10" Text="This will set the track radius as the forearm length."/>
-            <Button Margin="0,10,0,0" Width="80" Content="Set Elbow" HorizontalAlignment="Left" Command="{Binding CenterTargetOnParticipantElbow, Mode=OneWay}" />
+            <TextBlock Margin="0,10,0,0" FontSize="12" FontWeight="SemiBold" Text="Setup Track"/>
+            <TextBlock Margin="0,10,0,0" FontSize="12" Text="Center the track on elbow using forearm length"/>
+            <Button Margin="0,10,0,0" Width="180" Content="Center Elbow w Forearm Length" HorizontalAlignment="Left" Command="{Binding SetTrackRadiusOnForearmLength, Mode=OneWay}" />
+
+            <TextBlock Margin="0,10,0,0" FontSize="12" Text="Or manually set the track size"/>
+            <Button Margin="0,10,0,0" Width="140" Content="Center Track on Elbow" HorizontalAlignment="Left" Command="{Binding CenterTargetOnParticipantElbow, Mode=OneWay}" />
+
+            <StackPanel Margin="0,10,0,0" Orientation="Horizontal">
+                <TextBlock  FontSize="12"  Text="Track Radius:"/>                
+            <TextBox Margin="10,0,0,0" Height="23" TextWrapping="Wrap"  Width="150" Text="{Binding TrackRadius, UpdateSourceTrigger=PropertyChanged}">
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="TextChanged">
+                        <i:InvokeCommandAction Command="{Binding UpdateAfterManualTrackSizeChange}"/>
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+            </TextBox>
+            </StackPanel>
 
         </StackPanel>
     </Grid>

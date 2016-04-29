@@ -482,6 +482,7 @@ namespace TheoryC.ViewModels
             if (CurrentTrial.Results.KinectFPSTrial > 0) {
                 CurrentTrial.Results.KinectTotalPossibleBodyFrames = Convert.ToInt32(CurrentTrial.Results.KinectFPSTrial * CurrentTrial.DurationSeconds);
             }
+
         }
 
         private void CalculateFirstThirdResults(List<double> ABE1, List<bool> IsInside1, List<bool> OnTarget1, double firstTimePercentage)
@@ -753,6 +754,7 @@ namespace TheoryC.ViewModels
 
         private void PlaceTargetInStartingPosition()
         {
+
             Point pt = Tools.GetPointForPlacingTargetInStartingPosition(TrackCenter, TrackRadius, TargetSizeRadius);
 
             TargetPositionLeft = pt.X;
@@ -1444,16 +1446,7 @@ namespace TheoryC.ViewModels
                 _CenterTargetOnParticipantElbow = new DelegateCommand(new Action(
                     () =>
                     {
-                        CalculatePursuitTrackRadius();
-
-                        Settings.Default.TrackLeftX = this.Elbow.X - TrackRadius;
-                        Settings.Default.TrackTopY = this.Elbow.Y - TrackRadius;
-
-                        TrackCenter.X = this.Elbow.X;
-                        TrackCenter.Y = this.Elbow.Y;
-
-                        this.PlaceTargetInStartingPosition();
-
+                        UpdateTrackAndTargetPosition(this.Elbow.X, this.Elbow.Y);
                     }),
 
                     new Func<bool>(
@@ -1466,12 +1459,70 @@ namespace TheoryC.ViewModels
             }
         }
 
-        private void CalculatePursuitTrackRadius()
+        DelegateCommand _SetTrackRadiusOnForearmLength = null;
+        public DelegateCommand SetTrackRadiusOnForearmLength
         {
-            double distance = Tools.DistanceBetween2Points(this.Elbow, this.InputPosition);
-            TrackRadius = distance;
+            get
+            {
+                if (_SetTrackRadiusOnForearmLength != null)
+                    return _SetTrackRadiusOnForearmLength;
+
+                _SetTrackRadiusOnForearmLength = new DelegateCommand(new Action(
+                    () =>
+                    {
+                        // radius is the distance between elbow and the finger tip (used as input)
+                        TrackRadius = Tools.DistanceBetween2Points(this.Elbow, this.InputPosition);
+
+                        UpdateTrackAndTargetPosition(this.Elbow.X, this.Elbow.Y);
+                    }),
+
+                    new Func<bool>(
+                        () =>
+                        {
+                            return !IsExperimentRunning;
+                        }));
+                this.PropertyChanged += (s, e) => _SetTrackRadiusOnForearmLength.RaiseCanExecuteChanged();
+                return _SetTrackRadiusOnForearmLength;
+            }
         }
 
+        DelegateCommand _UpdateAfterManualTrackSizeChange = null;
+        public DelegateCommand UpdateAfterManualTrackSizeChange
+        {
+            get
+            {
+                if (_UpdateAfterManualTrackSizeChange != null)
+                    return _UpdateAfterManualTrackSizeChange;
+
+                _UpdateAfterManualTrackSizeChange = new DelegateCommand(new Action(
+                    () =>
+                    {
+                        UpdateTrackAndTargetPosition(TrackCenter.X, TrackCenter.Y);
+                    }),
+
+                    new Func<bool>(
+                        () =>
+                        {
+                            return !IsExperimentRunning;
+                        }));
+                this.PropertyChanged += (s, e) => _UpdateAfterManualTrackSizeChange.RaiseCanExecuteChanged();
+                return _UpdateAfterManualTrackSizeChange;
+            }
+        }
+
+        private void UpdateTrackAndTargetPosition(double trackCenterX, double trackCenterY)
+        {
+            // where to place the track on canvas
+            Settings.Default.TrackLeftX = trackCenterX - TrackRadius;
+            Settings.Default.TrackTopY = trackCenterY - TrackRadius;
+
+            // needed for placing target at the proper position
+            TrackCenter.X = trackCenterX;
+            TrackCenter.Y = trackCenterY;
+
+            // now place target at proper position
+            this.PlaceTargetInStartingPosition();
+        }
 
         DelegateCommand _ClearResultsCommand = null;
         public DelegateCommand ClearResultsCommand
