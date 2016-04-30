@@ -23,6 +23,9 @@ namespace TheoryC.Models
         double _rpm = default(double);
         public double RPMs { get { return _rpm; } set { base.SetProperty(ref _rpm, value); } }
 
+        int _breakTime = default(int);
+        public int BreakTime { get { return _breakTime; } set { base.SetProperty(ref _breakTime, value); } }
+
         int _number = default(int);
         public int Number { get { return _number; } set { base.SetProperty(ref _number, value); } }
 
@@ -36,7 +39,8 @@ namespace TheoryC.Models
         {
             _shapeSizeDiameter = 50;
             _durationSeconds = 5;
-            _rpm = 10; 
+            _rpm = 10;
+            _breakTime = 3;
         }
 
         internal void ClearResults()

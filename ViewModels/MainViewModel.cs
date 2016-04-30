@@ -110,8 +110,8 @@ namespace TheoryC.ViewModels
         bool _ShowTarget = default(bool);
         public bool ShowTarget { get { return _ShowTarget; } set { base.SetProperty(ref _ShowTarget, value); } }
 
-        int _CountdownTimeInSeconds = default(int);
-        public int CountdownTimeInSeconds { get { return _CountdownTimeInSeconds; } set { base.SetProperty(ref _CountdownTimeInSeconds, value); } }
+        //int _CountdownTimeInSeconds = default(int);
+        //public int CountdownTimeInSeconds { get { return _CountdownTimeInSeconds; } set { base.SetProperty(ref _CountdownTimeInSeconds, value); } }
 
         bool _ShowFingerTip = default(bool);
         public bool ShowFingerTip { get { return _ShowFingerTip; } set { base.SetProperty(ref _ShowFingerTip, value); } }
@@ -223,7 +223,7 @@ namespace TheoryC.ViewModels
             // other defaults to use
             Handedness = Side.Right;
             ShowTrack = true;
-            CountdownTimeInSeconds = 3;
+//            CountdownTimeInSeconds = 3;
             
             // reality modes
             CurrentReality = Reality.Augmented;
@@ -668,6 +668,11 @@ namespace TheoryC.ViewModels
                 // first line is the trialOrder
                 using (StreamReader reader = new StreamReader(dialog.FileName))
                 {
+                    // for adding breaktime (same for trials)
+                    var countdownTime = reader.ReadLine();
+//TODO:                    this.CountdownTimeInSeconds = Convert.ToInt16(countdownTime);
+
+                    // for each trial
                     while (!reader.EndOfStream)
                     {
                         var line = reader.ReadLine();
@@ -700,7 +705,7 @@ namespace TheoryC.ViewModels
         void GameTimer_Tick(object sender, EventArgs e)
         {
             CurrentTrial.Results.TickCount++;
-            //            Debug.Print("Tick #" + tickCounter++ + " and time is right now " + DateTime.Now.ToString("hh.mm.ss.ffffff"));
+//            Debug.Print("Tick #" + CurrentTrial.Results.TickCount + " and time is right now " + DateTime.Now.ToString("hh.mm.ss.ffffff") + " InputPosition at (" + this.InputPosition.X + "," + this.InputPosition.Y + ")");
 
             CalculateAngleBasedOnTimeSampling();
 
@@ -860,14 +865,12 @@ namespace TheoryC.ViewModels
                 ShowParticipantInstructionsText =
                     "In this experiment, you will track a yellow circle moving\n" +
                     "steadily around a circular path. Try to keep the tips of\n" +
-                    "your fingers of your dominant hand within the yellow circle\n" +
-                    "at all times.\n" +
+                    "your fingers of your hand within the yellow circle at all times.\n" +
                     "\n" +
                     "Please keep your arm out as far away from your body as comfortable.\n" +
                     "\n" +
-                    "There will be a total of " + Trials.Count + " trials. Between each trial,\n" +
-                    "you will have a " + CountdownTimeInSeconds + " second break where you will rest your arm\n" +
-                    "at your side.\n" +
+                    "There will be a total of " + Trials.Count + " trials. You will have some break time\n" +
+                    "in between each trial where you will rest your arm at your side.\n" +
                     "\n" +
                     //"The experiment will last approximately " + experimentRunTimeInMinutes + "\n" +
                     //"\n" +
@@ -896,7 +899,7 @@ namespace TheoryC.ViewModels
 
             if (IsUsingKinect)
             {
-                breakTime = CountdownTimeInSeconds;
+                breakTime = this.CurrentTrial.BreakTime;
             }
 
             foreach (var trial in Trials)
@@ -969,7 +972,7 @@ namespace TheoryC.ViewModels
         private void ShowCountdownWindowUI()
         {
             ShowCountdownWindow = true;
-            CountdownCount = CountdownTimeInSeconds;
+            CountdownCount = this.CurrentTrial.BreakTime;
 
             countdownWindowTimer = new DispatcherTimer();
             countdownWindowTimer.Interval = TimeSpan.FromSeconds(1);

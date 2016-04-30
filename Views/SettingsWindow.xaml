@@ -95,6 +95,11 @@
                         <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="RPMs" VerticalAlignment="Top"/>
                         <TextBox Margin="0,5,0,0" HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" Text="{Binding CurrentTrial.RPMs}" VerticalAlignment="Top" Width="86"/>
                     </StackPanel>
+
+                    <StackPanel Margin="0,5,0,0" Orientation="Vertical">
+                        <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="BreakTime" VerticalAlignment="Top"/>
+                        <TextBox Margin="0,5,0,0" HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" Text="{Binding CurrentTrial.BreakTime}" VerticalAlignment="Top" Width="86"/>
+                    </StackPanel>
                 </StackPanel>
 
                 <StackPanel Grid.Column="3">
