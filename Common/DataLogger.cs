@@ -219,6 +219,8 @@ namespace TheoryC.Common
             {
                 StreamWriter writer = new StreamWriter(filename, false);
 
+                writer.WriteLine("shapeSizeDiameter, durationSeconds, rpm, breaktime,");
+
                 foreach (var trial in Trials)
                 {
                     string strResults = SeralizedSettings(trial);
@@ -238,13 +240,14 @@ namespace TheoryC.Common
 
         private static string SeralizedSettings(Models.Trial trial)
         {
-            //shapeSizeDiameter, durationSeconds, rpm
+            //shapeSizeDiameter, durationSeconds, rpm, breaktime
 
             string str;
 
             str = trial.ShapeSizeDiameter.ToString() + ",";
             str += trial.DurationSeconds.ToString() + ",";
             str += trial.RPMs.ToString() + ",";
+            str += trial.BreakTime.ToString() + ","; 
 
             return str;
         }

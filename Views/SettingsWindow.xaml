@@ -28,7 +28,7 @@
                 <ColumnDefinition Width="239*"/>
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
-                <RowDefinition Height="105" />
+                <RowDefinition Height="85" />
                 <RowDefinition />
             </Grid.RowDefinitions>
 
@@ -36,12 +36,6 @@
                 <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
                     <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Participant ID" VerticalAlignment="Top"/>
                     <TextBox Margin="10,0,0,0" HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" VerticalAlignment="Top" Width="160" Text="{Binding ParticipantID}"/>
-                </StackPanel>
-
-                <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
-                    <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Break Time" VerticalAlignment="Top"/>
-                    <TextBox Margin="22,0,0,0" HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" VerticalAlignment="Top" Width="160" Text="{Binding CountdownTimeInSeconds}"/>
-                    <TextBlock Margin="5,0,0,0" HorizontalAlignment="Left" TextWrapping="Wrap" Text="(same break time in seconds for every trial)" VerticalAlignment="Top"/>
                 </StackPanel>
 
                  <TextBlock Text="Trials and Results" Margin="0,10,0,0" FontSize="13" FontWeight="SemiBold"></TextBlock>

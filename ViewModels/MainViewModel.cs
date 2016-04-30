@@ -110,9 +110,6 @@ namespace TheoryC.ViewModels
         bool _ShowTarget = default(bool);
         public bool ShowTarget { get { return _ShowTarget; } set { base.SetProperty(ref _ShowTarget, value); } }
 
-        //int _CountdownTimeInSeconds = default(int);
-        //public int CountdownTimeInSeconds { get { return _CountdownTimeInSeconds; } set { base.SetProperty(ref _CountdownTimeInSeconds, value); } }
-
         bool _ShowFingerTip = default(bool);
         public bool ShowFingerTip { get { return _ShowFingerTip; } set { base.SetProperty(ref _ShowFingerTip, value); } }
 
@@ -223,7 +220,6 @@ namespace TheoryC.ViewModels
             // other defaults to use
             Handedness = Side.Right;
             ShowTrack = true;
-//            CountdownTimeInSeconds = 3;
             
             // reality modes
             CurrentReality = Reality.Augmented;
@@ -267,7 +263,7 @@ namespace TheoryC.ViewModels
             this.Trials[currentCount].PropertyChanged += CurrentTrial_PropertyChanged;
         }
 
-        private void AddTrial(double diameter, double duration, double rpm)
+        private void AddTrial(double diameter, double duration, double rpm, int breakTime)
         {
             int currentCount = Trials.Count;
 
@@ -276,7 +272,8 @@ namespace TheoryC.ViewModels
                 ShapeSizeDiameter = diameter,
                 DurationSeconds = duration,
                 RPMs = rpm,
-                Number = currentCount, // Number uses a converter + 1, // no 0-based trials exposed to user                
+                Number = currentCount, // Number uses a converter + 1, // no 0-based trials exposed to user 
+                BreakTime = breakTime,
                 Results = new Models.Result
                 {
                     TimeOnTarget = 0,
@@ -665,12 +662,11 @@ namespace TheoryC.ViewModels
         {
             try
             {
-                // first line is the trialOrder
+
                 using (StreamReader reader = new StreamReader(dialog.FileName))
                 {
-                    // for adding breaktime (same for trials)
-                    var countdownTime = reader.ReadLine();
-//TODO:                    this.CountdownTimeInSeconds = Convert.ToInt16(countdownTime);
+                    // ignore the first line - it's the column header
+                    reader.ReadLine();
 
                     // for each trial
                     while (!reader.EndOfStream)
@@ -680,7 +676,8 @@ namespace TheoryC.ViewModels
 
                         AddTrial(Convert.ToDouble(values[0]),
                                  Convert.ToDouble(values[1]),
-                                 Convert.ToDouble(values[2]));
+                                 Convert.ToDouble(values[2]), 
+                                 Convert.ToInt32(values[3]));
                     }
 
                 }
@@ -972,7 +969,10 @@ namespace TheoryC.ViewModels
         private void ShowCountdownWindowUI()
         {
             ShowCountdownWindow = true;
-            CountdownCount = this.CurrentTrial.BreakTime;
+
+            // we need the previous trial's breaktime
+            int prevTrialNumber = CurrentTrial.Number - 1;
+            CountdownCount = Trials[prevTrialNumber].BreakTime;               
 
             countdownWindowTimer = new DispatcherTimer();
             countdownWindowTimer.Interval = TimeSpan.FromSeconds(1);
