@@ -219,8 +219,6 @@ namespace TheoryC.Common
             {
                 StreamWriter writer = new StreamWriter(filename, false);
 
-                writer.WriteLine("shapeSizeDiameter, durationSeconds, rpm, breaktime,");
-
                 foreach (var trial in Trials)
                 {
                     string strResults = SeralizedSettings(trial);

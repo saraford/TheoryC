@@ -665,9 +665,6 @@ namespace TheoryC.ViewModels
 
                 using (StreamReader reader = new StreamReader(dialog.FileName))
                 {
-                    // ignore the first line - it's the column header
-                    reader.ReadLine();
-
                     // for each trial
                     while (!reader.EndOfStream)
                     {

@@ -27,6 +27,10 @@ namespace TheoryC.Views
         {
             InitializeComponent();
         }
+        private void WindowMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            DragMove();
+        }
 
     }
 }
