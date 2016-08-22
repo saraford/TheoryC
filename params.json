@@ -1,6 +1,6 @@
 {
   "name": "TheoryC",
   "tagline": "Kinect app for Kinesiology motor learning experiment - My UX Masters project",
-  "body": "### Hello World!\r\n\r\nStay tuned... I'll put all my instruction videos, user manual, etc. here. \r\n\r\n",
+  "body": "# Welcome to TheoryC\r\n\r\n\"Coding an Augmented Reality Pursuit Rotor for Studying Continuous Skills using the Kinect v2 Sensor\"\r\n\r\n## tl;dr\r\n\r\nTheoryC replicates a classic Kinesiology experiment (pursuit rotor task) using a Kinect for Windows sensor to research varying teaching techniques that yield the best performance in acquisition and retention of new skills. The Kinect will collect novel telemetry of human performance to direct future research.\r\n\r\nSince this video, I've added additional settings and collecting more data, but it gives you an idea. :)\r\n\r\nhttps://www.youtube.com/watch?v=qLDbcNBgMU8\r\n\r\n## Documents\r\n\r\n- [Review of Literature](https://dl.dropboxusercontent.com/u/60537438/TheoryC/Sara%20Ford%20Review%20of%20Literature%20Kin298%20Project%20Final.docx)\r\n- [Technical Overview of TheoryC Software](https://dl.dropboxusercontent.com/u/60537438/TheoryC/Technical%20overview%20of%20the%20TheoryC%20software.docx)\r\n- [Poster from Project Day](https://dl.dropboxusercontent.com/u/60537438/TheoryC/Sara%20Ford%20TheoryC%20Poster%20Final.pptx)\r\n\r\n\r\n",
   "note": "Don't delete this file! It's used internally to help with page regeneration."
 }
